@@ -12,17 +12,19 @@ def init [] {
     pueued -d
 
     const basedir = path self .
+    const this = path self
     let files = ls ($basedir | path join "*.nu" | into glob)
-    | where name != $env.CURRENT_FILE
+    | where name != $this
     | get name
 
     if true {
         mut script = [
-            "def begin [f] { print $\"(date now | format date '%FT%T%.3f')│source ($f)\" }"
+            $"use ($this) now"
             $'cd ($basedir)'
         ]
         for file in $files {
-            $script ++= [$"begin ($file)" $"source ($file)"]
+            let cmd = $"source ($file)"
+            $script ++= [$"print $'\(now\)($cmd)'" $cmd]
         }
         $script
         | str join (char newline)
