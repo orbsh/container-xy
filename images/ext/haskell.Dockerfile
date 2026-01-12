@@ -96,16 +96,16 @@ RUN set -eux \
   ; rm -rf ${STACK_ROOT}/pantry/hackage/* \
   ; chown ${MASTER}:${MASTER} -R ${STACK_ROOT} \
   ; opwd=$PWD \
-  ; cd /world \
+  ; cd /home/${MASTER} \
   ; stack new ${STACK_FLAGS} hello-rio rio \
   ; cd hello-rio \
   ; gen-hie > hie.yaml \
-  ; cd /world \
+  ; cd /home/${MASTER} \
   ; chown ${MASTER}:${MASTER} -R hello-rio \
   ; stack new ${STACK_FLAGS} hello-haskell \
   ; cd hello-haskell \
   ; gen-hie > hie.yaml \
-  ; cd /world \
+  ; cd /home/${MASTER} \
   ; chown ${MASTER}:${MASTER} -R hello-haskell \
   ; cd $opwd \
   ; for x in config.yaml \
