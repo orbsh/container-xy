@@ -16,6 +16,13 @@ export def commit [image] {
     buildah commit $env.BUILDAH_WORKING_CONTAINER $image
 }
 
+export def with-mount [act] {
+    let tg = $env.BUILDAH_WORKING_MOUNTPOINT
+    cd $tg
+    lg o -p with-mount $tg
+    do $act $tg
+}
+
 export module conf {
     export def env [rec: record] {
         $rec

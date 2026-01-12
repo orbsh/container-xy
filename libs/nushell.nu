@@ -7,11 +7,13 @@ export def up [user dir config: record --skip-download] {
         lg o -p 'nushell-version' $ver
 
         let url = $"https://github.com/nushell/nushell/releases/download/($ver)/nu-($ver)-x86_64-unknown-linux-musl.tar.gz"
-        let dst = $env.BUILDAH_WORKING_MOUNTPOINT | path join (relative-path $dir)
-        lg o -p 'nushell-dir' $dst
 
-        let plugin = $config.plugin | each {|x| $"*/nu_plugin_($x)" }
-        curl --retry 3 -fsSL $url | tar -zxf - -C $dst --strip-components=1 --wildcards '*/nu' ...$plugin
+        with-mount {
+            let dst = relative-path $dir | path expand
+            lg o -p 'nushell-dir' $dst
+            let plugin = $config.plugin | each {|x| $"*/nu_plugin_($x)" }
+                curl --retry 3 -fsSL $url | tar -zxf - -C $dst --strip-components=1 --wildcards '*/nu' ...$plugin
+        }
     }
 
     let reg = $config.plugin

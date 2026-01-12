@@ -27,7 +27,7 @@ export def main [context: record = {}] {
             wasm32-wasip1 wasm32-wasip2 wasm32-unknown-unknown
         ] --bin [
             bacon
-            cargo-pgo cargo-profiler cargo-bloat
+            cargo-pgo cargo-bloat # cargo-profiler
             cargo-expand cargo-eval cargo-tree
             cargo-feature cargo-edit cargo-rail
             rust-script trunk cargo-wasi

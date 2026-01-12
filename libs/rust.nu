@@ -16,12 +16,14 @@ export def up [
         run [
             $"rustup component add ($component | str join ' ')"
         ]
-        let dst = $env.BUILDAH_WORKING_MOUNTPOINT | path join usr/bin
-        lg o -p 'rust-component' $dst
-        for b in [rust-analyzer] {
-            if ($b in $bin) and not ($dst | path join $b | path exists) {
-                lg o -p 'fix-rustup-bin' $b
-                ln -sf ($dst | path join rustup) ($dst | path join $b)
+        with-mount {
+            let dst = 'usr/bin' | path expand
+            lg o -p 'rust-component' $dst
+            for b in [rust-analyzer] {
+                if ($b in $bin) and not ($dst | path join $b | path exists) {
+                    lg o -p 'fix-rustup-bin' $b
+                    ln -sf ($dst | path join rustup) ($dst | path join $b)
+                }
             }
         }
     }
@@ -31,11 +33,13 @@ export def up [
         ]
     }
     if ($bin | is-not-empty) {
-        let dst = $env.BUILDAH_WORKING_MOUNTPOINT | path join usr/local/bin/
-        lg o -p 'cargo-binstall-dir' $dst
-        let url = 'https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz'
-        curl -fsSL $url | tar zxf - -C $dst
-        chmod +x ($dst | path join cargo-binstall)
+        with-mount {
+            let dst = 'usr/local/bin/' | path expand
+            lg o -p 'cargo-binstall-dir' $dst
+            let url = 'https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz'
+            curl -fsSL $url | tar zxf - -C $dst
+            chmod +x ($dst | path join cargo-binstall)
+        }
         run [
             $"cargo binstall -y ($bin | str join ' ')"
         ]
@@ -47,8 +51,6 @@ export def up [
 }
 
 export def prefetch [owner workdir proj pkgs --test --debug: string] {
-    let dst = $env.BUILDAH_WORKING_MOUNTPOINT
-    | path join (relative-path $workdir)
     # mkdir $dst
     run [
         $"cd ($workdir)"
@@ -61,21 +63,25 @@ export def prefetch [owner workdir proj pkgs --test --debug: string] {
     let pkgs = $pkgs | reduce -f {} {|i,a|
         $a | insert $i '*'
     }
-    let dstf = $dst | path join $proj Cargo.toml
-    lg o -p 'prefetch' $dstf
-    if ($debug | is-not-empty) {
-        {
-            dst: $dst
-            dstf: $dstf
-        }
-        | load-env
-        use upterm.nu
-        upterm $debug
-    }
 
-    cat $dstf | from toml | update dependencies $pkgs 
-    | do { let n = $in; print $n; $n }
-    | save -f $dstf
+    with-mount {
+        let dst = relative-path $workdir | path expand
+        let dstf = $dst | path join $proj Cargo.toml
+        lg o -p 'prefetch' ($dstf | path relative-to $dst)
+        if ($debug | is-not-empty) {
+            {
+                dst: $dst
+                dstf: $dstf
+            }
+            | load-env
+            use upterm.nu
+            upterm $debug
+        }
+
+        cat $dstf | from toml | update dependencies $pkgs
+        | do { let n = $in; print $n; $n }
+        | save -f $dstf
+    }
 
     if $test {
         run [$'cat ($workdir)/($proj)/Cargo.toml']
