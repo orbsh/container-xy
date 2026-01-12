@@ -1,11 +1,21 @@
 use utils.nu *
 
 export def install [pkgs] {
+    let pkgs = $pkgs | str join ' '
     match $env.OS_RELEASE_ID {
         arch => {
             run [
-                $"pacman -Sy --noconfirm ($pkgs | str join ' ')"
+                $"pacman -Sy --noconfirm ($pkgs)"
                 "rm -rf /var/cache/pacman/pkg/*"
+            ]
+        }
+        debian => {
+            run [
+                'apt-get update'
+                $'DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ($pkgs)'
+                'apt-get autoremove -y'
+                'apt-get clean -y'
+                'rm -rf /var/lib/apt/lists/*'
             ]
         }
     }
@@ -19,6 +29,12 @@ export def with [pkgs act] {
                 $"pacman -Sy --noconfirm ($pkgs)"
             ]
         }
+        debian => {
+            run [
+                'apt-get update'
+                $'DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ($pkgs)'
+            ]
+        }
     }
 
     let r = do $act
@@ -30,6 +46,13 @@ export def with [pkgs act] {
                 "rm -rf /var/cache/pacman/pkg/*"
             ]
         }
+        debian => {
+            run [
+                $'apt-get purge -y --auto-remove ($pkgs)'
+                'apt-get clean -y'
+                'rm -rf /var/lib/apt/lists/*'
+            ]
+        }
     }
     $r
 }
@@ -38,6 +61,12 @@ export def update [] {
     match $env.OS_RELEASE_ID {
         arch => {
             run ["pacman -Syu --noconfirm"]
+        }
+        debian => {
+            run [
+                'apt-get update'
+                'apt-get upgrade -y'
+            ]
         }
     }
 }

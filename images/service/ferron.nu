@@ -40,16 +40,14 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
 
-            if ($env.CONFIGFILE? | is-not-empty) {
-                run-ferron $env.CONFIGFILE
-            }
+            run-ferron $env.CONFIGFILE?
 
-            def run-ferron [config] {
+            def run-ferron [config?] {
                 mut cmd = ["/opt/ferron/ferron"]
-                let config = if $config != "." {
-                    [--config $config]
-                } else {
+                let config = if ($config | is-empty) {
                     [--config /opt/ferron/ferron.kdl]
+                } else {
+                    [--config $config]
                 }
                 print $"(now) ($config | str join ' ')"
                 $cmd ++= $config

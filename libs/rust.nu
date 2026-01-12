@@ -20,9 +20,9 @@ export def up [
             let dst = 'usr/bin' | path expand
             lg o -p 'rust-component' $dst
             for b in [rust-analyzer] {
-                if ($b in $bin) and not ($dst | path join $b | path exists) {
+                if ($b in $component) and not ($dst | path join $b | path exists) {
                     lg o -p 'fix-rustup-bin' $b
-                    ln -sf ($dst | path join rustup) ($dst | path join $b)
+                    ln -sf /usr/bin/rustup ($dst | path join $b)
                 }
             }
         }
