@@ -1,0 +1,10 @@
+:8080 {
+    root "/srv"
+    // directory_listing
+    cgi
+    cgi_extension ".nu"
+    rewrite "^/(.*)" "/ferron/upload.nu/$1" file=#false directory=#false last=#true
+
+    log "/dev/stdout"
+    error_log "/dev/stderr"
+}

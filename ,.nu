@@ -25,6 +25,30 @@ export module test {
         buildah unshare nu images/test.nu
     }
 
+    def cmpl-ferron [] {
+        ls ($CWD)/images/service/ferron
+        | get name
+        | path parse
+        | where extension == kdl
+        | get stem
+    }
+
+    export def ferron [config:string@cmpl-ferron] {
+        let name = 'test-ferron'
+        ^$env.CNTRCTL rm -f $name
+        mut flag = [
+            -it
+            --name $name
+            -v ($CWD)/images/service/ferron:/srv/ferron
+            -e CONFIGFILE=/srv/ferron/($config).kdl
+            -p 8888:8080
+        ]
+        ^$env.CNTRCTL run ...[
+            ...$flag
+            ghcr.io/fj0r/xy:ferron
+        ]
+    }
+
     export def run [
     --user(-u)
     --socat
