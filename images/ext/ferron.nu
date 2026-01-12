@@ -16,22 +16,27 @@ export def main [context: record = {}] {
 
         curl --retry 3 -fsSL $url -o ferron.zip
         unzip ferron.zip
+
+        lg o origin config
+        cat ferron.kdl
+
         with-mount {|new, old|
             mkdir opt/ferron
             cd opt/ferron
-            cp ($old | path join ferron) .
-            chmod +x ferron
+            for f in [ferron ferron-passwd ferron-yaml2kdl ferron-precompress] {
+                cp ($old | path join ferron) .
+            }
 
-            '
+            r#'
             :8080 {
                 root "/srv"
             }
-            '
+            '#
             | str trim
-            | str replace -rma $'^\s{12}' ''
+            | str replace -rma $'^ {12}' ''
             | save ferron.kdl
 
-            '
+            r#'
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
 
@@ -41,16 +46,22 @@ export def main [context: record = {}] {
 
             def run-ferron [config] {
                 mut cmd = ["/opt/ferron/ferron"]
-                if $config != "." {
-                    $cmd ++= [--config $config]
+                let config = if $config != "." {
+                    [--config $config]
+                } else {
+                    [--config /opt/ferron/ferron.kdl]
                 }
+                print $"(now) ($config | str join ' ')"
+                $cmd ++= $config
                 pueue-extend default 1
                 pueue add --group default -l ferron -- ($cmd | str join " ")
             }
-            '
+            '#
             | str trim
-            | str replace -rma $'^\s{12}' ''
+            | str replace -rma $'^ {12}' ''
             | save ($new | path join entrypoint ferron.nu)
         }
+
+        conf cmd ['srv']
     }
 }

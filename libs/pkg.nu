@@ -7,6 +7,18 @@ export def install [pkgs] {
     ]
 }
 
+export def with [pkgs act] {
+    let pkgs = $pkgs | str join ' '
+    run [
+        $"pacman -Sy --noconfirm ($pkgs)"
+    ]
+    do $act
+    run [
+        $"pacman -Rsn --noconfirm ($pkgs)"
+        "rm -rf /var/cache/pacman/pkg/*"
+    ]
+}
+
 export def update [] {
     run ["pacman -Syu --noconfirm"]
 }

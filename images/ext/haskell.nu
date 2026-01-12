@@ -9,7 +9,7 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         with-mount {
-            '
+            r#'
             :set prompt "λ: "
             :set prompt-cont "   | "
             :set +t
@@ -73,9 +73,9 @@ export def main [context: record = {}] {
             :m +System.Environment
             :m +System.IO
             :m +Data.Time
-            '
+            '#
             | str trim
-            | str replace -rma $'^\s{12}' ''
+            | str replace -rma $'^ {12}' ''
         }
           
     }

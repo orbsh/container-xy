@@ -13,22 +13,24 @@ export def main [context: record = {}] {
             HOST: '0.0.0.0'
             PORT: '8080'
         }
-        pkg pip install [
-            'psycopg[binary]' lancedb
-            'polars[all]' numpy scikit-learn
-            # httpx aiofile aiostream fastapi uvicorn
-            # debugpy pytest pydantic pydantic-graph PyParsing
-            # typer pydantic-settings pyyaml
-            # boltons decorator
-            pydantic-ai deltalake
-            marimo[recommended,lsp,sql] altair
-        ]
-        pkg pip install --index-url https://download.pytorch.org/whl/cpu [
-            torch torchvision torchaudio
-        ]
+        pkg with [ base-devel ] {
+            pkg pip install [
+                'psycopg[binary]' lancedb
+                'polars' numpy scikit-learn # 'polars[all]'
+                # httpx aiofile aiostream fastapi uvicorn
+                # debugpy pytest pydantic pydantic-graph PyParsing
+                # typer pydantic-settings pyyaml
+                # boltons decorator
+                deltalake
+                marimo[recommended,lsp,sql] altair
+            ]
+            pkg pip install --index-url https://download.pytorch.org/whl/cpu [
+                torch torchvision torchaudio
+            ]
+        }
         with-mount {
             cd entrypoint
-            '
+            r#'
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
 
@@ -41,9 +43,9 @@ export def main [context: record = {}] {
                 pueue-extend default 1
                 pueue add --group default -l marimo -- ($cmd | str join " ")
             }
-            '
+            '#
             | str trim
-            | str replace -rma $'^\s{12}' ''
+            | str replace -rma $'^ {12}' ''
             | save marimo.nu
         }
         conf cmd ['srv']
