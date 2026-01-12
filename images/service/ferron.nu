@@ -47,7 +47,7 @@ export def main [context: record = {}] {
                 } else {
                     [--config $config]
                 }
-                print $"(now) ($config | str join ' ')"
+                print $"(now)($config | str join ' ')"
                 $cmd ++= $config
                 pueue-extend default 1
                 pueue add --group default -l ferron -- ($cmd | str join " ")

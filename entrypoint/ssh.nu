@@ -19,7 +19,7 @@ def set_user [user_info: string, pubkey: string] {
     ] | where { |it| $it | path exists } | first
 
     if not $root {
-        print $"(now) setup user: ($name)"
+        print $"(now)setup user: ($name)"
 
         if (sudo getent group $name | is-empty) {
             sudo groupadd -g $gid $name
@@ -56,10 +56,10 @@ def init_ssh [config] {
 
 def run_ssh [] {
     let timeout_args = if ($env.SSH_TIMEOUT? != null) {
-        print $"(now) Starting dropbear with a timeout of ($env.SSH_TIMEOUT) seconds"
+        print $"(now)Starting dropbear with a timeout of ($env.SSH_TIMEOUT) seconds"
         ["-K" $env.SSH_TIMEOUT "-I" $env.SSH_TIMEOUT]
     } else {
-        print $"(now) Starting dropbear"
+        print $"(now)Starting dropbear"
         []
     }
 

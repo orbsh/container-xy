@@ -8,7 +8,7 @@ def run_socat [job] {
     for j in $job {
         let cmd = $"sudo socat ($j.proto)-listen:($j.port),reuseaddr,fork ($j.proto):($j.target)"
         pueue add -g $g -l $"socat_($j.proto)_($j.port)" -- $"($cmd)"
-        print $"(now) ($j.proto):($j.port) --> ($j.target)"
+        print $"(now)($j.proto):($j.port) --> ($j.target)"
     }
 }
 

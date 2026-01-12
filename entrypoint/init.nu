@@ -4,7 +4,7 @@ def init [] {
     if ($env.DEBUG? == 'true') { $env.config.show_errors = true }
 
     if ($env.PREBOOT? | is-not-empty) {
-        print $"(now) preboot ($env.PREBOOT)"
+        print $"(now)preboot ($env.PREBOOT)"
         nu -c $"source ($env.PREBOOT)"
     }
 
@@ -18,7 +18,7 @@ def init [] {
 
     if true {
         mut script = [
-            "def begin [f] { print $\"[(date now | format date '%FT%T%.3f')] source ($f)\" }"
+            "def begin [f] { print $\"(date now | format date '%FT%T%.3f')│source ($f)\" }"
             $'cd ($basedir)'
         ]
         for file in $files {
@@ -29,29 +29,29 @@ def init [] {
         | nu -c $in
     } else {
         for file in $files {
-            print $"(now) source ($file)"
+            print $"(now)source ($file)"
             nu $file
         }
     }
 
     if ($env.POSTBOOT? | is-not-empty) {
-        print $"(now) postboot ($env.POSTBOOT)"
+        print $"(now)postboot ($env.POSTBOOT)"
         nu -c $"source ($env.POSTBOOT)"
     }
 
-    print $"(now) boot completed"
+    print $"(now)boot completed"
 }
 
 export def main [...args] {
     init
 
     if ($args | is-empty) {
-        print $"(now) entering interactive mode..."
+        print $"(now)entering interactive mode..."
         exec nu
     } else if ($args.0 == "srv") {
         let g = 'default'
         let interval = $env.CHECK_INTERVAL? | default '5sec' | into duration
-        print $"(now) entering service mode, monitoring process status."
+        print $"(now)entering service mode, monitoring process status."
 
         mut finished = []
         loop {
@@ -70,7 +70,7 @@ export def main [...args] {
             | where group == $g and status == "Done"
 
             if ($finished | length) > 0 {
-                print $"(now) detected a task has exited!"
+                print $"(now)detected a task has exited!"
                 $finished
                 | insert output {|x|
                     pueue log $x.id -j | from json | values | get output
@@ -83,7 +83,7 @@ export def main [...args] {
         }
         exit 1
     } else {
-        print $"(now) entering batch mode: ($args)"
+        print $"(now)entering batch mode: ($args)"
         let cmd = ($args | get 0)
         let rest = ($args | drop nth 0)
         run-external $cmd ...$rest
@@ -97,5 +97,5 @@ export def pueue-extend [group, num = 1] {
 }
 
 export def now [] {
-    $"[(date now | format date '%FT%T%.3f')]"
+    $"(date now | format date '%FT%T%.3f')│"
 }

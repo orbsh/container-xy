@@ -16,7 +16,7 @@ def main [] {
         return
     }
 
-    print $"(now) Initializing Upterm service..."
+    print $"(now)Initializing Upterm service..."
 
     let server_arg = if ($env.UPTERM_SERVER? | is-not-empty) {
         ["--server" $env.UPTERM_SERVER]
@@ -36,12 +36,12 @@ def main [] {
     let add_result = pueue add --group default -l "upterm_host" -- $cmd_str | complete
 
     if $add_result.exit_code != 0 {
-        print $"(now) Error: Failed to add task to Pueue: ($add_result.stderr)"
+        print $"(now)Error: Failed to add task to Pueue: ($add_result.stderr)"
         return
     }
 
     let job_id = $add_result.stdout | parse -r 'New task added \(id (?<id>[0-9]+)\)' | get 0.id
-    print $"(now) Upterm task added to Pueue with ID: ($job_id)"
+    print $"(now)Upterm task added to Pueue with ID: ($job_id)"
 
     job spawn {
         mut connection_str = ""
@@ -50,7 +50,7 @@ def main [] {
 
             let job_log = pueue log $job_id --json | from json | get $job_id
             if 'Running' not-in $job_log.task.status {
-                print $"(now) Upterm process failed. Last logs:\n($job_log.output)"
+                print $"(now)Upterm process failed. Last logs:\n($job_log.output)"
                 return
             }
             let matches = ($job_log.output | lines | where $it =~ "SSH:" | first? | str replace "SSH:" "" | str trim)
@@ -61,25 +61,25 @@ def main [] {
         }
 
         if ($connection_str | is-empty) {
-            print $"(now) Upterm Error: Failed to retrieve session address"
+            print $"(now)Upterm Error: Failed to retrieve session address"
             return
         }
 
-        print $"(now) Upterm Ready: ($connection_str)"
+        print $"(now)Upterm Ready: ($connection_str)"
 
         if ($env.UPTERM_WEBHOOK? | is-not-empty) {
             let payload = {
                 msg_type: "text",
                 content: {
-                    text: $"Container remote debugging enabled\nHostname: (hostname)\nCommand: ($connection_str)\nTime: (now)"
+                    text: $"(now)Container remote debugging enabled\nHostname: (hostname)\nCommand: ($connection_str)"
                 }
             }
 
             try {
                 http post -t application/json $env.UPTERM_WEBHOOK $payload
-                print $"(now) Upterm Webhook sent successfully"
+                print $"(now)Upterm Webhook sent successfully"
             } catch {
-                print $"(now) Upterm Webhook failed to send"
+                print $"(now)Upterm Webhook failed to send"
             }
         }
     }
