@@ -2,7 +2,7 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'ghcr.io/fj0r/xy:latest'
+        from: $'($context.image):latest'
         user: master
         workdir: /home/master
     }
