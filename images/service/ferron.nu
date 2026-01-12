@@ -40,8 +40,6 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
 
-            run-ferron $env.CONFIGFILE?
-
             def run-ferron [config?] {
                 mut cmd = ["/opt/ferron/ferron"]
                 let config = if ($config | is-empty) {
@@ -54,6 +52,8 @@ export def main [context: record = {}] {
                 pueue-extend default 1
                 pueue add --group default -l ferron -- ($cmd | str join " ")
             }
+
+            run-ferron $env.CONFIGFILE?
             '#
             | str trim
             | str replace -rma $'^ {12}' ''

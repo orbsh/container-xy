@@ -1,7 +1,26 @@
 const CWD = path self .
+const CFG = path self ,.toml
+
+export module image {
+    export def pull [] {
+        let cfg = open $CFG | get assets.image
+        for t in $cfg.tags {
+            use libs/lg.nu
+            let img = ($cfg.repo):($t)
+            lg o pull $img
+            ^$env.CNTRCTL pull $img
+        }
+    }
+
+    export def archive [] {
+        let cfg = open $CFG | get assets.image
+        let imgs = $cfg.tags
+        | each {|x| ($cfg.repo):($x) }
+        ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
+    }
+}
 
 export module test {
-
     export def build [] {
         buildah unshare nu images/test.nu
     }

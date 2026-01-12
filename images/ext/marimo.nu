@@ -34,7 +34,7 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
 
-            def main [] {
+            def run-marimo [] {
                 mut cmd = [
                     marimo edit --no-token
                     -p $env.PORT
@@ -43,6 +43,8 @@ export def main [context: record = {}] {
                 pueue-extend default 1
                 pueue add --group default -l marimo -- ($cmd | str join " ")
             }
+
+            run-marimo
             '#
             | str trim
             | str replace -rma $'^ {12}' ''

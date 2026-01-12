@@ -1,0 +1,9 @@
+[assets.image]
+repo = "ghcr.io/fj0r/xy"
+tags = [
+  "latest",
+  "z",
+  "ferron",
+  "marimo",
+]
+archive = "~/pub/Platform/xy.tar.zst"
