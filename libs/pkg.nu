@@ -1,26 +1,45 @@
 use utils.nu *
 
 export def install [pkgs] {
-    run [
-        $"pacman -Sy --noconfirm ($pkgs | str join ' ')"
-        "rm -rf /var/cache/pacman/pkg/*"
-    ]
+    match $env.OS_RELEASE_ID {
+        arch => {
+            run [
+                $"pacman -Sy --noconfirm ($pkgs | str join ' ')"
+                "rm -rf /var/cache/pacman/pkg/*"
+            ]
+        }
+    }
 }
 
 export def with [pkgs act] {
     let pkgs = $pkgs | str join ' '
-    run [
-        $"pacman -Sy --noconfirm ($pkgs)"
-    ]
-    do $act
-    run [
-        $"pacman -Rsn --noconfirm ($pkgs)"
-        "rm -rf /var/cache/pacman/pkg/*"
-    ]
+    match $env.OS_RELEASE_ID {
+        arch => {
+            run [
+                $"pacman -Sy --noconfirm ($pkgs)"
+            ]
+        }
+    }
+
+    let r = do $act
+
+    match $env.OS_RELEASE_ID {
+        arch => {
+            run [
+                $"pacman -Rsn --noconfirm ($pkgs)"
+                "rm -rf /var/cache/pacman/pkg/*"
+            ]
+        }
+    }
+    $r
 }
 
 export def update [] {
-    run ["pacman -Syu --noconfirm"]
+    match $env.OS_RELEASE_ID {
+        arch => {
+            run ["pacman -Syu --noconfirm"]
+        }
+    }
 }
 
 export def 'pip install' [

@@ -57,7 +57,7 @@ jobs:
       - name: Build ferron
         shell: buildah unshare nu {0}
         run: |
-          overlay use ${{ github.workspace }}/images/ext/ferron.nu as build
+          overlay use ${{ github.workspace }}/images/service/ferron.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
