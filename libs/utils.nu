@@ -18,9 +18,10 @@ export def commit [image] {
 
 export def with-mount [act] {
     let tg = $env.BUILDAH_WORKING_MOUNTPOINT
+    let old = $env.PWD
     cd $tg
     lg o -p with-mount $tg
-    do $act $tg
+    do $act $tg $old
 }
 
 export module conf {
@@ -76,12 +77,12 @@ export module conf {
         | to json -r
         | buildah config --cmd $in $env.BUILDAH_WORKING_CONTAINER
     }
+
+    export def user [user] {
+        buildah config --user $user $env.BUILDAH_WORKING_CONTAINER
+    }
 }
 
 export def relative-path [path] {
-    if ($path | str starts-with '/') {
-        $path | path relative-to '/'
-    } else {
-        $path
-    }
+    $path | path split | where $it != '/' | path join
 }

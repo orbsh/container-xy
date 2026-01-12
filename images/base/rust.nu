@@ -1,4 +1,4 @@
-use ../libs *
+use ../../libs *
 
 export def main [context: record = {}] {
     {
@@ -16,7 +16,7 @@ export def main [context: record = {}] {
             CARGO_HOME: '/opt/cargo'
             RUSTC_WRAPPER: '/usr/bin/sccache'
         }
-        arch install [
+        pkg install [
             rustup lldb sccache
         ]
         rust up $ctx.user $ctx.rust.channel --component [

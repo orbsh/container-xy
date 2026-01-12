@@ -1,4 +1,4 @@
-use ../libs *
+use ../../libs *
 
 export def main [context: record = {}] {
     {
@@ -21,8 +21,8 @@ export def main [context: record = {}] {
             MASTER: $ctx.user
             PYTHONUNBUFFERED: x
         }
-        arch update
-        arch install [
+        pkg update
+        pkg install [
             sudo cronie tzdata
             # base-devel
             # nushell
@@ -43,14 +43,14 @@ export def main [context: record = {}] {
             dst: $xdg_config
             plugin: [query]
         }
-        arch setup python [
+        pkg setup python [
             ty
             httpx aiofile aiostream fastapi uvicorn
             debugpy pytest pydantic pydantic-graph PyParsing
             typer pydantic-settings pyyaml
             boltons decorator
         ]
-        arch setup js [
+        pkg setup js [
             @typespec/compiler @typespec/json-schema
             vscode-langservers-extracted
             yaml-language-server

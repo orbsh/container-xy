@@ -1,4 +1,4 @@
-name: base
+name: buildah
 
 on:
   push:
@@ -58,9 +58,9 @@ jobs:
             test:
               - 'images/test.nu'
             base:
-              - 'images/base.nu'
+              - 'images/base/base.nu'
             rust:
-              - 'images/rust.nu'
+              - 'images/base/rust.nu'
 
 
       - name: Setup upterm session
@@ -73,7 +73,7 @@ jobs:
       - name: test
         # if: steps.changes.outputs.base == 'true'
         if: contains(github.event.head_commit.message, '+test')
-        shell: 'script -q -e -c "buildah unshare nu {0}" /dev/null'
+        shell: buildah unshare nu {0}
         run: |
           overlay use ${{ github.workspace }}/images/test.nu as build
           build {
@@ -85,9 +85,10 @@ jobs:
           }
 
       - name: build base
+        if: ${{ !contains(github.event.head_commit.message, '+skip-base') }}
         shell: buildah unshare nu {0}
         run: |
-          overlay use ${{ github.workspace }}/images/base.nu as build
+          overlay use ${{ github.workspace }}/images/base/base.nu as build
           build {
             from: archlinux
             author: ${{ env.USERNAME }}
@@ -97,9 +98,10 @@ jobs:
           }
 
       - name: build rust
+        if: ${{ !contains(github.event.head_commit.message, '+skip-base') }}
         shell: buildah unshare nu {0}
         run: |
-          overlay use ${{ github.workspace }}/images/rust.nu as build
+          overlay use ${{ github.workspace }}/images/base/rust.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
@@ -108,9 +110,10 @@ jobs:
           }
 
       - name: build moon
+        if: ${{ !contains(github.event.head_commit.message, '+skip-base') }}
         shell: buildah unshare nu {0}
         run: |
-          overlay use ${{ github.workspace }}/images/moon.nu as build
+          overlay use ${{ github.workspace }}/images/base/moon.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}

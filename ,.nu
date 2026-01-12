@@ -11,7 +11,7 @@ export module test {
     --socat
     --s3
     --ssh
-    --check: duration = 10sec
+    --check: duration = 1sec
     ...args
     ] {
         let name = 'test-xy'

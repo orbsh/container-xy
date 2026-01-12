@@ -7,14 +7,15 @@ name: ext
 
 on:
   workflow_run:
-    workflows: ["base"]
-    branches: [ main ]
+    workflows: [ buildah ]
+    branches: [ main, buildah ]
     types:
       - completed
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: fj0r/xy
+  USERNAME: fj0r
+  IMAGE_NAME: xy
 
 
 jobs:
@@ -48,14 +49,29 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build marimo
-        uses: docker/build-push-action@v4
-        # if: steps.changes.outputs.base == 'true'
+      - name: Setup Nushell
+        uses: hustcer/setup-nu@v3
         with:
-          context: ext
-          file: ext/marimo.Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:marimo
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            message=${{ github.event.head_commit.message }}
+          version: '0.109.1'
+
+      - name: Build ferron
+        shell: buildah unshare nu {0}
+        run: |
+          overlay use ${{ github.workspace }}/images/ext/ferron.nu as build
+          build {
+            author: ${{ env.USERNAME }}
+            password: ${{ secrets.GHCR_TOKEN }}
+            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+            tags: ferron
+          }
+
+      - name: Build marimo
+        shell: buildah unshare nu {0}
+        run: |
+          overlay use ${{ github.workspace }}/images/ext/marimo.nu as build
+          build {
+            author: ${{ env.USERNAME }}
+            password: ${{ secrets.GHCR_TOKEN }}
+            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+            tags: marimo
+          }

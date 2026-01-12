@@ -33,7 +33,7 @@ def main [] {
 
     pueue-extend default 1
     let cmd_str = (["upterm" ...$upterm_args] | str join " ")
-    let add_result = pueue add --group default --title "upterm_host" -- $cmd_str | complete
+    let add_result = pueue add --group default -l "upterm_host" -- $cmd_str | complete
 
     if $add_result.exit_code != 0 {
         print $"(now) Error: Failed to add task to Pueue: ($add_result.stderr)"
