@@ -1,0 +1,19 @@
+:8080 {
+    root "/srv"
+    cgi
+    cgi_extension ".nu"
+
+    rewrite "^/bin/(.*)" "/ferron/bin.nu/$1" file=#false directory=#false last=#true
+    rewrite "^/box/(.*)" "/ferron/box.nu/$1" file=#false directory=#false last=#true
+    rewrite "^/install/(.*)" "/ferron/install.nu/$1" file=#false directory=#false last=#true
+
+    rewrite "^/(.*)" "/ferron/index.nu/$1" file=#false directory=#false last=#true
+
+    // location "/box" remove_base=#true {
+    //     root "/srv/box"
+    //     directory_listing
+    // }
+
+    log "/dev/stdout"
+    error_log "/dev/stderr"
+}
