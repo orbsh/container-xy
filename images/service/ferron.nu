@@ -73,7 +73,7 @@ export def main [context: record = {}] {
             mkdir bin box install ferron
         }
 
-        copy ferron /srv/ferron
+        copy images/service/ferron /srv/ferron
 
         conf cmd ['srv']
     }
