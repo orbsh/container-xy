@@ -1,9 +1,16 @@
 :8080 {
     root "/srv"
-    // directory_listing
     cgi
     cgi_extension ".nu"
-    rewrite "^/(.*)" "/ferron/upload.nu/$1" file=#false directory=#false last=#true
+
+    rewrite "^/upload/(.*)" "/ferron/upload.nu/$1" file=#false directory=#false last=#true
+
+    rewrite "^/(.*)" "/ferron/index.nu/$1" file=#false directory=#false last=#true
+
+    location "/ftp" remove_base=#true {
+        root "/srv/ftp"
+        directory_listing
+    }
 
     log "/dev/stdout"
     error_log "/dev/stderr"
