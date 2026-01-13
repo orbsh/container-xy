@@ -28,6 +28,10 @@ export def status [code] {
     }
 }
 
+export def is-binary-file []: binary -> bool {
+    $in | first 512 | bytes index-of 0x[00] | $in >= 0
+}
+
 export def query [] {
     $env.QUERY_STRING? | default '' | url split-query
 }
