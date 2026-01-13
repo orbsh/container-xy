@@ -9,6 +9,8 @@ export module image {
             let img = ($cfg.repo):($t)
             lg o pull $img
             ^$env.CNTRCTL pull $img
+            ^$env.CNTRCTL tag $img ($cfg.repo | path split | last):($t)
+            ^$env.CNTRCTL rmi $img
         }
     }
 

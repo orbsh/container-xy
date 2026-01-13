@@ -14,6 +14,9 @@ export def main [context: record = {}] {
         | get 0.name
         let url = $"https://github.com/ferronweb/ferron/releases/download/($version)/ferron-($version)-x86_64-unknown-linux-musl.zip"
 
+        use std/dirs
+        mkdir assets
+        dirs add assets
         curl --retry 3 -fsSL $url -o ferron.zip
         unzip ferron.zip
 
@@ -24,7 +27,7 @@ export def main [context: record = {}] {
             mkdir opt/ferron
             cd opt/ferron
             for f in [ferron ferron-passwd ferron-yaml2kdl ferron-precompress] {
-                cp ($old | path join ferron) .
+                cp ($old | path join $f) .
             }
 
             r#'
@@ -36,6 +39,11 @@ export def main [context: record = {}] {
             | str replace -rma $'^ {12}' ''
             | save ferron.kdl
 
+        }
+        dirs drop
+
+        with-mount {
+            cd entrypoint
             r#'
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
@@ -57,8 +65,15 @@ export def main [context: record = {}] {
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
-            | save ($new | path join entrypoint ferron.nu)
+            | save ferron.nu
         }
+
+        with-mount {
+            cd srv
+            mkdir bin box install ferron
+        }
+
+        copy ferron /srv/ferron
 
         conf cmd ['srv']
     }
