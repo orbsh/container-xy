@@ -1,3 +1,43 @@
+export def content [
+  --json(-j)
+  --plain(-p)
+  --html(-h)
+] {
+    if $json {
+        print "Content-Type: application/json; charset=utf-8\n"
+    } else if $plain {
+        print "Content-Type: text/plain\n"
+    } else if $html {
+        print "Content-Type: text/html; charset=utf-8\n"
+    } else {
+        print "Content-Type: application/octet-stream\n"
+    }
+}
+
+export def status [code] {
+    match $code {
+        401 => {
+            print "Status: 401 Unauthorized\n"
+        }
+        403 => {
+            print "Status: 403 Forbidden\n"
+        }
+        404 => {
+            print "Status: 404 Not Found\n"
+        }
+    }
+}
+
+export def query [] {
+    $env.QUERY_STRING? | default '' | url split-query
+}
+
+
+export def envs [] {
+    $env
+    | reject PROMPT_COMMAND ENV_CONVERSIONS PROMPT_COMMAND PROMPT_COMMAND_RIGHT config
+}
+
 export def json [...acts] {
     print "Content-Type: application/json\n"
     for a in $acts {
@@ -21,20 +61,5 @@ export def route [
     let d = $env.PATH_INFO | parse -r $pattern
     if ($d | is-not-empty) {
         do $act ($d | first)
-    }
-}
-
-export def query [] {
-    $env.QUERY_STRING? | default '' | url split-query
-}
-
-export def info [] {
-    $env
-    | transpose k v
-    | where {|x|
-        $x.k =~ '^(HTTP|PATH|QUERY|REMOTE|REQUEST|SCRIPT|SERVER|CONTENT|GATEWAY|DOCUMENT)_'
-    }
-    | reduce -f {} {|i, a|
-        $a | insert $i.k $i.v
     }
 }

@@ -4,33 +4,58 @@ const utils = path self utils.nu
 use $utils *
 
 export def main [] {
-    let n = $in
-    json {
-        route '/' -m post {
-            let i = $n | upload
-            $i
+    match ($env.REQUEST_METHOD | str downcase) {
+        post => {
+            let i = $in | upload
+            content -j
+            $i | to json -r
         }
-    } {
-        route '/' {
-            info
+        _ => {
+            index
+        }
+    }
+}
+
+def index [] {
+    let file = $env.PATH_INFO | path split | where { $in != '/' } | path join
+    let file = $env.DOCUMENT_ROOT | path join $file
+    match ($file | path type) {
+        file => {
+            content
+            open -r $file
+        }
+        dir => {
+            cd $file
+            content -j
+            ls | to json -r
+        }
+        _ => {
+            status 404
         }
     }
 }
 
 def upload [] {
-    let root = 'ftp'
+    let n = $in
     let file = $env.PATH_INFO | path split | where { $in != '/' } | path join
-    let dest = $env.DOCUMENT_ROOT | path join $root $file
+    let dest = $env.DOCUMENT_ROOT | path join $file
     let parent = $dest | path parse | get parent
     if not ($parent | path exists) {
         mkdir $parent
     }
-    $in | save -f $dest
+    $n | save -f $dest
+    let binary = ($n | describe -d).type == 'binary'
+    let size = if $binary {
+        $n | bytes length
+    } else {
+        $n | str length
+    }
     {
         event: "file_uploaded",
         host: $env.HTTP_HOST
-        filename: ('/' | path join $root $file),
-        size: ($in | bytes length),
+        binary: $binary
+        size: $size
+        filename: ('/' | path join $file),
         timestamp: (date now | format date "%+")
     }
 }
