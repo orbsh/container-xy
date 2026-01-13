@@ -14,6 +14,9 @@ export def main [context: record = {}] {
         | get 0.name
         let url = $"https://github.com/ferronweb/ferron/releases/download/($version)/ferron-($version)-x86_64-unknown-linux-musl.zip"
 
+        use std/dirs
+        mkdir assets
+        dirs add assets
         curl --retry 3 -fsSL $url -o ferron.zip
         unzip ferron.zip
 
@@ -37,6 +40,7 @@ export def main [context: record = {}] {
             | save ferron.kdl
 
         }
+        dirs drop
 
         with-mount {
             cd entrypoint

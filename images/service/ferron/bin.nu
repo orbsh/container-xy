@@ -28,14 +28,3 @@ export def main [] {
     }
     | to json -r
 }
-
-def info [] {
-    $env
-    | transpose k v
-    | where {|x|
-        $x.k =~ '^(HTTP|PATH|QUERY|REMOTE|REQUEST|SCRIPT|SERVER|CONTENT|GATEWAY|DOCUMENT)_'
-    }
-    | reduce -f {} {|i, a|
-        $a | insert $i.k $i.v
-    }
-}
