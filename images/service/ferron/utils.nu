@@ -36,6 +36,32 @@ export def query [] {
     $env.QUERY_STRING? | default '' | url split-query
 }
 
+export def path-to-file [] {
+  $env.DOCUMENT_ROOT | path join ($env.PATH_INFO | str substring 1..)
+}
+
+export def send-file [file] {
+    match ($file | path type) {
+        file => {
+            let is_bin = open -r $file | into binary | is-binary-file
+            if $is_bin {
+                content
+                cat $file
+            } else {
+                content -p
+                open -r $file
+            }
+        }
+        dir => {
+            cd $file
+            content -j
+            ls | to json -r
+        }
+        _ => {
+            status 404
+        }
+    }
+}
 
 export def envs [] {
     $env

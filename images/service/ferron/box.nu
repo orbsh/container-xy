@@ -7,6 +7,9 @@ export def main [] {
     match ($env.REQUEST_METHOD | str downcase) {
         post => {
             let i = $in | upload
+            if ($env.WEBHOOK_UPLOAD? | is-not-empty) {
+                webhook $env.WEBHOOK_URI $i
+            }
             content -j
             $i | to json -r
         }
@@ -17,34 +20,13 @@ export def main [] {
 }
 
 def index [] {
-    let file = $env.PATH_INFO | path split | where { $in != '/' } | path join
-    let file = $env.DOCUMENT_ROOT | path join $file
-    match ($file | path type) {
-        file => {
-            let is_bin = open -r $file | into binary | is-binary-file
-            if $is_bin {
-                content
-                cat $file
-            } else {
-                content -p
-                open -r $file
-            }
-        }
-        dir => {
-            cd $file
-            content -j
-            ls | to json -r
-        }
-        _ => {
-            status 404
-        }
-    }
+    let file = path-to-file
+    send-file $file
 }
 
 def upload [] {
     let n = $in
-    let file = $env.PATH_INFO | path split | where { $in != '/' } | path join
-    let dest = $env.DOCUMENT_ROOT | path join $file
+    let dest = path-to-file
     let parent = $dest | path parse | get parent
     if not ($parent | path exists) {
         mkdir $parent
@@ -61,7 +43,7 @@ def upload [] {
         host: $env.HTTP_HOST
         binary: $binary
         size: $size
-        filename: ('/' | path join $file),
+        filename: $env.PATH_INFO,
         timestamp: (date now | format date "%+")
     }
 }
