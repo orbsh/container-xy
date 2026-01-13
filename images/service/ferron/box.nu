@@ -21,12 +21,14 @@ def index [] {
     let file = $env.DOCUMENT_ROOT | path join $file
     match ($file | path type) {
         file => {
-            if ($file | into binary | is-binary-file) {
+            let is_bin = open -r $file | into binary | is-binary-file
+            if $is_bin {
                 content
+                cat $file
             } else {
                 content -p
+                open -r $file
             }
-            open -r $file
         }
         dir => {
             cd $file

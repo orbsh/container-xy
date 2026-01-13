@@ -75,6 +75,10 @@ export def main [context: record = {}] {
 
         copy images/service/ferron /srv/ferron
 
+        conf env {
+            CONFIGFILE: /srv/ferron/box.kdl
+        }
+
         conf cmd ['srv']
     }
 }
