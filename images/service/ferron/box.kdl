@@ -3,7 +3,7 @@
     cgi
     cgi_extension ".nu"
 
-    rewrite "^/bin/(.*)" "/ferron/bin.nu/bin/$1" file=#true directory=#true last=#true
+    rewrite "^/bin/(.*)" "/ferron/bin.nu/$1" file=#true directory=#true last=#true
     rewrite "^/box/(.*)" "/ferron/box.nu/box/$1" file=#true directory=#true last=#true
     rewrite "^/install/(.*)" "/ferron/install.nu/install/$1" file=#true directory=#true last=#true
 

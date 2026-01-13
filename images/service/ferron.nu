@@ -75,6 +75,11 @@ export def main [context: record = {}] {
 
         copy images/service/ferron /srv/ferron
 
+        conf env {
+            CONFIGFILE: /srv/ferron/box.kdl
+            WEBHOOK_URI: ''
+        }
+
         conf cmd ['srv']
     }
 }
