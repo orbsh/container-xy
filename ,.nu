@@ -18,6 +18,99 @@ export module image {
         | each {|x| ($cfg.repo):($x) }
         ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
     }
+
+    export def gen-actions [
+        --reg:string = "ghcr.io"
+        --user:string = "fj0r"
+        --image:string = xy
+        --nu-ver: string = "0.109.1"
+    ] {
+        cd ($CWD | path join images)
+        let fs = ls */*.nu | get name | each { $in | path parse }
+        for f in $fs {
+            {
+                name: branch_($f.stem),
+                on: {
+                    push: {
+                        branches: [ $f.stem ],
+                        tags: [ "v*.*.*" ]
+                    },
+                    workflow_dispatch: null
+                },
+                env: { REGISTRY: $reg, USERNAME: $user, IMAGE_NAME: $image },
+                jobs: {
+                    build: {
+                        runs-on: ubuntu-latest,
+                        if: "${{ !endsWith(github.event.head_commit.message, '~') }}",
+                        permissions: {
+                            contents: read,
+                            packages: write
+                        },
+                        steps: [
+                            {
+                                name: "Checkout repository",
+                                uses: "actions/checkout@v3",
+                                with: {
+                                    submodules: "true"
+                                }
+                            },
+                            {
+                                name: "Log into registry ${{ env.REGISTRY }}",
+                                if: "github.event_name != 'pull_request'",
+                                uses: "docker/login-action@v2",
+                                with: {
+                                    registry: "${{ env.REGISTRY }}",
+                                    username: "${{ env.USERNAME }}",
+                                    password: "${{ secrets.GHCR_TOKEN }}"
+                                }
+                            },
+                            {
+                                name: "Extract Docker metadata",
+                                id: meta,
+                                uses: "docker/metadata-action@v4",
+                                with: {
+                                    images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+                                }
+                            },
+                            {
+                                name: "Setup Nushell",
+                                uses: "hustcer/setup-nu@v3",
+                                with: {
+                                    version: $nu_ver
+                                }
+                            },
+                            {
+                                name: "Setup upterm session",
+                                uses: "owenthereal/action-upterm@v1",
+                                if: "contains(github.event.head_commit.message, '+debug')",
+                                with: {
+                                    upterm-server: "${{ secrets.UPTERMD_ADDR }}"
+                                }
+                            },
+                            {
+                                name: $"build ($f.stem)",
+                                shell: "buildah unshare nu {0}",
+                                run: (
+                                    $"
+                                    overlay use ${{ github.workspace }}/images/($f.parent)/($f.stem).nu as build
+                                    build {
+                                      author: ${{ env.USERNAME }}
+                                      password: ${{ secrets.GHCR_TOKEN }}
+                                      image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+                                      tags: ($f.stem)
+                                    }
+                                    "
+                                    | str trim
+                                    | str replace -rma '^ {36}' ''
+                                    )
+                            },
+                        ]
+                    }
+                }
+            }
+            | save -f ($CWD)/.github/workflows/branch_($f.stem).yaml
+        }
+    }
 }
 
 export module test {
