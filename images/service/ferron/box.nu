@@ -1,32 +1,20 @@
 #!/usr/bin/env -S nu --stdin
 
+const utils = path self utils.nu
+use $utils *
+
 export def main [] {
     let n = $in
-    print "Content-Type: application/json\n"
-    match $env.REQUEST_METHOD {
-        POST => {
+    json {
+        route '/' -m post {
             let i = $n | upload
-            # format pattern
-            let q = $env.QUERY_STRING? | default '' | url split-query
-            {
-                event: $i
-                query: $q
-            }
+            $i
         }
-        INFO => {
+    } {
+        route '/' {
             info
         }
-        BODY => {
-            {
-                type: ($n | describe)
-                body: $n
-            }
-        }
-        _ => {
-          {status: ok}
-        }
     }
-    | to json -r
 }
 
 def upload [] {
@@ -47,16 +35,6 @@ def upload [] {
     }
 }
 
-def info [] {
-    $env
-    | transpose k v
-    | where {|x|
-        $x.k =~ '^(HTTP|PATH|QUERY|REMOTE|REQUEST|SCRIPT|SERVER|CONTENT|GATEWAY|DOCUMENT)_'
-    }
-    | reduce -f {} {|i, a|
-        $a | insert $i.k $i.v
-    }
-}
 
 def webhook [url payload] {
     try {
