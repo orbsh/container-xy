@@ -2,7 +2,7 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: archlinux
+        from: 'archlinux'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
