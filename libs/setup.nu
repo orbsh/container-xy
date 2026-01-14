@@ -27,8 +27,12 @@ export def master [
     workdir: string
     config_dir: string
 ] {
+    let group = match $env.OS_RELEASE_ID {
+        arch => 'wheel'
+        debian => 'sudo'
+    }
     run [
-        $'useradd -mU -G wheel,root ($user)'
+        $'useradd -mU -G ($group),root ($user)'
         $'mkdir -p ($workdir)'
         $'chown ($user):($user) -R ($workdir)'
         $'mkdir -p ($config_dir)'
