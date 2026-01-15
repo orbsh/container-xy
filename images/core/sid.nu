@@ -27,12 +27,32 @@ export def main [context: record = {}] {
             # base-devel
             # nushell
             # dropbear
-            openssh rsync s3fs
+            openssh-client rsync s3fs
             tcpdump socat websocat
             sqlite3 patch tree
             xz-utils zstd zip unzip
             lsof inetutils-ping iproute2 iptables net-tools
-            pueue # entrypoint
         ]
+        let xdg_config = $"/home/($ctx.user)/.config"
+        setup master $ctx.user $ctx.workdir $xdg_config
+        nushell setup '/usr/local/bin' {
+            user: $ctx.user
+            src: $ctx.config.nushell
+            dst: $xdg_config
+            plugin: [query]
+        }
+
+        github install pueue websocat
+
+        conf env {
+            DEBUGE: ''
+            PREBOOT: ''
+            POSTBOOT: ''
+            CRONFILE: ''
+        }
+        conf workdir $ctx.workdir
+        conf cmd []
+        copy entrypoint /entrypoint
+        conf entrypoint ["/entrypoint/init.nu"]
     }
 }

@@ -38,7 +38,8 @@ export def main [context: record = {}] {
         #arch config nushell $ctx.user $xdg_home $ctx.config.nushell
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell up $ctx.user '/usr/local/bin' {
+        nushell setup '/usr/local/bin' {
+            user: $ctx.user
             src: $ctx.config.nushell
             dst: $xdg_config
             plugin: [query]
@@ -56,16 +57,15 @@ export def main [context: record = {}] {
             yaml-language-server
         ]
         # conf volume [$ctx.workdir]
-        conf workdir $ctx.workdir
-        copy entrypoint /entrypoint
         conf env {
             DEBUGE: ''
             PREBOOT: ''
             POSTBOOT: ''
             CRONFILE: ''
-            git_pull: ''
         }
+        conf workdir $ctx.workdir
         conf cmd []
+        copy entrypoint /entrypoint
         conf entrypoint ["/entrypoint/init.nu"]
     }
 }

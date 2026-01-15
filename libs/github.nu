@@ -1,0 +1,65 @@
+use trace.nu
+use transformer.nu
+use extract.nu
+const CFG = path self ../,.toml
+
+export def get-version [repo] {
+    let ver = curl --retry 3 -fsSL https://api.github.com/repos/($repo)/releases/latest | from json | get tag_name
+    trace o -p 'version' { repo: $repo, version: $ver }
+    $ver
+}
+
+export def install [
+    ...tags
+    --target(-t): string = '/usr/local'
+    --unpack(-u): closure
+] {
+    for t in $tags {
+        trace o -p 'github-install' $t
+        install-inner $t
+    }
+}
+
+def install-inner [
+    tag
+    --target(-t): string = '/usr/local'
+    --unpack(-u): closure
+] {
+    let cfg = open $CFG | get github | get $tag
+    let ev = {
+        version: (get-version $cfg.repo | transformer run $cfg.version?)
+        arch: $nu.os-info.arch
+    }
+    let uris = if ($cfg.uri | describe -d).type == list {
+        $cfg.uri
+    } else {
+        [$cfg.uri]
+    }
+    | each {|x| $ev | format pattern $x }
+
+    let wd = mktemp -t -d
+    cd $wd
+
+    for uri in $uris {
+        let f = $uri | url parse | get path | path parse
+        let f = [$f.stem $f.extension] | str join '.'
+        curl --retry 3 -fsSL $uri -o $f
+
+        let ext = $uri | split row '.' | last 2
+        cat $f | extract as $ext $f
+    }
+
+
+    let upk = if ($unpack | is-empty) { {|x| $x} } else { $unpack }
+    let upk = do $upk (
+        $cfg.unpack? | default [] | each {|x| $ev | format pattern $x}
+    )
+    let dst = extract unpack $upk
+
+    cd ($dst | last)
+    tar -cf * | tar -xf - -C $target
+
+    for d in ($dst | append $wd | uniq) {
+        rm -rf $wd
+    }
+}

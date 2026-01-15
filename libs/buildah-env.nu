@@ -1,4 +1,4 @@
-use lg.nu
+use trace.nu
 use utils.nu *
 
 export def enter --env [from] {
@@ -9,7 +9,7 @@ export def enter --env [from] {
         BUILDAH_WORKING_CONTAINER: $working_container
         BUILDAH_WORKING_MOUNTPOINT: $mountpoint
     }
-    | lg f inject environment
+    | trace f inject environment
     | load-env
 }
 

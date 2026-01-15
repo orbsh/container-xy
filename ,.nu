@@ -5,9 +5,9 @@ export module image {
     export def pull [] {
         let cfg = open $CFG | get assets.image
         for t in $cfg.tags {
-            use libs/lg.nu
+            use libs/trace.nu
             let img = ($cfg.repo):($t)
-            lg o pull $img
+            trace o pull $img
             ^$env.CNTRCTL pull $img
             use entrypoint/init.nu now
             notify-send $"(now)($img)"
