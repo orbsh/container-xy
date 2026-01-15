@@ -1,3 +1,5 @@
+use trace.nu
+
 export def as [
     ext file
 ] {
@@ -46,6 +48,7 @@ export def unpack [acts?: list = []] {
 }
 
 def dispatch [act args?] {
+    trace o $act $args
     match $act {
         strip => {
             let s = $args.0? | default '1' | into int
@@ -58,7 +61,7 @@ def dispatch [act args?] {
             let s = $args.0? | default 'bin'
             let t = mktemp -t -d
             let n = $t | path join $s
-            tar -cf * | tar -xf - -C $n
+            cp -v -r * $n
             cd $t
         }
         filter => {

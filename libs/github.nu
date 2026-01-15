@@ -57,6 +57,8 @@ def install-inner [
     let dst = extract unpack $upk
 
     cd ($dst | last)
+    trace o files ready
+    tree
     tar -cf * | tar -xf - -C $target
 
     for d in ($dst | append $wd | uniq) {
