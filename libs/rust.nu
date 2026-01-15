@@ -1,5 +1,5 @@
 use utils.nu *
-use lg.nu
+use trace.nu
 
 export def up [
     owner
@@ -18,10 +18,10 @@ export def up [
         ]
         with-mount {
             let dst = 'usr/bin' | path expand
-            lg o -p 'rust-component' $dst
+            trace o -p 'rust-component' $dst
             for b in [rust-analyzer] {
                 if ($b in $component) and not ($dst | path join $b | path exists) {
-                    lg o -p 'fix-rustup-bin' $b
+                    trace o -p 'fix-rustup-bin' $b
                     ln -sf /usr/bin/rustup ($dst | path join $b)
                 }
             }
@@ -35,7 +35,7 @@ export def up [
     if ($bin | is-not-empty) {
         with-mount {
             let dst = 'usr/local/bin/' | path expand
-            lg o -p 'cargo-binstall-dir' $dst
+            trace o -p 'cargo-binstall-dir' $dst
             let url = 'https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz'
             curl -fsSL $url | tar zxf - -C $dst
             chmod +x ($dst | path join cargo-binstall)
@@ -67,7 +67,7 @@ export def prefetch [owner workdir proj pkgs --test --debug: string] {
     with-mount {
         let dst = relative-path $workdir | path expand
         let dstf = $dst | path join $proj Cargo.toml
-        lg o -p 'prefetch' ($dstf | path relative-to $dst)
+        trace o -p 'prefetch' ($dstf | path relative-to $dst)
         if ($debug | is-not-empty) {
             {
                 dst: $dst

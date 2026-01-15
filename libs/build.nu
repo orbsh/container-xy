@@ -1,4 +1,4 @@
-use lg.nu
+use trace.nu
 
 export def main [acts --squash --skip-push] {
     let ctx = $in
@@ -26,7 +26,7 @@ export def main [acts --squash --skip-push] {
 
 
     let image = ($ctx.image):($ctx.tags? | default 'latest')
-    lg o commit $image
+    trace o commit $image
     if $squash {
         buildah commit --squash $working_container $image
     } else {
@@ -34,7 +34,7 @@ export def main [acts --squash --skip-push] {
     }
 
     if not $skip_push {
-        lg o push $image
+        trace o push $image
         buildah push --creds ($ctx.author):($ctx.password) $image
     }
 }

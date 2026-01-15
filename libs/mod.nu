@@ -1,5 +1,5 @@
 export use build.nu
-export use lg.nu
+export use trace.nu
 export use pkg.nu
 export use utils.nu *
 export use rust.nu

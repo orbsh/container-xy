@@ -30,6 +30,7 @@ export def as [
         [_ zip]     => {
             unzip
         }
+        _ => {}
     }
 }
 
@@ -51,7 +52,6 @@ def dispatch [act args?] {
             for i in ..<$s {
                 let d = ls | where type == dir | first | get name
                 cd $d
-                pwd
             }
         }
         wrap => {
@@ -60,7 +60,6 @@ def dispatch [act args?] {
             let n = $t | path join $s
             tar -cf * | tar -xf - -C $n
             cd $t
-            pwd
         }
         filter => {
             let s = $args | each { $in | into glob }
@@ -73,7 +72,15 @@ def dispatch [act args?] {
                 cp -v -r $x $d
             }
             cd $t
-            pwd
+        }
+        mv => {
+            mv $args.0 $args.1
+        }
+        chmodx => {
+            for f in $args {
+                chmod +x $f
+            }
         }
     }
+    pwd
 }

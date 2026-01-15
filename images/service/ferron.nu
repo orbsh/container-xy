@@ -20,7 +20,7 @@ export def main [context: record = {}] {
         curl --retry 3 -fsSL $url -o ferron.zip
         unzip ferron.zip
 
-        lg o origin config
+        trace o origin config
         cat ferron.kdl
 
         with-mount {|new, old|

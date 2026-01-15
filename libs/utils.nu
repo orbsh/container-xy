@@ -1,14 +1,14 @@
-use lg.nu
+use trace.nu
 
 export def copy [src dst] {
-    lg o copy $src $dst
+    trace o copy $src $dst
     buildah copy $env.BUILDAH_WORKING_CONTAINER $src $dst
 }
 
 export def run [cmd: list] {
     $cmd
     | str join ' && '
-    | lg f run
+    | trace f run
     | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
 }
 
@@ -20,14 +20,14 @@ export def with-mount [act] {
     let tg = $env.BUILDAH_WORKING_MOUNTPOINT
     let old = $env.PWD
     cd $tg
-    lg o -p with-mount $tg
+    trace o -p with-mount $tg
     do $act $tg $old
 }
 
 export module conf {
     export def env [rec: record] {
         $rec
-        | lg f config env
+        | trace f config env
         | items {|k, v| [--env ($k)=($v)] }
         | flatten
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
@@ -35,7 +35,7 @@ export module conf {
 
     export def expose [vec: list] {
         $vec
-        | lg f config expose
+        | trace f config expose
         | each {|x|
             let x = $x | into string
             if ($x | str starts-with u) {
@@ -50,7 +50,7 @@ export module conf {
 
     export def volume [vec: list] {
         $vec
-        | lg f config volume
+        | trace f config volume
         | each {|x| [--volume $x] }
         | flatten
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
@@ -58,7 +58,7 @@ export module conf {
 
     export def workdir [...vec] {
         $vec
-        | lg f config workdir
+        | trace f config workdir
         | each {|x| [--workingdir $x] }
         | flatten
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
@@ -66,14 +66,14 @@ export module conf {
 
     export def entrypoint [vec: list] {
         $vec
-        | lg f config entrypoint
+        | trace f config entrypoint
         | to json -r
         | buildah config --entrypoint $in $env.BUILDAH_WORKING_CONTAINER
     }
 
     export def cmd [vec: list] {
         $vec
-        | lg f config cmd
+        | trace f config cmd
         | to json -r
         | buildah config --cmd $in $env.BUILDAH_WORKING_CONTAINER
     }
