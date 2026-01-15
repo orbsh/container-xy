@@ -1,4 +1,5 @@
 use trace.nu
+use utils.nu *
 
 export def as [
     ext file
@@ -61,7 +62,7 @@ def dispatch [act args?] {
             let s = $args.0? | default 'bin'
             let t = mktemp -t -d
             let n = $t | path join $s
-            cp -v -r * $n
+            glob **/* | into-tree $n
             cd $t
         }
         filter => {

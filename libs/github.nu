@@ -1,6 +1,7 @@
 use trace.nu
 use transformer.nu
 use extract.nu
+use utils.nu *
 const CFG = path self ../,.toml
 
 export def get-version [repo] {
@@ -57,9 +58,9 @@ def install-inner [
     let dst = extract unpack $upk
 
     cd ($dst | last)
-    trace o files ready
+    trace o -p 'files-ready' $env.PWD
     tree
-    tar -cf * | tar -xf - -C $target
+    glob **/* | into-tree $target
 
     for d in ($dst | append $wd | uniq) {
         rm -rf $wd

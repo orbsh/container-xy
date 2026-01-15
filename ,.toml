@@ -14,7 +14,7 @@ uri = "https://github.com/nushell/nushell/releases/download/{version}/nu-{versio
 version = ["trim"]
 unpack = [
   "strip 1",
-  "filter nu_plugin_query"
+  "filter nu nu_plugin_query"
 ]
 
 [github.pueue]

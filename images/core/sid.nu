@@ -28,7 +28,7 @@ export def main [context: record = {}] {
             # nushell
             # dropbear
             openssh-client rsync s3fs
-            tcpdump socat websocat
+            tcpdump socat
             sqlite3 patch tree
             xz-utils zstd zip unzip
             lsof inetutils-ping iproute2 iptables net-tools

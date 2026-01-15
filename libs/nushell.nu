@@ -8,7 +8,16 @@ export def setup [dir config: record --skip-download] {
             let dst = relative-path $dir | path expand
             trace o -p 'install-nushell' $dst
             let plugin = $config.plugin | each {|x| $"nu_plugin_($x)" }
-            github install nushell -t $dst -u {|x| $x | append $plugin | uniq }
+            github install nushell -t $dst -u {|x|
+                $x | each {|y|
+                    if ($y | str starts-with "filter") {
+                        let f = [nu] | append $plugin | uniq
+                        $"filter ($f | str join ' ')"
+                    } else {
+                        $y
+                    }
+                }
+            }
         }
     }
 
