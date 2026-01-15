@@ -1,9 +1,9 @@
-export def run [list] {
+export def run [list? = []] {
     let n = $in
     $list
     | reduce -f $n {|x, acc|
-        let r = $x | transpose k v | first
-        dispatch $acc $r.k $r.v
+        let r = $x | split row -r '\s+'
+        dispatch $acc $r.0 ($r | slice 1..)
     }
 }
 
