@@ -38,7 +38,7 @@ export def main [context: record = {}] {
         #arch config nushell $ctx.user $xdg_home $ctx.config.nushell
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell up $ctx.user '/usr/local/bin' {
+        nushell setup $ctx.user '/usr/local/bin' {
             src: $ctx.config.nushell
             dst: $xdg_config
             plugin: [query]

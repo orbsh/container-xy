@@ -1,5 +1,5 @@
 use utils.nu *
-use lg
+use lg.nu
 
 export def up [
     owner

@@ -1,7 +1,7 @@
 use utils.nu *
-use lg
+use lg.nu
 
-export def up [user dir config: record --skip-download] {
+export def setup [user dir config: record --skip-download] {
     if not $skip_download {
         let ver = curl --retry 3 -fsSL https://api.github.com/repos/nushell/nushell/releases/latest | from json | get tag_name
         lg o -p 'nushell-version' $ver
