@@ -32,6 +32,6 @@ unpack = [
 repo = "vi/websocat"
 uri = "https://github.com/vi/websocat/releases/download/{version}/websocat.{arch}-unknown-linux-musl"
 unpack = [
-    "mv websocat.{arch}-unknown-linux-musl websocat"
+    "mv websocat.{arch}-unknown-linux-musl websocat",
     "wrap bin"
 ]
