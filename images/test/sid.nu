@@ -24,14 +24,14 @@ export def main [context: record = {}] {
         }
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell setup '/usr/local' -c ~/Downloads {
+        nushell setup '/usr/local' -c $ctx.cache? {
             user: $ctx.user
             src: $ctx.config.nushell
             dst: $xdg_config
             plugin: [query]
         }
 
-        github install -c ~/Downloads websocat pueue
+        github install -c $ctx.cache websocat pueue
 
         conf workdir $ctx.workdir
         conf cmd []

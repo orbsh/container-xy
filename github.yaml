@@ -25,3 +25,8 @@ packages:
     - mv websocat.{arch}-unknown-linux-musl websocat
     - chmodx websocat
     - wrap bin
+  ferron:
+    repo: ferronweb/ferron
+    uri: https://github.com/ferronweb/ferron/releases/download/{version}/ferron-{version}-{arch}-unknown-linux-musl.zip
+    unpack:
+    - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress

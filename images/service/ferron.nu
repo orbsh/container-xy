@@ -9,19 +9,7 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         conf expose [8080]
-        let version = curl -sSL https://api.github.com/repos/ferronweb/ferron/releases
-        | from json
-        | get 0.name
-        let url = $"https://github.com/ferronweb/ferron/releases/download/($version)/ferron-($version)-x86_64-unknown-linux-musl.zip"
-
-        use std/dirs
-        mkdir assets
-        dirs add assets
-        curl --retry 3 -fsSL $url -o ferron.zip
-        unzip ferron.zip
-
-        trace o origin config
-        cat ferron.kdl
+        github install ferron -c $ctx.cache?
 
         with-mount {|new, old|
             mkdir opt/ferron
