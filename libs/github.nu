@@ -17,7 +17,7 @@ export def install [
 ] {
     for t in $tags {
         trace o -p 'github-install' $t
-        install-inner $t
+        install-inner $t -t $target -u $unpack
     }
 }
 
@@ -38,7 +38,7 @@ def install-inner [
     }
     | each {|x| $ev | format pattern $x }
 
-    let wd = mktemp -t -d
+    let wd = mktemp -t -d --suffix .buildah
     cd $wd
 
     for uri in $uris {
@@ -47,10 +47,13 @@ def install-inner [
         let cache = if ($cfg.cache? | is-not-empty) {
             ($cfg.cache)/($f) | path expand
         }
-        if ($cache | path exists) {
-            cp $cache $f
-        } else {
+        if ($cache | is-empty) {
             curl --retry 3 -fsSL $uri -o $f
+        } else {
+            if not ($cache | path exists) {
+                curl --retry 3 -fsSL $uri -o $cache
+            }
+            cp $cache $f
         }
 
         let ext = $uri | split row '.' | last 2
@@ -67,7 +70,11 @@ def install-inner [
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
     tree
-    glob **/* | into-tree $target
+    with-mount {|new, old|
+        let t = $new | path join (relative-path $target)
+        cd $old
+        cp -r -v * $t
+    }
 
     for d in ($dst | append $wd | uniq) {
         rm -rf $wd
