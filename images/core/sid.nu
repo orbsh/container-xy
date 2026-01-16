@@ -35,7 +35,7 @@ export def main [context: record = {}] {
         ]
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell setup '/usr/local/bin' {
+        nushell setup '/usr/local' {
             user: $ctx.user
             src: $ctx.config.nushell
             dst: $xdg_config

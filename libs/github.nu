@@ -72,6 +72,12 @@ def install-inner [
     tree
     with-mount {|new, old|
         let t = $new | path join (relative-path $target)
+        let d = $t | path parse | get parent
+            trace o -p 'target' {t : $t, target: $target, d: $d}
+        if not ($d | path exists) {
+            trace o -p 'create-dir' $d
+            mkdir $d
+        }
         cd $old
         cp -r -v * $t
     }
