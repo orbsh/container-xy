@@ -10,7 +10,7 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         conf expose [8080]
-        github install ferron -c $ctx.cache?
+        github install [ferron] -c $ctx.cache?
 
         with-mount {|new, old|
             r#'

@@ -155,7 +155,7 @@ export module test {
         ]
         ^$env.CNTRCTL run ...[
             ...$flag
-            ghcr.io/fj0r/xy:ferron
+            xy:ferron
         ]
     }
 

@@ -45,7 +45,7 @@ export def main [context: record = {}] {
             plugin: [query]
         }
 
-        github install pueue websocat
+        github install [pueue websocat]
 
         conf env {
             DEBUGE: ''

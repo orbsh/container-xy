@@ -2,16 +2,21 @@ use trace.nu
 use transformer.nu
 use extract.nu
 use utils.nu *
-const CFG = path self ../github.yaml
+const CFG = path self ../packages.yaml
 
 export def get-version [repo] {
-    let ver = curl --retry 3 -fsSL https://api.github.com/repos/($repo)/releases/latest | from json | get tag_name
+    let ver = if ($repo | str starts-with 'http') {
+        curl --retry 3 -fsSL $repo
+    } else {
+        let url = $"https://api.github.com/repos/($repo)/releases/latest"
+        curl --retry 3 -fsSL $url | from json | get tag_name
+    }
     trace o -p 'version' { repo: $repo, version: $ver }
     $ver
 }
 
 export def install [
-    ...tags
+    tags
     --target(-t): string = '/usr/local'
     --unpack(-u): closure
     --cache(-c): string = ''
@@ -22,16 +27,28 @@ export def install [
     }
 }
 
+def arch2 [a] {
+    match $a {
+        'x86_64' => 'amd64',
+        'aarch64' => 'arm64',
+        'i386' | 'i686' => '396',
+        'armv7' | 'armhf' => 'arm'
+        _ => $a
+    }
+}
+
+
 def install-inner [
     tag
     --target(-t): string
     --unpack(-u): closure
     --cache(-c): string
 ] {
-    let cfg = open $CFG | get packages | get $tag
+    let cfg = open $CFG | get github | get $tag
     let ev = {
         version: (get-version $cfg.repo | transformer run $cfg.version?)
         arch: $nu.os-info.arch
+        arch2: (arch2 $nu.os-info.arch)
     }
     let uris = if ($cfg.uri | describe -d).type == list {
         $cfg.uri
@@ -86,7 +103,7 @@ def install-inner [
             mkdir $d
         }
         cd $old
-        cp -r -v * $t
+        cp -r -v **/* $t
     }
 
     cd $origin

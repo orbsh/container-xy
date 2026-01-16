@@ -63,7 +63,7 @@ def dispatch [act args?] {
             let t = mktemp -t -d --suffix .buildah
             let n = $t | path join $s
             mkdir $n
-            cp -r -v * $n
+            cp -r -v **/* $n
             cd $t
         }
         filter => {
@@ -74,7 +74,7 @@ def dispatch [act args?] {
                 if not ($d | path exists) {
                     mkdir $d
                 }
-                cp -v $x $t
+                cp -v $x $d
             }
             cd $t
         }
