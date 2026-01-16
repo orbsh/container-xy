@@ -18,7 +18,7 @@ export def install [
 ] {
     for t in $tags {
         trace o -p 'github-install' $t
-        install-inner $t -t $target -u $unpack
+        install-inner $t -t $target -u $unpack -c $cache
     }
 }
 
@@ -50,7 +50,7 @@ def install-inner [
         | str join '.'
 
         let cache = if ($cache | is-not-empty) {
-            ($cfg.cache)/($f) | path expand
+            ($cache)/($f) | path expand
         }
         if ($cache | is-empty) {
             curl --retry 3 -fsSL $uri -o $f
@@ -84,6 +84,8 @@ def install-inner [
             mkdir $d
         }
         cd $old
+        print =============================
+        tree
         cp -r -v * $t
     }
 

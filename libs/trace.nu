@@ -13,7 +13,7 @@ export def parse_msg [args] {
 
 export def o [...msg: any --prefix(-p): string] {
     let msg = parse_msg $msg
-    mut r = [$"(ansi grey)******($msg.time)"]
+    mut r = [$"(ansi grey)******│($msg.time)"]
     if ($prefix | is-not-empty) {
         $r ++= [$"<($prefix)>"]
     }

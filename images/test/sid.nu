@@ -13,7 +13,7 @@ export def main [context: record = {}] {
         image: test
     }
     | merge $context
-    | build {|ctx|
+    | build --skip-push {|ctx|
         conf expose [22]
         conf env {
             LANG: C.UTF-8
