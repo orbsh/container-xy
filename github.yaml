@@ -31,3 +31,24 @@ packages:
     unpack:
     - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
     - wrap bin
+  kubectl:
+    repo: https://storage.googleapis.com/kubernetes-release/release/stable.txt
+    uri: https://dl.k8s.io/{version}/kubernetes-node-linux-amd64.tar.gz
+    unpack:
+    - filter kubernetes/node/bin/kubectl kubernetes/node/bin/kubeadm
+    - strip 3
+    - chmodx
+    - wrap bin
+  helm:
+    repo: helm/helm
+    uri: https://get.helm.sh/helm-{version}-linux-amd64.tar.gz
+    unpack:
+    - filter linux-amd64/helm
+    - strip 1
+    - wrap bin
+  istio:
+    repo: istio/istio
+    uri: https://github.com/istio/istio/releases/latest/download/istioctl-{version}-linux-amd64.tar.gz
+    upack:
+    - filter istioctl
+    - wrap bin

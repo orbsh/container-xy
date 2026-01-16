@@ -5,7 +5,12 @@ use utils.nu *
 const CFG = path self ../github.yaml
 
 export def get-version [repo] {
-    let ver = curl --retry 3 -fsSL https://api.github.com/repos/($repo)/releases/latest | from json | get tag_name
+    let ver = if ($repo | str starts-with 'http') {
+        curl --retry 3 -fsSL $repo
+    } else {
+        let url = $"https://api.github.com/repos/($repo)/releases/latest"
+        curl --retry 3 -fsSL $url | from json | get tag_name
+    }
     trace o -p 'version' { repo: $repo, version: $ver }
     $ver
 }
