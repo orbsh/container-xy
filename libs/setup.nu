@@ -17,9 +17,18 @@ export def git [author] {
 }
 
 export def sudo [] {
-    run [
-        `sed -i 's/# \(%.*NOPASSWD.*\)/&\n\1/' /etc/sudoers`
-    ]
+    match $env.OS_RELEASE_ID {
+        arch => {
+            run [
+                `sed -i 's/# \(%.*NOPASSWD.*\)/&\n\1/' /etc/sudoers`
+            ]
+        }
+        _ => {
+            run [
+                `sed -i 's/^.*\(%sudo.*\)ALL$/\1NOPASSWD: ALL/g' /etc/sudoers`
+            ]
+        }
+    }
 }
 
 export def master [

@@ -7,31 +7,3 @@ tags = [
   "marimo",
 ]
 archive = "~/pub/Platform/xy.tar.zst"
-
-[github.nushell]
-repo = "nushell/nushell"
-uri = "https://github.com/nushell/nushell/releases/download/{version}/nu-{version}-{arch}-unknown-linux-musl.tar.gz"
-version = ["trim"]
-unpack = [
-  "strip 1",
-  "filter nu_plugin_query"
-]
-
-[github.pueue]
-repo = "Nukesor/pueue"
-uri = [
-  "https://github.com/Nukesor/pueue/releases/download/{version}/pueue-{arch}-unknown-linux-musl",
-  "https://github.com/Nukesor/pueue/releases/download/{version}/pueued-{arch}-unknown-linux-musl",
-]
-unpack = [
-  "chmod pueue pueued",
-  "wrap bin"
-]
-
-[github.websocat]
-repo = "vi/websocat"
-uri = "https://github.com/vi/websocat/releases/download/{version}/websocat.{arch}-unknown-linux-musl"
-unpack = [
-    "mv websocat.{arch}-unknown-linux-musl websocat",
-    "wrap bin"
-]

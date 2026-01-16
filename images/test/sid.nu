@@ -2,7 +2,7 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'debian:sid-slim'
+        from: 'ghcr.lizzie.fun/fj0r/io:base'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
@@ -10,9 +10,10 @@ export def main [context: record = {}] {
         config: {
             nushell: 'https://github.com/fj0r/nushell.git'
         }
+        image: test
     }
     | merge $context
-    | build {|ctx|
+    | build --skip-push {|ctx|
         conf expose [22]
         conf env {
             LANG: C.UTF-8
@@ -21,35 +22,17 @@ export def main [context: record = {}] {
             MASTER: $ctx.user
             PYTHONUNBUFFERED: x
         }
-        pkg update
-        pkg install [
-            sudo attr procps htop cron tzdata
-            # base-devel
-            # nushell
-            # dropbear
-            openssh-client rsync s3fs
-            tcpdump socat
-            sqlite3 patch tree
-            xz-utils zstd zip unzip
-            lsof inetutils-ping iproute2 iptables net-tools
-        ]
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell setup '/usr/local' {
+        nushell setup '/usr/local' -c ~/Downloads {
             user: $ctx.user
             src: $ctx.config.nushell
             dst: $xdg_config
             plugin: [query]
         }
 
-        github install pueue websocat
+        github install -c ~/Downloads websocat pueue
 
-        conf env {
-            DEBUGE: ''
-            PREBOOT: ''
-            POSTBOOT: ''
-            CRONFILE: ''
-        }
         conf workdir $ctx.workdir
         conf cmd []
         copy entrypoint /entrypoint

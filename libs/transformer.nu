@@ -1,6 +1,7 @@
-export def run [list? = []] {
+export def run [acts?: list] {
     let n = $in
-    $list
+    $acts
+    | default []
     | reduce -f $n {|x, acc|
         let r = $x | split row -r '\s+'
         dispatch $acc $r.0 ($r | slice 1..)

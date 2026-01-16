@@ -1,7 +1,8 @@
 use trace.nu
 use transformer.nu
 use extract.nu
-const CFG = path self ../,.toml
+use utils.nu *
+const CFG = path self ../github.yaml
 
 export def get-version [repo] {
     let ver = curl --retry 3 -fsSL https://api.github.com/repos/($repo)/releases/latest | from json | get tag_name
@@ -13,19 +14,21 @@ export def install [
     ...tags
     --target(-t): string = '/usr/local'
     --unpack(-u): closure
+    --cache(-c): string = ''
 ] {
     for t in $tags {
         trace o -p 'github-install' $t
-        install-inner $t
+        install-inner $t -t $target -u $unpack -c $cache
     }
 }
 
 def install-inner [
     tag
-    --target(-t): string = '/usr/local'
+    --target(-t): string
     --unpack(-u): closure
+    --cache(-c): string
 ] {
-    let cfg = open $CFG | get github | get $tag
+    let cfg = open $CFG | get packages | get $tag
     let ev = {
         version: (get-version $cfg.repo | transformer run $cfg.version?)
         arch: $nu.os-info.arch
@@ -37,13 +40,26 @@ def install-inner [
     }
     | each {|x| $ev | format pattern $x }
 
-    let wd = mktemp -t -d
+    let wd = mktemp -t -d --suffix .buildah
     cd $wd
 
     for uri in $uris {
         let f = $uri | url parse | get path | path parse
-        let f = [$f.stem $f.extension] | str join '.'
-        curl --retry 3 -fsSL $uri -o $f
+        let f = [$f.stem $f.extension]
+        | where { $in | is-not-empty }
+        | str join '.'
+
+        let cache = if ($cache | is-not-empty) {
+            ($cache)/($f) | path expand
+        }
+        if ($cache | is-empty) {
+            curl --retry 3 -fsSL $uri -o $f
+        } else {
+            if not ($cache | path exists) {
+                curl --retry 3 -fsSL $uri -o $cache
+            }
+            cp $cache $f
+        }
 
         let ext = $uri | split row '.' | last 2
         cat $f | extract as $ext $f
@@ -57,9 +73,21 @@ def install-inner [
     let dst = extract unpack $upk
 
     cd ($dst | last)
-    trace o files ready
+    trace o -p 'files-ready' $env.PWD
     tree
-    tar -cf * | tar -xf - -C $target
+    with-mount {|new, old|
+        let t = $new | path join (relative-path $target)
+        let d = $t | path parse | get parent
+            trace o -p 'target' {t : $t, target: $target, d: $d}
+        if not ($d | path exists) {
+            trace o -p 'create-dir' $d
+            mkdir $d
+        }
+        cd $old
+        print =============================
+        tree
+        cp -r -v * $t
+    }
 
     for d in ($dst | append $wd | uniq) {
         rm -rf $wd

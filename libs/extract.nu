@@ -1,4 +1,5 @@
 use trace.nu
+use utils.nu *
 
 export def as [
     ext file
@@ -36,9 +37,9 @@ export def as [
     }
 }
 
-export def unpack [acts?: list = []] {
+export def unpack [acts?: list] {
     mut dirs = []
-    for a in $acts {
+    for a in ($acts | default []) {
         let r = $a | split row -r '\s+'
         let d = dispatch $r.0 ($r | slice 1..)
         $dirs ++= [$d]
@@ -59,20 +60,21 @@ def dispatch [act args?] {
         }
         wrap => {
             let s = $args.0? | default 'bin'
-            let t = mktemp -t -d
+            let t = mktemp -t -d --suffix .buildah
             let n = $t | path join $s
-            cp -v -r * $n
+            mkdir $n
+            cp -r -v * $n
             cd $t
         }
         filter => {
             let s = $args | each { $in | into glob }
-            let t = mktemp -t -d
+            let t = mktemp -t -d --suffix .buildah
             for x in (ls ...$s | get name) {
                 let d = $t | path join ($x | path parse | get parent)
                 if not ($d | path exists) {
                     mkdir $d
                 }
-                cp -v -r $x $d
+                cp -v $x $t
             }
             cd $t
         }
