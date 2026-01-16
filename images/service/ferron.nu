@@ -2,7 +2,7 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):latest'
+        from: $'($context.image):sid'
         user: master
         workdir: /home/master
     }

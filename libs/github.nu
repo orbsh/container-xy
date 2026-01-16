@@ -40,6 +40,8 @@ def install-inner [
     }
     | each {|x| $ev | format pattern $x }
 
+    let origin = pwd
+
     let wd = mktemp -t -d --suffix .buildah
     cd $wd
 
@@ -84,12 +86,12 @@ def install-inner [
             mkdir $d
         }
         cd $old
-        print =============================
-        tree
         cp -r -v * $t
     }
 
+    cd $origin
     for d in ($dst | append $wd | uniq) {
-        rm -rf $wd
+        trace o -p 'clean temp dir' $d
+        rm -rf $d
     }
 }

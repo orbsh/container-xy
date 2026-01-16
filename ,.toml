@@ -2,6 +2,7 @@
 repo = "ghcr.io/fj0r/xy"
 tags = [
   "latest",
+  "sid",
   "z",
   "ferron",
   "marimo",
