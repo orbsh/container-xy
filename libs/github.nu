@@ -89,8 +89,9 @@ def install-inner [
     let upk = do $upk (
         $cfg.unpack? | default [] | each {|x| $ev | format pattern $x}
     )
-    let dst = extract unpack $upk
+    let dst = extract unpack $upk | prepend $wd
 
+    trace o -p 'temp-dirs' $dst
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
     tree
@@ -107,7 +108,7 @@ def install-inner [
     }
 
     cd $origin
-    for d in ($dst | append $wd | uniq) {
+    for d in ($dst | uniq) {
         trace o -p 'clean temp dir' $d
         rm -rf $d
     }

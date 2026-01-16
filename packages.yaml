@@ -37,7 +37,7 @@ github:
     unpack:
     - filter kubernetes/node/bin/kubectl kubernetes/node/bin/kubeadm
     - strip 3
-    - chmodx
+    - chmodx kubectl kubeadm
     - wrap bin
   helm:
     repo: helm/helm
@@ -54,8 +54,8 @@ github:
     - wrap bin
   mihomo:
     repo: MetaCubeX/mihomo
-    uri: https://github.com/MetaCubeX/mihomo/releases/download/{version}/mihomo-linux-{arch2}-{version}.gz
+    uri: https://github.com/MetaCubeX/mihomo/releases/download/{version}/mihomo-linux-{arch2}-v3-{version}.gz
     upack:
-    - mv mihomo-linux-{arch2}-{version} mihomo
-    - chmodx
+    - mv mihomo-linux-{arch2}-v3-{version} mihomo
+    - chmodx mihomo
     - wrap bin

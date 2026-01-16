@@ -30,7 +30,10 @@ export module image {
         --nu-ver: string = "0.109.1"
     ] {
         cd ($CWD | path join images)
-        let fs = ls */*.nu | get name | each { $in | path parse }
+        let fs = ls */*.nu
+        | get name
+        | where { not ($in | str starts-with test/) }
+        | each { $in | path parse }
         for f in $fs {
             {
                 name: branch_($f.stem),

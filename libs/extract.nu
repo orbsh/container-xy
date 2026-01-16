@@ -33,7 +33,11 @@ export def as [
         [_ zip]     => {
             unzip $file
         }
-        _ => {}
+        _ => {
+            error make {
+                msg: $"extension ($ext) not found"
+            }
+        }
     }
 }
 
@@ -84,6 +88,11 @@ def dispatch [act args?] {
         chmodx => {
             for f in $args {
                 chmod +x $f
+            }
+        }
+        _ => {
+            error make {
+                msg: $"acts `($act)` not found"
             }
         }
     }
