@@ -119,13 +119,22 @@ export module image {
 
 export module test {
     def cmpl-build [] {
-        glob ($CWD)/images/test/*.nu
-        | path parse
-        | get stem
+        glob ($env.PWD)/images/*/*.nu
+        | path split
+        | each { $in | last 2 | path join }
     }
 
     export def build [s: string@cmpl-build] {
-        buildah unshare nu images/test/($s).nu
+        buildah unshare nu -c $"
+            overlay use images/($s) as build
+            build {
+                cache: ~/Downloads
+                image: xy
+                author: orbit
+            }
+            "
+            | str trim
+            | str replace -rma '^ {12}' ''
     }
 
     def cmpl-ferron [] {
