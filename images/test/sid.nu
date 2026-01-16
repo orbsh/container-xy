@@ -10,6 +10,7 @@ export def main [context: record = {}] {
         config: {
             nushell: 'https://github.com/fj0r/nushell.git'
         }
+        image: test
     }
     | merge $context
     | build {|ctx|
@@ -23,14 +24,14 @@ export def main [context: record = {}] {
         }
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell setup '/usr/local' {
+        nushell setup '/usr/local' -c ~/Downloads {
             user: $ctx.user
             src: $ctx.config.nushell
             dst: $xdg_config
             plugin: [query]
         }
 
-        github install pueue websocat
+        github install -c ~/Downloads websocat pueue
 
         conf workdir $ctx.workdir
         conf cmd []

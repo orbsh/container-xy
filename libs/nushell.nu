@@ -2,11 +2,16 @@ use utils.nu *
 use trace.nu
 use github.nu
 
-export def setup [dir config: record --skip-download] {
+export def setup [
+    dir
+    config: record
+    --skip-download
+    --cache(-c): string = ''
+] {
     if not $skip_download {
         trace o -p 'install-nushell' $dir
         let plugin = $config.plugin | each {|x| $"nu_plugin_($x)" }
-        github install nushell -t $dir -u {|x|
+        github install nushell -t $dir -c $cache -u {|x|
             $x | each {|y|
                 if ($y | str starts-with "filter") {
                     let f = [nu] | append $plugin | uniq
@@ -32,7 +37,7 @@ export def setup [dir config: record --skip-download] {
     }
 
     let reg = $config.plugin
-    | each {|x| $"plugin add ($dir | path join nu_plugin_($x))"}
+    | each {|x| $"plugin add ($dir | path join bin nu_plugin_($x))"}
     | str join '; '
 
     run [

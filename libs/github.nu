@@ -2,7 +2,7 @@ use trace.nu
 use transformer.nu
 use extract.nu
 use utils.nu *
-const CFG = path self ../,.toml
+const CFG = path self ../github.yaml
 
 export def get-version [repo] {
     let ver = curl --retry 3 -fsSL https://api.github.com/repos/($repo)/releases/latest | from json | get tag_name
@@ -14,6 +14,7 @@ export def install [
     ...tags
     --target(-t): string = '/usr/local'
     --unpack(-u): closure
+    --cache(-c): string = ''
 ] {
     for t in $tags {
         trace o -p 'github-install' $t
@@ -23,10 +24,11 @@ export def install [
 
 def install-inner [
     tag
-    --target(-t): string = '/usr/local'
+    --target(-t): string
     --unpack(-u): closure
+    --cache(-c): string
 ] {
-    let cfg = open $CFG | get github | get $tag
+    let cfg = open $CFG | get packages | get $tag
     let ev = {
         version: (get-version $cfg.repo | transformer run $cfg.version?)
         arch: $nu.os-info.arch
@@ -43,8 +45,11 @@ def install-inner [
 
     for uri in $uris {
         let f = $uri | url parse | get path | path parse
-        let f = [$f.stem $f.extension] | str join '.'
-        let cache = if ($cfg.cache? | is-not-empty) {
+        let f = [$f.stem $f.extension]
+        | where { $in | is-not-empty }
+        | str join '.'
+
+        let cache = if ($cache | is-not-empty) {
             ($cfg.cache)/($f) | path expand
         }
         if ($cache | is-empty) {

@@ -37,9 +37,9 @@ export def as [
     }
 }
 
-export def unpack [acts?: list = []] {
+export def unpack [acts?: list] {
     mut dirs = []
-    for a in $acts {
+    for a in ($acts | default []) {
         let r = $a | split row -r '\s+'
         let d = dispatch $r.0 ($r | slice 1..)
         $dirs ++= [$d]
