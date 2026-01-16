@@ -33,7 +33,7 @@ github:
     - wrap bin
   kubectl:
     repo: https://storage.googleapis.com/kubernetes-release/release/stable.txt
-    uri: https://dl.k8s.io/{version}/kubernetes-node-linux-amd64.tar.gz
+    uri: https://dl.k8s.io/{version}/kubernetes-node-linux-{arch2}.tar.gz
     unpack:
     - filter kubernetes/node/bin/kubectl kubernetes/node/bin/kubeadm
     - strip 3
@@ -41,14 +41,21 @@ github:
     - wrap bin
   helm:
     repo: helm/helm
-    uri: https://get.helm.sh/helm-{version}-linux-amd64.tar.gz
+    uri: https://get.helm.sh/helm-{version}-linux-{arch2}.tar.gz
     unpack:
-    - filter linux-amd64/helm
+    - filter linux-{arch2}/helm
     - strip 1
     - wrap bin
   istio:
     repo: istio/istio
-    uri: https://github.com/istio/istio/releases/latest/download/istioctl-{version}-linux-amd64.tar.gz
+    uri: https://github.com/istio/istio/releases/latest/download/istioctl-{version}-linux-{arch2}.tar.gz
     upack:
     - filter istioctl
+    - wrap bin
+  mihomo:
+    repo: MetaCubeX/mihomo
+    uri: https://github.com/MetaCubeX/mihomo/releases/download/{version}/mihomo-linux-{arch2}-{version}.gz
+    upack:
+    - mv mihomo-linux-{arch2}-{version} mihomo
+    - chmodx
     - wrap bin

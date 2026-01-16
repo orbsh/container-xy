@@ -3,8 +3,11 @@ repo = "ghcr.io/fj0r/xy"
 tags = [
   "latest",
   "sid",
+  "rust",
   "z",
   "ferron",
   "marimo",
+  # "haskell",
+  "ci",
 ]
 archive = "~/pub/Platform/xy.tar.zst"

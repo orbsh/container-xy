@@ -27,6 +27,17 @@ export def install [
     }
 }
 
+def arch2 [a] {
+    match $a {
+        'x86_64' => 'amd64',
+        'aarch64' => 'arm64',
+        'i386' | 'i686' => '396',
+        'armv7' | 'armhf' => 'arm'
+        _ => $a
+    }
+}
+
+
 def install-inner [
     tag
     --target(-t): string
@@ -37,6 +48,7 @@ def install-inner [
     let ev = {
         version: (get-version $cfg.repo | transformer run $cfg.version?)
         arch: $nu.os-info.arch
+        arch2: (arch2 $nu.os-info.arch)
     }
     let uris = if ($cfg.uri | describe -d).type == list {
         $cfg.uri
