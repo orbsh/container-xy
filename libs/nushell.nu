@@ -3,8 +3,8 @@ use trace.nu
 use github.nu
 
 export def setup [dir config: record --skip-download] {
-    if not $skip_download {
-        with-mount {
+    with-mount {
+        if not $skip_download {
             let dst = relative-path $dir | path expand
             trace o -p 'install-nushell' $dst
             let plugin = $config.plugin | each {|x| $"nu_plugin_($x)" }
@@ -21,16 +21,24 @@ export def setup [dir config: record --skip-download] {
         }
     }
 
+    run [
+        $'usermod -s ($dir | path join "nu") ($config.user)'
+    ]
+
+    with-mount {
+        let dst = relative-path $config.dst
+        | path expand
+        | path join nushell
+        git clone --depth=3 $config.src $dst
+        cd $dst
+        git log -1 --date=iso
+    }
+
     let reg = $config.plugin
     | each {|x| $"plugin add ($dir | path join nu_plugin_($x))"}
     | str join '; '
+
     run [
-        $'usermod -s ($dir | path join "nu") ($config.user)'
-        $'git clone --depth=3 ($config.src) ($config.dst)/nushell'
-        'opwd=$PWD'
-        $'cd ($config.dst)/nushell'
-        'git log -1 --date=iso'
-        'cd $opwd'
         $'chown ($config.user):($config.user) -R ($config.dst)/nushell'
         $'sudo -u ($config.user) nu -c "($reg)"'
         $"echo '$env.NU_POWER_CONFIG.theme.color.normal = \"xterm_olive\"' >> /home/($config.user)/.nu"

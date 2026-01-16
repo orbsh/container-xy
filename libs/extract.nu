@@ -73,7 +73,7 @@ def dispatch [act args?] {
                 if not ($d | path exists) {
                     mkdir $d
                 }
-                cp -v -r $x $d
+                cp -v $x $t
             }
             cd $t
         }
