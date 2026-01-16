@@ -34,6 +34,7 @@ export def main [context: record = {}] {
         ]
         setup timezone $ctx.timezone
         setup sudo
+
         setup git $ctx.author
         #arch config nushell $ctx.user $xdg_home $ctx.config.nushell
         let xdg_config = $"/home/($ctx.user)/.config"

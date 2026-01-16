@@ -30,3 +30,4 @@ packages:
     uri: https://github.com/ferronweb/ferron/releases/download/{version}/ferron-{version}-{arch}-unknown-linux-musl.zip
     unpack:
     - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
+    - wrap bin

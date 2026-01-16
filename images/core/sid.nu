@@ -33,6 +33,9 @@ export def main [context: record = {}] {
             xz-utils zstd zip unzip
             lsof inetutils-ping iproute2 iptables net-tools
         ]
+        setup timezone $ctx.timezone
+        setup sudo
+
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
         nushell setup '/usr/local' {

@@ -5,6 +5,7 @@ export def main [context: record = {}] {
         from: $'($context.image):sid'
         user: master
         workdir: /home/master
+        tags: ferron
     }
     | merge $context
     | build {|ctx|
@@ -12,12 +13,6 @@ export def main [context: record = {}] {
         github install ferron -c $ctx.cache?
 
         with-mount {|new, old|
-            mkdir opt/ferron
-            cd opt/ferron
-            for f in [ferron ferron-passwd ferron-yaml2kdl ferron-precompress] {
-                cp ($old | path join $f) .
-            }
-
             r#'
             :8080 {
                 root "/srv"
@@ -25,10 +20,8 @@ export def main [context: record = {}] {
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
-            | save ferron.kdl
-
+            | save etc/ferron.kdl
         }
-        dirs drop
 
         with-mount {
             cd entrypoint
@@ -37,9 +30,9 @@ export def main [context: record = {}] {
             use init.nu [pueue-extend now]
 
             def run-ferron [config?] {
-                mut cmd = ["/opt/ferron/ferron"]
+                mut cmd = ["/usr/local/bin/ferron"]
                 let config = if ($config | is-empty) {
-                    [--config /opt/ferron/ferron.kdl]
+                    [--config /etc/ferron.kdl]
                 } else {
                     [--config $config]
                 }

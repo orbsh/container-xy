@@ -19,19 +19,19 @@ export def as [
             $n | tar Jxf -
         }
         [_ gz]      => {
-            $n | gzip -d | save -f $file
+            $n | gzip -d | save -f ($file | path parse | get stem)
         }
         [_ zst]     => {
-            $n | zstd -d | save -f $file
+            $n | zstd -d | save -f ($file | path parse | get stem)
         }
         [_ bz2]     => {
-            $n | bzip2 -d | save -f $file
+            $n | bzip2 -d | save -f ($file | path parse | get stem)
         }
         [_ xz]      => {
-            $n | xz -d | save -f $file
+            $n | xz -d | save -f ($file | path parse | get stem)
         }
         [_ zip]     => {
-            unzip
+            unzip $file
         }
         _ => {}
     }
