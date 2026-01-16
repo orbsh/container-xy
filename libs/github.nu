@@ -2,7 +2,7 @@ use trace.nu
 use transformer.nu
 use extract.nu
 use utils.nu *
-const CFG = path self ../github.yaml
+const CFG = path self ../packages.yaml
 
 export def get-version [repo] {
     let ver = if ($repo | str starts-with 'http') {
@@ -16,7 +16,7 @@ export def get-version [repo] {
 }
 
 export def install [
-    ...tags
+    tags
     --target(-t): string = '/usr/local'
     --unpack(-u): closure
     --cache(-c): string = ''
@@ -33,7 +33,7 @@ def install-inner [
     --unpack(-u): closure
     --cache(-c): string
 ] {
-    let cfg = open $CFG | get packages | get $tag
+    let cfg = open $CFG | get github | get $tag
     let ev = {
         version: (get-version $cfg.repo | transformer run $cfg.version?)
         arch: $nu.os-info.arch
@@ -91,7 +91,7 @@ def install-inner [
             mkdir $d
         }
         cd $old
-        cp -r -v * $t
+        cp -r -v **/* $t
     }
 
     cd $origin

@@ -11,7 +11,7 @@ export def setup [
     if not $skip_download {
         trace o -p 'install-nushell' $dir
         let plugin = $config.plugin | each {|x| $"nu_plugin_($x)" }
-        github install nushell -t $dir -c $cache -u {|x|
+        github install [nushell] -t $dir -c $cache -u {|x|
             $x | each {|y|
                 if ($y | str starts-with "filter") {
                     let f = [nu] | append $plugin | uniq
