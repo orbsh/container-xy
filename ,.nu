@@ -118,15 +118,19 @@ export module image {
 }
 
 export module test {
-    export def build [] {
-        buildah unshare nu images/test.nu
+    def cmpl-build [] {
+        glob ($CWD)/images/test/*.nu
+        | path parse
+        | get stem
+    }
+
+    export def build [s: string@cmpl-build] {
+        buildah unshare nu images/test/($s).nu
     }
 
     def cmpl-ferron [] {
-        ls ($CWD)/images/service/ferron
-        | get name
+        glob ($CWD)/images/service/ferron/*.kdl
         | path parse
-        | where extension == kdl
         | get stem
     }
 

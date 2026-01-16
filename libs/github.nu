@@ -44,7 +44,14 @@ def install-inner [
     for uri in $uris {
         let f = $uri | url parse | get path | path parse
         let f = [$f.stem $f.extension] | str join '.'
-        curl --retry 3 -fsSL $uri -o $f
+        let cache = if ($cfg.cache? | is-not-empty) {
+            ($cfg.cache)/($f) | path expand
+        }
+        if ($cache | path exists) {
+            cp $cache $f
+        } else {
+            curl --retry 3 -fsSL $uri -o $f
+        }
 
         let ext = $uri | split row '.' | last 2
         cat $f | extract as $ext $f
