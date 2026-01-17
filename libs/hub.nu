@@ -4,14 +4,17 @@ use extract.nu
 use utils.nu *
 const CFG = path self ../hub.yaml
 
-export def get-version [repo] {
-    let ver = if ($repo | str starts-with 'http') {
-        curl --retry 3 -fsSL $repo
+export def get-version [cfg] {
+    let ver = if ($cfg.repo | str starts-with 'http') {
+        curl --retry 3 -fsSL $cfg.repo
+    } else if ($cfg.with_prerelease? | default false) {
+        let url = $"https://api.github.com/repos/($cfg.repo)/releases"
+        curl --retry 3 -fsSL $url | from json | first | get tag_name
     } else {
-        let url = $"https://api.github.com/repos/($repo)/releases/latest"
+        let url = $"https://api.github.com/repos/($cfg.repo)/releases/latest"
         curl --retry 3 -fsSL $url | from json | get tag_name
     }
-    trace o -p 'version' { repo: $repo, version: $ver }
+    trace o -p 'version' { repo: $cfg.repo, version: $ver }
     $ver
 }
 
@@ -46,7 +49,7 @@ def install-inner [
 ] {
     let cfg = open $CFG | get packages | get $tag
     let ev = {
-        version: (get-version $cfg.repo | transformer run $cfg.version?)
+        version: (get-version $cfg | transformer run $cfg.version?)
         arch: $nu.os-info.arch
         arch2: (arch2 $nu.os-info.arch)
     }

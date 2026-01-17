@@ -60,7 +60,8 @@ packages:
     - wrap bin
   surrealdb:
     repo: surrealdb/surrealdb
-    uri: https://github.com/surrealdb/surrealdb/releases/download/{version}/surreal-${version}.linux-{arch2}.tgz
+    with_prerelease: true
+    uri: https://github.com/surrealdb/surrealdb/releases/download/{version}/surreal-{version}.linux-{arch2}.tgz
     upack:
     - wrap bin
   mihomo:
