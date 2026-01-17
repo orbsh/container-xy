@@ -1,5 +1,4 @@
 use trace.nu
-use b.nu *
 
 export def as [
     ext file

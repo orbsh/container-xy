@@ -64,26 +64,25 @@ packages:
     unpack:
     - wrap bin
     hooks:
-      script: |
+      after: |
         let ctx = $env.HUBHOOK | from nuon
         use b.nu
-        print ($ctx | table -e)
+        use trace.nu
 
         [
-            $"SET extension_directory = $'/($ctx.target | path join share/duckdb/extensions)';"
+            $"SET extension_directory = '/($ctx.target | path join share/duckdb/extensions)';"
             'SET autoinstall_known_extensions = true;'
             'SET autoload_known_extensions = true;'
         ]
         | str join (char newline)
         | save -a ($ctx.mount)/root/.duckdbrc
-      after: |
-        let ctx = $env.HUBHOOK | from nuon
-        use b.nu
 
-        let pkgs = $ctx.cfg.options?.extensions? | default []
+        let exts = $ctx.cfg.options?.extensions? | default []
+        trace o -p duckdb-extensions $exts
+        let exts = $exts
         | each {|x| $"INSTALL ($x)" }
         | str join '; '
-        b run [ $"duckdb -c '($pkgs)'" ]
+        b run [ $"duckdb -c '($exts)'" ]
     options:
       extensions:
       - httpfs

@@ -1,7 +1,7 @@
 use trace.nu
 use transformer.nu
 use extract.nu
-use b.nu *
+use b.nu
 const CFG = path self ../hub.yaml
 
 export def get-version [cfg] {
@@ -107,12 +107,12 @@ def install-inner [
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
     tree
-    with-mount {|new, old|
-        let target = relative-path $target
+    b with-mount {|new, old|
+        let target = b relative-path $target
         let t = $new | path join $target
         mkdir $t
         let d = $t | path parse | get parent
-            trace o -p 'target' {t : $t, target: $target, d: $d}
+        trace o -p 'target' {t : $t, target: $target, d: $d}
         if not ($d | path exists) {
             trace o -p 'create-dir' $d
             mkdir $d

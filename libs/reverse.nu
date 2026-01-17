@@ -1,4 +1,4 @@
-use b.nu *
+use b.nu
 use trace.nu
 
 export def shell [addr port] {

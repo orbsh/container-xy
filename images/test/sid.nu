@@ -27,10 +27,6 @@ export def main [context: record = {}] {
 
         hub install -c $ctx.cache [websocat pueue]
 
-        pkg setup duckdb [
-            httpfs # delta ducklake iceberg postgres sqlite fts
-        ]
-
         conf workdir $ctx.workdir
         conf cmd []
         copy entrypoint /entrypoint
