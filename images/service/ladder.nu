@@ -53,7 +53,7 @@ export def main [context: record = {}] {
         user: master
         workdir: /home/master
     }
-    | $context
+    | merge $context
     | merge { tags: singbox }
     | build {|ctx|
     }

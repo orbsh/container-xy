@@ -9,6 +9,11 @@ export def setup [
     --skip-download
     --cache(-c): string = ''
 ] {
+    let injection = [
+        'export alias pst = pueue status'
+        'export alias pf = pueue follow'
+    ]
+
     if not $skip_download {
         trace o -p 'install-nushell' $dir
         let plugin = $config.plugin | each {|x| $"nu_plugin_($x)" }
@@ -33,8 +38,7 @@ export def setup [
 
         [
             '$env.config.show_banner = "short"'
-            'export alias pst = pueue status'
-            'export alias pf = pueue follow'
+            ...$injection
         ]
         | str join (char newline)
         | save -a root/.config/nushell/config.nu
@@ -49,8 +53,7 @@ export def setup [
 
         [
             '$env.NU_POWER_CONFIG.theme.color.normal = "xterm_olive"'
-            'export alias pst = pueue status'
-            'export alias pf = pueue follow'
+            ...$injection
         ]
         | str join (char newline)
         | save -a $'home/($config.user)/.nu'

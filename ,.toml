@@ -9,6 +9,7 @@ tags = [
   # "haskell",
   "sid",
   "ferron",
+  "surreal",
   "mihomo",
 ]
 archive = "~/pub/Platform/xy.tar.zst"
