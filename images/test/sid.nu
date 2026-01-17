@@ -3,11 +3,9 @@ use ../../libs *
 export def main [context: record = {}] {
     {
         from: 'ghcr.lizzie.fun/fj0r/io:base'
-        author: unnamed
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
-        image: test
     }
     | merge $context
     | build --skip-push {|ctx|
@@ -28,10 +26,6 @@ export def main [context: record = {}] {
         }
 
         hub install -c $ctx.cache [websocat pueue]
-
-        pkg setup duckdb [
-            httpfs # delta ducklake iceberg postgres sqlite fts
-        ]
 
         conf workdir $ctx.workdir
         conf cmd []

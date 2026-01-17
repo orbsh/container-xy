@@ -1,7 +1,7 @@
 use trace.nu
 use transformer.nu
 use extract.nu
-use utils.nu *
+use b.nu
 const CFG = path self ../hub.yaml
 
 export def get-version [cfg] {
@@ -107,22 +107,56 @@ def install-inner [
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
     tree
-    with-mount {|new, old|
-        let t = $new | path join (relative-path $target)
+    b with-mount {|new, old|
+        let target = b relative-path $target
+        let t = $new | path join $target
         mkdir $t
         let d = $t | path parse | get parent
-            trace o -p 'target' {t : $t, target: $target, d: $d}
+        trace o -p 'target' {t : $t, target: $target, d: $d}
         if not ($d | path exists) {
             trace o -p 'create-dir' $d
             mkdir $d
         }
         cd $old
+
+        const self = path self .
+        let envs = {
+            cfg: $cfg
+            context: $origin
+            mount: $new
+            target: $target
+            workdir: $env.PWD
+        }
+        | to nuon
+
+        if ($cfg.hooks?.prepare? | is-not-empty) {
+            with-env {HUBHOOK: $envs} {
+                let exe = mktemp -p $self
+                $cfg.hooks.prepare | save -f $exe
+                print '<<<<<< prepare'
+                nu $exe
+                print '>>>>>> prepare'
+                rm -f $exe
+            }
+        }
+
         if $archive {
             tar -cvf - *
             | zstd -18 -T0
             | save -f ($t | path join $'($tag).tar.zst')
         } else {
             cp -r -v * $t
+        }
+
+        if ($cfg.hooks?.after? | is-not-empty) {
+            with-env {HUBHOOK: $envs} {
+                let exe = mktemp -p $self
+                $cfg.hooks.after | save -f $exe
+                print '<<<<<< after'
+                nu $exe
+                print '>>>>>> after'
+                rm -f $exe
+            }
         }
     }
 

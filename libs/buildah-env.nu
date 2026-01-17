@@ -1,5 +1,5 @@
 use trace.nu
-use utils.nu *
+use b.nu
 
 export def enter --env [from] {
     let working_container = buildah from $from

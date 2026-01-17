@@ -11,6 +11,7 @@ export def main [context: record = {}] {
     | build {|ctx|
         hub install [
             nushell
+            duckdb
             pueue
             websocat
             kubectl

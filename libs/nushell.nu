@@ -1,4 +1,4 @@
-use utils.nu *
+use b.nu
 use trace.nu
 use hub.nu
 const CFG = path self ../hub.yaml
@@ -29,11 +29,11 @@ export def setup [
         }
     }
 
-    run [
+    b run [
         $'usermod -s ($dir | path join bin "nu") ($config.user)'
     ]
 
-    with-mount {
+    b with-mount {
         mkdir root/.config/nushell
 
         [
@@ -44,7 +44,7 @@ export def setup [
         | save -a root/.config/nushell/config.nu
     }
 
-    with-mount {
+    b with-mount {
         let cfg = (open $CFG).settings.nushell
         let dst = relative-path $config.dst
         | path expand
@@ -66,7 +66,7 @@ export def setup [
     | each {|x| $"plugin add ($dir | path join bin nu_plugin_($x))"}
     | str join '; '
 
-    run [
+    b run [
         $"chown ($config.user):($config.user) /home/($config.user)/.nu"
         $'chown ($config.user):($config.user) -R ($config.dst)/nushell'
         $'sudo -u ($config.user) nu -c "($reg)"'

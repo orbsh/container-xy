@@ -36,11 +36,17 @@ export def main [context: record = {}] {
         #arch config nushell $ctx.user $xdg_home $ctx.config.nushell
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
+
         nushell setup '/usr/local' {
             user: $ctx.user
             dst: $xdg_config
             plugin: [query]
         }
+
+        hub install [
+            duckdb
+        ]
+
         pkg setup python [
             ty
             httpx aiofile aiostream fastapi uvicorn
@@ -52,10 +58,6 @@ export def main [context: record = {}] {
             @typespec/compiler @typespec/json-schema
             vscode-langservers-extracted
             yaml-language-server
-        ]
-
-        pkg setup duckdb [
-            httpfs delta ducklake iceberg postgres sqlite fts
         ]
 
         # conf volume [$ctx.workdir]
