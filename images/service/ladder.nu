@@ -30,6 +30,7 @@ export def main [context: record = {}] {
             $"
             #!/usr/bin/env nu
             use init.nu [pueue-extend now]
+
             for i in ($m | get f | to nuon) {
                 ln -fs /opt/\($i\) /data
             }
@@ -37,6 +38,7 @@ export def main [context: record = {}] {
             pueue-extend default 1
             pueue add --group default -l mihomo -- mihomo -d /data -ext-ctl 0.0.0.0:9090
             "
+            | str trim
             | str replace -rma '^ {12}' ''
             | save entrypoint/mihomo.nu
         }
@@ -47,7 +49,7 @@ export def main [context: record = {}] {
     }
 
     {
-        from: $'ghcr.io/sagernet/sing-box:latest'
+        from: 'ghcr.io/sagernet/sing-box:latest'
         user: master
         workdir: /home/master
     }

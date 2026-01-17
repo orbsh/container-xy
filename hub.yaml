@@ -7,7 +7,7 @@ settings:
 packages:
   nushell:
     repo: nushell/nushell
-    uri: https://github.com/nushell/nushell/releases/download/{version}/nu-{version}-{arch}-unknown-linux-musl.tar.gz
+    uri: download/{version}/nu-{version}-{arch}-unknown-linux-musl.tar.gz
     version:
     - trim
     unpack:
@@ -17,8 +17,8 @@ packages:
   pueue:
     repo: Nukesor/pueue
     uri:
-    - https://github.com/Nukesor/pueue/releases/download/{version}/pueue-{arch}-unknown-linux-musl
-    - https://github.com/Nukesor/pueue/releases/download/{version}/pueued-{arch}-unknown-linux-musl
+    - download/{version}/pueue-{arch}-unknown-linux-musl
+    - download/{version}/pueued-{arch}-unknown-linux-musl
     unpack:
     - mv pueue-{arch}-unknown-linux-musl pueue
     - mv pueued-{arch}-unknown-linux-musl pueued
@@ -26,14 +26,14 @@ packages:
     - wrap bin
   websocat:
     repo: vi/websocat
-    uri: https://github.com/vi/websocat/releases/download/{version}/websocat.{arch}-unknown-linux-musl
+    uri: download/{version}/websocat.{arch}-unknown-linux-musl
     unpack:
     - mv websocat.{arch}-unknown-linux-musl websocat
     - chmodx websocat
     - wrap bin
   ferron:
     repo: ferronweb/ferron
-    uri: https://github.com/ferronweb/ferron/releases/download/{version}/ferron-{version}-{arch}-unknown-linux-musl.zip
+    uri: download/{version}/ferron-{version}-{arch}-unknown-linux-musl.zip
     unpack:
     - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
     - wrap bin
@@ -54,13 +54,19 @@ packages:
     - wrap bin
   istio:
     repo: istio/istio
-    uri: https://github.com/istio/istio/releases/latest/download/istioctl-{version}-linux-{arch2}.tar.gz
+    uri: download/istioctl-{version}-linux-{arch2}.tar.gz
     upack:
     - filter istioctl
     - wrap bin
+  surrealdb:
+    repo: surrealdb/surrealdb
+    with_prerelease: true
+    uri: download/{version}/surreal-{version}.linux-{arch2}.tgz
+    unpack:
+    - wrap bin
   mihomo:
     repo: MetaCubeX/mihomo
-    uri: https://github.com/MetaCubeX/mihomo/releases/download/{version}/mihomo-linux-{arch2}-v3-{version}.gz
+    uri: download/{version}/mihomo-linux-{arch2}-v3-{version}.gz
     unpack:
     - mv mihomo-linux-{arch2}-v3-{version} mihomo
     - chmodx mihomo

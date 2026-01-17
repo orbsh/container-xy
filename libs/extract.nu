@@ -7,7 +7,7 @@ export def as [
     let n = $in
     mut del = true
     match $ext {
-        [tar gz]  => {
+        [tar gz] | [_ tgz]  => {
             $n | tar zxf -
         }
         [tar zst] => {
@@ -16,7 +16,7 @@ export def as [
         [tar bz2] => {
             $n | tar jxf -
         }
-        [tar xz]  => {
+        [tar xz] | [_ txz]  => {
             $n | tar Jxf -
         }
         [_ gz]      => {
