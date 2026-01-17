@@ -2,7 +2,7 @@ use trace.nu
 use transformer.nu
 use extract.nu
 use utils.nu *
-const CFG = path self ../packages.yaml
+const CFG = path self ../hub.yaml
 
 export def get-version [repo] {
     let ver = if ($repo | str starts-with 'http') {
@@ -22,7 +22,7 @@ export def install [
     --cache(-c): string = ''
 ] {
     for t in $tags {
-        trace o -p 'github-install' $t
+        trace o -p 'hub-install' $t
         install-inner $t -t $target -u $unpack -c $cache
     }
 }
@@ -44,7 +44,7 @@ def install-inner [
     --unpack(-u): closure
     --cache(-c): string
 ] {
-    let cfg = open $CFG | get github | get $tag
+    let cfg = open $CFG | get packages | get $tag
     let ev = {
         version: (get-version $cfg.repo | transformer run $cfg.version?)
         arch: $nu.os-info.arch
@@ -89,8 +89,9 @@ def install-inner [
     let upk = do $upk (
         $cfg.unpack? | default [] | each {|x| $ev | format pattern $x}
     )
-    let dst = extract unpack $upk
+    let dst = extract unpack $upk | prepend $wd
 
+    trace o -p 'temp-dirs' $dst
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
     tree
@@ -103,11 +104,11 @@ def install-inner [
             mkdir $d
         }
         cd $old
-        cp -r -v **/* $t
+        cp -r -v * $t
     }
 
     cd $origin
-    for d in ($dst | append $wd | uniq) {
+    for d in ($dst | uniq) {
         trace o -p 'clean temp dir' $d
         rm -rf $d
     }

@@ -33,8 +33,13 @@ export def as [
         [_ zip]     => {
             unzip $file
         }
-        _ => {}
+        _ => {
+            error make {
+                msg: $"extension ($ext) not found"
+            }
+        }
     }
+    rm -f $file
 }
 
 export def unpack [acts?: list] {
@@ -49,7 +54,7 @@ export def unpack [acts?: list] {
 }
 
 def dispatch [act args?] {
-    trace o $act $args
+    trace o -p 'unpack' $act $args
     match $act {
         strip => {
             let s = $args.0? | default '1' | into int
@@ -63,7 +68,7 @@ def dispatch [act args?] {
             let t = mktemp -t -d --suffix .buildah
             let n = $t | path join $s
             mkdir $n
-            cp -r -v **/* $n
+            cp -r -v * $n
             cd $t
         }
         filter => {
@@ -84,6 +89,11 @@ def dispatch [act args?] {
         chmodx => {
             for f in $args {
                 chmod +x $f
+            }
+        }
+        _ => {
+            error make {
+                msg: $"acts `($act)` not found"
             }
         }
     }

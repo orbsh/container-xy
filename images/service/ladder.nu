@@ -9,7 +9,7 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        github install [mihomo]
+        hub install -c $ctx.cache? [mihomo]
         with-mount {
             let m = [
                 [country.mmdb Country.mmdb]
@@ -25,7 +25,9 @@ export def main [context: record = {}] {
                 }
             }
             for x in $m {
-                curl --retry 3 -fsSL https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/($x.u) -o opt/($x.f)
+                if ($ctx.cache | is-empty) {
+                    curl --retry 3 -fsSL https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/($x.u) -o opt/($x.f)
+                }
             }
         }
 
@@ -33,7 +35,9 @@ export def main [context: record = {}] {
         #!/usr/bin/env nu
         use init.nu [pueue-extend now]
         for i in ($m | get f | to nuon) {
-            ln -fs /opt/($i) /data
+            if ($ctx.cache | is-empty) {
+                ln -fs /opt/($i) /data
+            }
         }
 
         pueue-extend default 1
