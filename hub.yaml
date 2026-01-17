@@ -58,6 +58,11 @@ packages:
     upack:
     - filter istioctl
     - wrap bin
+  surrealdb:
+    repo: surrealdb/surrealdb
+    uri: https://github.com/surrealdb/surrealdb/releases/download/{version}/surreal-${version}.linux-{arch2}.tgz
+    upack:
+    - wrap bin
   mihomo:
     repo: MetaCubeX/mihomo
     uri: https://github.com/MetaCubeX/mihomo/releases/download/{version}/mihomo-linux-{arch2}-v3-{version}.gz
