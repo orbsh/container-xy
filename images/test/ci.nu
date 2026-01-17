@@ -9,6 +9,6 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        github install -c $ctx.cache? [ helm istio kubectl ]
+        hub install -c $ctx.cache? [ helm istio kubectl ]
     }
 }

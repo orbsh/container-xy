@@ -12,7 +12,7 @@ export def main [context: record = {}] {
         pkg install [
             buildah skopeo podman
         ]
-        github install [kubectl helm]
+        hub install [kubectl helm]
 
         pkg pip install [
             ansible kubernetes

@@ -31,7 +31,7 @@ export def main [context: record = {}] {
             plugin: [query]
         }
 
-        github install -c $ctx.cache [websocat pueue]
+        hub install -c $ctx.cache [websocat pueue]
 
         conf workdir $ctx.workdir
         conf cmd []

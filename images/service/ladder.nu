@@ -9,7 +9,7 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        github install -c $ctx.cache? [mihomo]
+        hub install -c $ctx.cache? [mihomo]
         with-mount {
             let m = [
                 [country.mmdb Country.mmdb]

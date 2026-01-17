@@ -68,7 +68,7 @@ def dispatch [act args?] {
             let t = mktemp -t -d --suffix .buildah
             let n = $t | path join $s
             mkdir $n
-            cp -r -v **/* $n
+            cp -r -v * $n
             cd $t
         }
         filter => {

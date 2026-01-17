@@ -7,6 +7,6 @@ export use nushell.nu
 export use setup.nu
 export use reverse.nu
 export use upterm.nu
-export use github.nu
+export use hub.nu
 export use transformer.nu
 export use extract.nu
