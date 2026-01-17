@@ -86,7 +86,7 @@ export def 'pip install' [
 }
 
 export def 'setup python' [pkgs] {
-    b install [
+    install [
         python python-pip
     ]
     pip install $pkgs
@@ -102,7 +102,7 @@ export def 'bun install' [
 }
 
 export def 'setup js' [pkgs] {
-    b install [
+    install [
         bun
     ]
     bun install $pkgs
