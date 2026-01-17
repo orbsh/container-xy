@@ -15,7 +15,6 @@ export def main [context: record = {}] {
                 [country.mmdb Country.mmdb]
                 geoip.dat
                 geoip.db
-                cn_domain.yaml
             ]
             | each {|i|
                 if ($i | describe -d).type == list {
@@ -25,9 +24,7 @@ export def main [context: record = {}] {
                 }
             }
             for x in $m {
-                if ($ctx.cache | is-empty) {
-                    curl --retry 3 -fsSL https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/($x.u) -o opt/($x.f)
-                }
+                curl --retry 3 -fsSL https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/($x.u) -o opt/($x.f)
             }
 
             $"
@@ -49,7 +46,7 @@ export def main [context: record = {}] {
         conf workdir /data
     }
     {
-        from: $'($context.image):sid'
+        from: $'ghcr.io/sagernet/sing-box:latest'
         user: master
         workdir: /home/master
         tags: singbox

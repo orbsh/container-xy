@@ -5,6 +5,7 @@ export def as [
     ext file
 ] {
     let n = $in
+    mut del = true
     match $ext {
         [tar gz]  => {
             $n | tar zxf -
@@ -35,9 +36,12 @@ export def as [
         }
         _ => {
             trace o -p 'warning' $"extension ($ext) not found"
+            $del = false
         }
     }
-    rm -f $file
+    if $del {
+        rm -f $file
+    }
 }
 
 export def unpack [acts?: list] {
