@@ -86,12 +86,12 @@ packages:
     options:
       extensions:
       - httpfs
-      # - delta
-      # - ducklake
-      # - iceberg
-      # - postgres
-      # - sqlite
-      # - fts
+      - delta
+      - ducklake
+      - iceberg
+      - postgres
+      - sqlite
+      - fts
   surrealdb:
     repo: surrealdb/surrealdb
     with_prerelease: true
