@@ -1,4 +1,4 @@
-use utils.nu *
+use b.nu *
 use trace.nu
 
 export def up [

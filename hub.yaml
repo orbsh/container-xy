@@ -63,6 +63,18 @@ packages:
     uri: download/{version}/duckdb_cli-linux-{arch2}.zip
     unpack:
     - wrap bin
+    script: |
+      let ctx = $env.context | from nuon
+      use b.nu
+    options:
+      extensions:
+      - httpfs
+      - delta
+      - ducklake
+      - iceberg
+      - postgres
+      - sqlite
+      - fts
   surrealdb:
     repo: surrealdb/surrealdb
     with_prerelease: true

@@ -1,7 +1,7 @@
 export use build.nu
 export use trace.nu
 export use pkg.nu
-export use utils.nu *
+export use b.nu *
 export use rust.nu
 export use nushell.nu
 export use setup.nu

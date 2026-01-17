@@ -1,4 +1,4 @@
-use utils.nu *
+use b.nu *
 
 export def timezone [timezone] {
     run [

@@ -1,7 +1,7 @@
 use trace.nu
 use transformer.nu
 use extract.nu
-use utils.nu *
+use b.nu *
 const CFG = path self ../hub.yaml
 
 export def get-version [cfg] {
@@ -117,6 +117,26 @@ def install-inner [
             mkdir $d
         }
         cd $old
+
+        if ($cfg.script? | is-not-empty) {
+            with-env {
+                context: ({
+                    cfg: $cfg
+                    target: $t
+                    cwd: $env.PWD
+                }
+                | to nuon)
+            } {
+                const self = path self .
+                let exe = mktemp -p $self
+                $cfg.script | save -f $exe
+                print '------------'
+                nu $exe
+                print '------------'
+                rm -f $exe
+            }
+        }
+
         if $archive {
             tar -cvf - *
             | zstd -18 -T0
