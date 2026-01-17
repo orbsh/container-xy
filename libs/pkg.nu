@@ -130,8 +130,8 @@ export def 'duckdb extension' [
     with-mount {
         [
             $"SET extension_directory = '($dir)';"
-            # 'SET autoinstall_known_extensions = true;'
-            # 'SET autoload_known_extensions = true;'
+            'SET autoinstall_known_extensions = true;'
+            'SET autoload_known_extensions = true;'
         ]
         | str join (char newline)
         | save -a root/.duckdbrc
