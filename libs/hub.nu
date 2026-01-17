@@ -18,18 +18,6 @@ export def get-version [cfg] {
     $ver
 }
 
-export def install [
-    tags
-    --target(-t): string = '/usr/local'
-    --unpack(-u): closure
-    --cache(-c): string = ''
-] {
-    for t in $tags {
-        trace o -p 'hub-install' $t
-        install-inner $t -t $target -u $unpack -c $cache
-    }
-}
-
 def arch2 [a] {
     match $a {
         'x86_64' => 'amd64',
@@ -40,12 +28,26 @@ def arch2 [a] {
     }
 }
 
+export def install [
+    tags
+    --target(-t): string = '/usr/local'
+    --unpack(-u): closure
+    --cache(-c): string = ''
+    --archive
+] {
+    for t in $tags {
+        trace o -p 'hub-install' $t
+        install-inner $t -t $target -u $unpack -c $cache --archive=$archive
+    }
+}
+
 
 def install-inner [
     tag
     --target(-t): string
     --unpack(-u): closure
     --cache(-c): string
+    --archive
 ] {
     let cfg = open $CFG | get packages | get $tag
     let ev = {
@@ -107,6 +109,7 @@ def install-inner [
     tree
     with-mount {|new, old|
         let t = $new | path join (relative-path $target)
+        mkdir $t
         let d = $t | path parse | get parent
             trace o -p 'target' {t : $t, target: $target, d: $d}
         if not ($d | path exists) {
@@ -114,7 +117,13 @@ def install-inner [
             mkdir $d
         }
         cd $old
-        cp -r -v * $t
+        if $archive {
+            tar -cvf - *
+            | zstd -18 -T0
+            | save -f ($t | path join $'($tag).tar.zst')
+        } else {
+            cp -r -v * $t
+        }
     }
 
     cd $origin
