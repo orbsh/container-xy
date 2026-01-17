@@ -55,8 +55,13 @@ packages:
   istio:
     repo: istio/istio
     uri: download/istioctl-{version}-linux-{arch2}.tar.gz
-    upack:
+    unpack:
     - filter istioctl
+    - wrap bin
+  duckdb:
+    repo: duckdb/duckdb
+    uri: download/{version}/duckdb_cli-linux-{arch2}.zip
+    unpack:
     - wrap bin
   surrealdb:
     repo: surrealdb/surrealdb

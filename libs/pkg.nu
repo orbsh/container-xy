@@ -1,4 +1,6 @@
 use utils.nu *
+use trace.nu
+use hub.nu
 
 export def install [pkgs] {
     let pkgs = $pkgs | str join ' '
@@ -104,4 +106,39 @@ export def 'setup js' [pkgs] {
         bun
     ]
     bun install $pkgs
+}
+
+export def 'setup duckdb' [
+    pkgs
+    --target(-t): string = '/usr/local'
+    --cache(-c): string = ''
+    --archive
+] {
+    hub install [duckdb] -t $target -c $cache --archive=$archive
+    duckdb extension $pkgs --dir ($target | path join 'share/duckdb/extensions')
+}
+
+export def 'duckdb extension' [
+    pkgs
+    --dir(-d): string = '/opt/duckdb/extensions'
+] {
+    trace o -p 'duckdb-extensions' $pkgs
+    # httpfs delta ducklake iceberg postgres sqlite fts
+    # conf env {
+    #     DUCKDB_EXTENSION_DIRECTORY: $dir
+    # }
+    with-mount {
+        [
+            $"SET extension_directory = '($dir)';"
+            # 'SET autoinstall_known_extensions = true;'
+            # 'SET autoload_known_extensions = true;'
+        ]
+        | str join (char newline)
+        | save -a root/.duckdbrc
+    }
+
+    let pkgs = $pkgs
+    | each {|x| $"INSTALL ($x)" }
+    | str join '; '
+    run [ $"duckdb -c '($pkgs)'" ]
 }

@@ -53,6 +53,11 @@ export def main [context: record = {}] {
             vscode-langservers-extracted
             yaml-language-server
         ]
+
+        pkg setup duckdb [
+            httpfs delta ducklake iceberg postgres sqlite fts
+        ]
+
         # conf volume [$ctx.workdir]
         conf env {
             DEBUGE: ''
