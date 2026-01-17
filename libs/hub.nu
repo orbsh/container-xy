@@ -108,7 +108,8 @@ def install-inner [
     trace o -p 'files-ready' $env.PWD
     tree
     with-mount {|new, old|
-        let t = $new | path join (relative-path $target)
+        let target = relative-path $target
+        let t = $new | path join $target
         mkdir $t
         let d = $t | path parse | get parent
             trace o -p 'target' {t : $t, target: $target, d: $d}
@@ -118,21 +119,23 @@ def install-inner [
         }
         cd $old
 
-        if ($cfg.script? | is-not-empty) {
-            with-env {
-                context: ({
-                    cfg: $cfg
-                    target: $t
-                    cwd: $env.PWD
-                }
-                | to nuon)
-            } {
-                const self = path self .
+        const self = path self .
+        let envs = {
+            cfg: $cfg
+            context: $origin
+            mount: $new
+            target: $target
+            workdir: $env.PWD
+        }
+        | to nuon
+
+        if ($cfg.hooks?.prepare? | is-not-empty) {
+            with-env {HUBHOOK: $envs} {
                 let exe = mktemp -p $self
-                $cfg.script | save -f $exe
-                print '------------'
+                $cfg.hooks.prepare | save -f $exe
+                print '<<<<<< prepare'
                 nu $exe
-                print '------------'
+                print '>>>>>> prepare'
                 rm -f $exe
             }
         }
@@ -143,6 +146,17 @@ def install-inner [
             | save -f ($t | path join $'($tag).tar.zst')
         } else {
             cp -r -v * $t
+        }
+
+        if ($cfg.hooks?.after? | is-not-empty) {
+            with-env {HUBHOOK: $envs} {
+                let exe = mktemp -p $self
+                $cfg.hooks.after | save -f $exe
+                print '<<<<<< after'
+                nu $exe
+                print '>>>>>> after'
+                rm -f $exe
+            }
         }
     }
 

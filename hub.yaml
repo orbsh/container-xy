@@ -63,18 +63,36 @@ packages:
     uri: download/{version}/duckdb_cli-linux-{arch2}.zip
     unpack:
     - wrap bin
-    script: |
-      let ctx = $env.context | from nuon
-      use b.nu
+    hooks:
+      script: |
+        let ctx = $env.HUBHOOK | from nuon
+        use b.nu
+        print ($ctx | table -e)
+
+        [
+            $"SET extension_directory = $'/($ctx.target | path join share/duckdb/extensions)';"
+            'SET autoinstall_known_extensions = true;'
+            'SET autoload_known_extensions = true;'
+        ]
+        | str join (char newline)
+        | save -a ($ctx.mount)/root/.duckdbrc
+      after: |
+        let ctx = $env.HUBHOOK | from nuon
+        use b.nu
+
+        let pkgs = $ctx.cfg.options?.extensions? | default []
+        | each {|x| $"INSTALL ($x)" }
+        | str join '; '
+        b run [ $"duckdb -c '($pkgs)'" ]
     options:
       extensions:
       - httpfs
-      - delta
-      - ducklake
-      - iceberg
-      - postgres
-      - sqlite
-      - fts
+      # - delta
+      # - ducklake
+      # - iceberg
+      # - postgres
+      # - sqlite
+      # - fts
   surrealdb:
     repo: surrealdb/surrealdb
     with_prerelease: true
