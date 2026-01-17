@@ -5,9 +5,9 @@ export def main [context: record = {}] {
         from: $'($context.image):sid'
         user: master
         workdir: /home/master
-        tags: mihomo
     }
     | merge $context
+    | merge { tags: mihomo }
     | build {|ctx|
         hub install -c $ctx.cache? [mihomo]
         with-mount {
@@ -45,13 +45,14 @@ export def main [context: record = {}] {
         conf cmd ['srv']
         conf workdir /data
     }
+
     {
         from: $'ghcr.io/sagernet/sing-box:latest'
         user: master
         workdir: /home/master
-        tags: singbox
     }
-    | merge $context
+    | $context
+    | merge { tags: singbox }
     | build {|ctx|
     }
 }
