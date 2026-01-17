@@ -134,6 +134,7 @@ export module test {
                 cache: ~/Downloads
                 image: xy
                 author: orbit
+                skip_push: true
             }
             "
             | str trim

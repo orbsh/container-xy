@@ -28,6 +28,13 @@ export def setup [
     ]
 
     with-mount {
+        mkdir root/.config/nushell
+
+        '$env.config.show_banner = "short"'
+        | save -a root/.config/nushell/config.nu
+    }
+
+    with-mount {
         let dst = relative-path $config.dst
         | path expand
         | path join nushell

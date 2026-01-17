@@ -29,20 +29,20 @@ export def main [context: record = {}] {
                     curl --retry 3 -fsSL https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/($x.u) -o opt/($x.f)
                 }
             }
-        }
 
-        r#'
-        #!/usr/bin/env nu
-        use init.nu [pueue-extend now]
-        for i in ($m | get f | to nuon) {
-            if ($ctx.cache | is-empty) {
-                ln -fs /opt/($i) /data
+            $"
+            #!/usr/bin/env nu
+            use init.nu [pueue-extend now]
+            for i in ($m | get f | to nuon) {
+                ln -fs /opt/\($i\) /data
             }
-        }
 
-        pueue-extend default 1
-        pueue add --group default -l mihomo -- mihomo -d /data -ext-ctl 0.0.0.0:9090
-        '#
+            pueue-extend default 1
+            pueue add --group default -l mihomo -- mihomo -d /data -ext-ctl 0.0.0.0:9090
+            "
+            | str replace -rma '^ {12}' ''
+            | save entrypoint/mihomo.nu
+        }
 
         conf expose [7890 7891 9090]
         conf cmd ['srv']

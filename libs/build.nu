@@ -33,7 +33,7 @@ export def main [acts --squash --skip-push] {
         buildah commit $working_container $image
     }
 
-    if not $skip_push {
+    if not ($ctx.skip_push? | default false) {
         trace o push $image
         buildah push --creds ($ctx.author):($ctx.password) $image
     }
