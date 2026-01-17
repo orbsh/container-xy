@@ -31,7 +31,12 @@ export def setup [
     with-mount {
         mkdir root/.config/nushell
 
-        '$env.config.show_banner = "short"'
+        [
+            '$env.config.show_banner = "short"'
+            'export alias pst = pueue status'
+            'export alias pf = pueue follow'
+        ]
+        | str join (char newline)
         | save -a root/.config/nushell/config.nu
     }
 
@@ -41,6 +46,15 @@ export def setup [
         | path expand
         | path join nushell
         git clone --depth=($cfg.clone?.depth? | default 3) $cfg.git $dst
+
+        [
+            '$env.NU_POWER_CONFIG.theme.color.normal = "xterm_olive"'
+            'export alias pst = pueue status'
+            'export alias pf = pueue follow'
+        ]
+        | str join (char newline)
+        | save -a $'home/($config.user)/.nu'
+
         cd $dst
         git log -1 --date=iso
     }
@@ -50,9 +64,8 @@ export def setup [
     | str join '; '
 
     run [
+        $"chown ($config.user):($config.user) /home/($config.user)/.nu"
         $'chown ($config.user):($config.user) -R ($config.dst)/nushell'
         $'sudo -u ($config.user) nu -c "($reg)"'
-        $"echo '$env.NU_POWER_CONFIG.theme.color.normal = \"xterm_olive\"' >> /home/($config.user)/.nu"
-        $"chown ($config.user):($config.user) /home/($config.user)/.nu"
     ]
 }
