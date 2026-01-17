@@ -147,7 +147,10 @@ export module test {
         | get stem
     }
 
-    export def ferron [config:string@cmpl-ferron] {
+    export def ferron [
+        config:string@cmpl-ferron
+        --image(-i): string = 'xy:ferron'
+    ] {
         let name = 'test-ferron'
         ^$env.CNTRCTL rm -f $name
         mut flag = [
@@ -159,7 +162,7 @@ export module test {
         ]
         ^$env.CNTRCTL run ...[
             ...$flag
-            xy:ferron
+            $image
         ]
     }
 
