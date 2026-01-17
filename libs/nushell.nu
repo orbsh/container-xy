@@ -1,6 +1,7 @@
 use utils.nu *
 use trace.nu
 use hub.nu
+const CFG = path self ../hub.yaml
 
 export def setup [
     dir
@@ -35,10 +36,11 @@ export def setup [
     }
 
     with-mount {
+        let cfg = (open $CFG).settings.nushell
         let dst = relative-path $config.dst
         | path expand
         | path join nushell
-        git clone --depth=3 $config.src $dst
+        git clone --depth=($cfg.clone?.depth? | default 3) $cfg.git $dst
         cd $dst
         git log -1 --date=iso
     }

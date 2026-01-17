@@ -34,9 +34,7 @@ export def as [
             unzip $file
         }
         _ => {
-            error make {
-                msg: $"extension ($ext) not found"
-            }
+            trace o -p 'warning' $"extension ($ext) not found"
         }
     }
     rm -f $file

@@ -7,9 +7,6 @@ export def main [context: record = {}] {
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
-        config: {
-            nushell: 'https://github.com/fj0r/nushell.git'
-        }
     }
     | merge $context
     | build {|ctx|
@@ -41,7 +38,6 @@ export def main [context: record = {}] {
         setup master $ctx.user $ctx.workdir $xdg_config
         nushell setup '/usr/local' {
             user: $ctx.user
-            src: $ctx.config.nushell
             dst: $xdg_config
             plugin: [query]
         }
