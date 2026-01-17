@@ -58,7 +58,14 @@ def install-inner [
     } else {
         [$cfg.uri]
     }
-    | each {|x| $ev | format pattern $x }
+    | each {|x|
+        let u = $ev | format pattern $x
+        if ($u | str starts-with 'http') {
+            $u
+        } else {
+            $'https://github.com/($cfg.repo)/releases' | path join $u
+        }
+    }
 
     let origin = pwd
 
