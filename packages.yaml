@@ -55,7 +55,7 @@ github:
   mihomo:
     repo: MetaCubeX/mihomo
     uri: https://github.com/MetaCubeX/mihomo/releases/download/{version}/mihomo-linux-{arch2}-v3-{version}.gz
-    upack:
+    unpack:
     - mv mihomo-linux-{arch2}-v3-{version} mihomo
     - chmodx mihomo
     - wrap bin

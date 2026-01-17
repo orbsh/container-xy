@@ -39,6 +39,7 @@ export def as [
             }
         }
     }
+    rm -f $file
 }
 
 export def unpack [acts?: list] {
@@ -53,7 +54,7 @@ export def unpack [acts?: list] {
 }
 
 def dispatch [act args?] {
-    trace o $act $args
+    trace o -p 'unpack' $act $args
     match $act {
         strip => {
             let s = $args.0? | default '1' | into int
