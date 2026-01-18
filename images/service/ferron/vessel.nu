@@ -11,13 +11,14 @@ export def main [] {
             content -p
             let r = $"
             for i in ($pkgs | split row ',') {
-                install ($env.HTTP_HOST)/vessel/download/$i /usr/local
+                print $'install \($i\)...'
+                install $'($env.HTTP_HOST)/vessel/download/\($i\).tar.zst' /usr/local
             }
             "
             | str trim
             | str replace -rma '^ {12}' ''
             [
-                (view source tar-ls)
+                (view source tar-fs)
                 (view source install)
                 $r
             ]
@@ -25,24 +26,34 @@ export def main [] {
             | print $in
         }
         [vessel download $pkg] => {
-            let f = '/opt/vessel' | path join $pkg | $"($in).tar.zst"
+            let f = '/opt/vessel' | path join $pkg
             send-file $f
         }
         [vessel $args] => {
             content -p
-            let ne = $args | split row ',' | where {|it|
+            let invalid = $args | split row ',' | where {|it|
                 '/opt/vessel' | path join $"($it).tar.zst" | path exists | not $in
             }
-            if ($ne | is-not-empty) {
-                print $"pkgs not exists: [($ne | str join ', ')]"
+            if ($invalid | is-not-empty) {
+                cd /opt/vessel
+                let pkgs = ls *.tar.zst
+                | get name
+                | each { $in | split row '.' | first }
+                {
+                    invalid: $invalid
+                    allowed: $pkgs
+                }
+                | to yaml
+                | print $in
                 return
             }
             $"
             if ! command -v nu >/dev/null 2>&1; then
-                echo \"nu not found. Installing...\"
+                echo \"nu not found. installing...\"
                 curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -sSL ($env.HTTP_HOST)/vessel/install/($args) | nu -c -
+            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/($args) > /tmp/vessel-install
+            /usr/local/bin/nu /tmp/vessel-install
             "
             | str trim
             | str replace -rma '^ {12}' ''
@@ -55,7 +66,7 @@ export def main [] {
     }
 }
 
-def tar-ls [f] {
+def tar-fs [f] {
     tar -tf $f
     | lines
     | reduce -f {} {|i,a|
@@ -65,5 +76,23 @@ def tar-ls [f] {
 }
 
 def install [url loc] {
-    curl -SL --progress-bar $url | zstd -d | tar -xf - -C $loc
+    let file = $url | path split | last
+    let file = '/tmp' | path join $file
+    curl -SL --progress-bar $url -o $file
+    let fs = tar-fs $file
+    cat $file | zstd -d | tar -xf - ...($fs | where $it not-in [config setup.nu]) -C $loc
+    if 'config' in $fs {
+        cat $file
+        | zstd -d
+        | tar -xf - --strip-component=1 config -C (
+            $env.HOME | path join '.config'
+        )
+    }
+    if 'setup.nu' in $fs {
+        cd
+        cat $file
+        | zstd -d
+        | tar -Oxf -
+        | nu -c $in
+    }
 }
