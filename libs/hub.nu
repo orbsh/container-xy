@@ -123,7 +123,6 @@ def install-inner [
         }
         cd $old
 
-        const self = path self .
         let envs = {
             cfg: $cfg
             context: $origin
@@ -133,18 +132,10 @@ def install-inner [
             user: $user
             author: $author
         }
-        | to nuon
 
-        if ($cfg.hooks?.prepare? | is-not-empty) {
-            with-env {HUBHOOK: $envs} {
-                let exe = mktemp -p $self
-                $cfg.hooks.prepare | save -f $exe
-                print '<<<<<< prepare'
-                nu $exe
-                print '>>>>>> prepare'
-                rm -f $exe
-            }
-        }
+        $cfg.hooks?.prepare? | run-script HUBHOOK $envs [
+            b.nu trace.nu
+        ]
 
         if $archive {
             tar -cvf - *
@@ -154,16 +145,9 @@ def install-inner [
             cp -r -v * $t
         }
 
-        if ($cfg.hooks?.after? | is-not-empty) {
-            with-env {HUBHOOK: $envs} {
-                let exe = mktemp -p $self
-                $cfg.hooks.after | save -f $exe
-                print '<<<<<< after'
-                nu $exe
-                print '>>>>>> after'
-                rm -f $exe
-            }
-        }
+        $cfg.hooks?.after? | run-script HUBHOOK $envs [
+            b.nu trace.nu
+        ]
     }
 
     cd $origin
@@ -171,4 +155,30 @@ def install-inner [
         trace o -p 'clean temp dir' $d
         rm -rf $d
     }
+}
+
+export def run-script [
+    key: string
+    envs: record
+    mods: list<string>
+]: any -> nothing {
+    let input = $in
+    if ($input | is-empty) { return }
+
+    let ctx = mktemp -d
+    trace o -p run-script $ctx
+
+    const self = path self .
+    for m in $mods {
+        cp ($self | path join $m) $ctx
+    }
+
+    let main = $ctx | path join main.nu
+    $input | save -f $main
+    with-env { $key: ($envs | to nuon) } {
+        print '<<<<<< prepare'
+        nu $main
+        print '>>>>>> prepare'
+    }
+    rm -rf $ctx
 }
