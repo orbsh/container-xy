@@ -54,24 +54,13 @@ jobs:
         with:
           version: '0.109.1'
 
-      - name: Build marimo
-        shell: buildah unshare nu {0}
-        run: |
-          overlay use ${{ github.workspace }}/images/ext/marimo.nu as build
-          build {
-            author: ${{ env.USERNAME }}
-            password: ${{ secrets.GHCR_TOKEN }}
-            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: marimo
-          }
-
-      - name: build surreal
+      - name: build vessel
         shell: buildah unshare nu {0}
         run: |-
-          overlay use ${{ github.workspace }}/images/database/surreal.nu as build
+          overlay use ${{ github.workspace }}/images/service/vessel.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: surreal
+            tags: vessel
           }
