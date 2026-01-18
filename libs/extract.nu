@@ -4,6 +4,7 @@ export def as [
     ext file
 ] {
     let n = $in
+    trace inc-level
     mut del = true
     match $ext {
         [tar gz] | [_ tgz]  => {
@@ -55,6 +56,7 @@ export def unpack [acts?: list] {
 }
 
 def dispatch [act args?] {
+    trace inc-level
     trace o -p 'unpack' $act $args
     match $act {
         strip => {

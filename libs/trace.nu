@@ -11,14 +11,23 @@ export def parse_msg [args] {
     {time: $time, txt: $s.txt, tag: $s.tag }
 }
 
+export def --env inc-level [] {
+    $env.TRACE_LEVEL = ($env.TRACE_LEVEL? | default (-1)) + 1
+}
+
 export def o [
     ...msg: any
     --prefix(-p): string
-    --lv(-l): int = 0
-    --total: int = 6
+    # --lv(-l): int = 0
+    --total: int = 8
 ] {
     let msg = parse_msg $msg
-    let lv = '' | fill -c '*' -w ($total - $lv) | fill -c ' ' -w $total -a right
+
+    let lv = $env.TRACE_LEVEL? | default 0 | into int
+    let lv = $total - $lv
+    let lv = if $lv >= 0 { $lv } else { 0 }
+    let lv = '' | fill -c '*' -w $lv | fill -c ' ' -w $total -a right
+
     mut r = [$"(ansi grey)($lv)│($msg.time)"]
     if ($prefix | is-not-empty) {
         $r ++= [$"<($prefix)>"]

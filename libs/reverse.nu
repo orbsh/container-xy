@@ -3,6 +3,7 @@ use trace.nu
 
 export def shell [addr port] {
     # local
+    trace inc-level
 
     trace o Ensure that $"`socat -d -d TCP-LISTEN:($port),reuseaddr FILE:\(tty\),raw,echo=0`" is running locally and is reachable.
     # remote

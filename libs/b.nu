@@ -1,11 +1,13 @@
 use trace.nu
 
 export def copy [src dst] {
+    trace inc-level
     trace o copy $src $dst
     buildah copy $env.BUILDAH_WORKING_CONTAINER $src $dst
 }
 
 export def run [cmd: list] {
+    trace inc-level
     $cmd
     | str join ' && '
     | trace f run
@@ -17,6 +19,7 @@ export def commit [image] {
 }
 
 export def with-mount [act] {
+    trace inc-level
     let tg = $env.BUILDAH_WORKING_MOUNTPOINT
     let old = $env.PWD
     cd $tg
@@ -26,6 +29,7 @@ export def with-mount [act] {
 
 export module conf {
     export def env [rec: record] {
+        trace inc-level
         $rec
         | trace f config env
         | items {|k, v| [--env ($k)=($v)] }
@@ -34,6 +38,7 @@ export module conf {
     }
 
     export def expose [vec: list] {
+        trace inc-level
         $vec
         | trace f config expose
         | each {|x|
@@ -49,6 +54,7 @@ export module conf {
     }
 
     export def volume [vec: list] {
+        trace inc-level
         $vec
         | trace f config volume
         | each {|x| [--volume $x] }
@@ -57,6 +63,7 @@ export module conf {
     }
 
     export def workdir [...vec] {
+        trace inc-level
         $vec
         | trace f config workdir
         | each {|x| [--workingdir $x] }
@@ -65,6 +72,7 @@ export module conf {
     }
 
     export def entrypoint [vec: list] {
+        trace inc-level
         $vec
         | trace f config entrypoint
         | to json -r
@@ -72,6 +80,7 @@ export module conf {
     }
 
     export def cmd [vec: list] {
+        trace inc-level
         $vec
         | trace f config cmd
         | to json -r

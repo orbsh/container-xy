@@ -9,6 +9,7 @@ export def setup [
     --skip-download
     --cache(-c): string = ''
 ] {
+    trace inc-level
     let injection = [
         'export alias pst = pueue status'
         'export alias pf = pueue follow'

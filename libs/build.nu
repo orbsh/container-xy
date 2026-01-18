@@ -20,6 +20,7 @@ export def main [acts --squash --skip-push] {
         BUILDAH_WORKING_MOUNTPOINT: $mountpoint
         # TODO: ssh support (libs/utils.nu)
         SSH_WORKING_HOST: ''
+        TRACE_LEVEL: 0
     } {
         do $acts $ctx
     }

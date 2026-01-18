@@ -2,6 +2,7 @@ use trace.nu
 use b.nu
 
 export def enter --env [from] {
+    trace inc-level
     let working_container = buildah from $from
     let mountpoint = buildah mount $working_container
 

@@ -5,6 +5,7 @@ use b.nu
 const CFG = path self ../hub.yaml
 
 export def get-version [cfg] {
+    trace inc-level
     let ver = if ($cfg.repo | str starts-with 'http') {
         curl --retry 3 -fsSL $cfg.repo
     } else if ($cfg.with_prerelease? | default false) {
@@ -37,6 +38,7 @@ export def install [
     --cache(-c): string = ''
     --archive
 ] {
+    trace inc-level
     for t in $tags {
         trace o -p 'hub-install' $t
         install-inner $t -t $target -u $unpack -c $cache --archive=$archive --user $user -A $author
@@ -53,6 +55,7 @@ def install-inner [
     --cache(-c): string
     --archive
 ] {
+    trace inc-level
     let cfg = open $CFG | get packages | get $tag
     let ev = {
         version: (get-version $cfg | transformer run $cfg.version?)
@@ -166,6 +169,7 @@ export def run-script [
     let input = $in
     if ($input | is-empty) { return }
 
+    trace inc-level
     let ctx = mktemp -d
     trace o -p run-script $ctx
 

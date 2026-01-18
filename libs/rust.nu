@@ -8,6 +8,7 @@ export def up [
     --target: list
     --bin: list
 ] {
+    trace inc-level
     b run [
         $"rustup default ($channel)"
         $"rustup toolchain install"
@@ -51,6 +52,7 @@ export def up [
 }
 
 export def prefetch [owner workdir proj pkgs --test --debug: string] {
+    trace inc-level
     # mkdir $dst
     b run [
         $"cd ($workdir)"
