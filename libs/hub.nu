@@ -110,7 +110,6 @@ def install-inner [
     trace o -p 'temp-dirs' $dst
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
-    tree
     b with-mount {|new, old|
         let target = b relative-path $target
         let t = $new | path join $target
@@ -137,6 +136,7 @@ def install-inner [
             b.nu trace.nu
         ]
 
+        tree
         if $archive {
             tar -cvf - *
             | zstd -18 -T0
