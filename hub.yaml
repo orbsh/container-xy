@@ -20,6 +20,7 @@ packages:
     unpack:
     - filter jj
     - wrap bin
+    exclude_vessel: true
     hooks:
       after: |
         let ctx = $env.HUBHOOK | from nuon

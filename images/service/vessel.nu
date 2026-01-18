@@ -9,14 +9,17 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        hub install [
-            nushell
-            duckdb
-            pueue
-            websocat
-            kubectl
-            helm
-            surrealdb
-        ] -c $ctx.cache? -t /opt/vessel --archive
+        const PKG = path self ../../hub.yaml
+        let pkg = open $PKG
+        | get packages
+        | transpose k v
+        | reduce -f [] {|i,a|
+            if ($i.v.exclude_vessel? | default false) {
+                $a
+            } else {
+                $a | append $i.k
+            }
+        }
+        hub install $pkg -c $ctx.cache? -t /opt/vessel --archive
     }
 }
