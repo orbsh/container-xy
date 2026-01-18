@@ -23,7 +23,7 @@ export def main [context: record = {}] {
             sudo cronie tzdata
             # base-devel
             # nushell
-            # git
+            git
             openssh rsync dropbear s3fs
             tcpdump socat websocat
             ripgrep dust
@@ -32,7 +32,7 @@ export def main [context: record = {}] {
         setup timezone $ctx.timezone
         setup sudo
 
-        # setup git $ctx.author
+        setup git $ctx.author
         #arch config nushell $ctx.user $xdg_home $ctx.config.nushell
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
@@ -44,7 +44,6 @@ export def main [context: record = {}] {
         }
 
         hub install --user $ctx.user -A $ctx.author [
-            jujutsu
             duckdb
         ]
 
