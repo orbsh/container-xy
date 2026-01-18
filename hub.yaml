@@ -98,7 +98,7 @@ packages:
         let exts = $exts
         | each {|x| $"INSTALL ($x)" }
         | str join '; '
-        bin/duckdb -c $"SET extension_directory = '($ctx.mount | path join $ctx.target share/duckdb/extensions)'; ($exts)"
+        bin/duckdb -c $"SET extension_directory = '($ctx.workdir | path join share/duckdb/extensions)'; ($exts)"
     options:
       extensions:
       - httpfs
