@@ -15,8 +15,8 @@ export def main [context: record = {}] {
         }
         pkg with [ base-devel ] {
             pkg pip install [
-                'psycopg[binary]' lancedb
-                'polars' numpy scikit-learn # 'polars[all]'
+                psycopg[binary] lancedb
+                polars numpy scikit-learn # polars[all]
                 # httpx aiofile aiostream fastapi uvicorn
                 # debugpy pytest pydantic pydantic-graph PyParsing
                 # typer pydantic-settings pyyaml
