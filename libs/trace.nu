@@ -11,9 +11,15 @@ export def parse_msg [args] {
     {time: $time, txt: $s.txt, tag: $s.tag }
 }
 
-export def o [...msg: any --prefix(-p): string] {
+export def o [
+    ...msg: any
+    --prefix(-p): string
+    --lv(-l): int = 0
+    --total: int = 6
+] {
     let msg = parse_msg $msg
-    mut r = [$"(ansi grey)******│($msg.time)"]
+    let lv = '' | fill -c '*' -w ($total - $lv) | fill -c ' ' -w $total -a right
+    mut r = [$"(ansi grey)($lv)│($msg.time)"]
     if ($prefix | is-not-empty) {
         $r ++= [$"<($prefix)>"]
     }

@@ -11,13 +11,14 @@ export def main [] {
             content -p
             let r = $"
             for i in ($pkgs | split row ',') {
-                print $'install \($i\)...'
+                info $'install \($i\)'
                 install $'($env.HTTP_HOST)/vessel/download/\($i\).tar.zst' /usr/local
             }
             "
             | str trim
             | str replace -rma '^ {12}' ''
             [
+                (view source info)
                 (view source tar-fs)
                 (view source install)
                 $r
@@ -50,11 +51,10 @@ export def main [] {
             }
             $"
             if ! command -v nu >/dev/null 2>&1; then
-                echo \"nu not found. installing...\"
+                echo \"nu not found. installing\"
                 curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/($args) > /tmp/vessel-install
-            /usr/local/bin/nu /tmp/vessel-install
+            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/($args) | /usr/local/bin/nu --stdin -c 'nu -c $in'
             "
             | str trim
             | str replace -rma '^ {12}' ''
@@ -81,8 +81,10 @@ def install [url loc] {
     let file = '/tmp' | path join $file
     curl -SL --progress-bar $url -o $file
     let fs = tar-fs $file
-    cat $file | zstd -d | tar -xf - ...($fs | where $it not-in [config setup.nu]) -C $loc
+    info --lv 1 $'extract'
+    cat $file | zstd -d | tar -xvf - -C $loc ...($fs | where $it not-in [config setup.nu])
     if 'config' in $fs {
+        info --lv 1 $'config'
         cat $file
         | zstd -d
         | tar -xf - --strip-component=1 config -C (
@@ -90,10 +92,20 @@ def install [url loc] {
         )
     }
     if 'setup.nu' in $fs {
+        info --lv 1 $'setup'
         cd
         cat $file
         | zstd -d
         | tar -Oxf -
         | nu -c $in
     }
+}
+
+def info [msg --lv:int --total:int] {
+    let time = date now | format date '%FT%T.%3f'
+    # HACK: view source
+    let lv = if ($lv | is-empty) { 0 } else { $lv }
+    let total = if ($total | is-empty) { 6 } else { $total }
+    let lv = '' | fill -c '*' -w ($total - $lv) | fill -c ' ' -w $total -a right
+    print $"(ansi grey)($lv)│($time)│($msg)(ansi reset)"
 }
