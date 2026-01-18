@@ -20,6 +20,7 @@ packages:
     unpack:
     - filter jj
     - wrap bin
+    exclude_vessel: true
     hooks:
       after: |
         let ctx = $env.HUBHOOK | from nuon
@@ -67,12 +68,6 @@ packages:
     unpack:
     - filter linux-{arch2}/helm
     - strip 1
-    - wrap bin
-  istio:
-    repo: istio/istio
-    uri: download/istioctl-{version}-linux-{arch2}.tar.gz
-    unpack:
-    - filter istioctl
     - wrap bin
   duckdb:
     repo: duckdb/duckdb
