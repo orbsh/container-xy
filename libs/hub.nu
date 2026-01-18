@@ -136,6 +136,7 @@ def install-inner [
             b.nu trace.nu
         ]
 
+        tree
         if $archive {
             tar -cvf - *
             | zstd -18 -T0
