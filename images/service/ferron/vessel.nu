@@ -36,14 +36,15 @@ export def main [] {
             }
             if ($invalid | is-not-empty) {
                 cd /opt/vessel
-                let pkgs = ls *.tar.zst
+                let pkgs = do -i { ls *.tar.zst }
+                | default []
                 | get name
                 | each { $in | split row '.' | first }
                 {
                     invalid: $invalid
                     allowed: $pkgs
                 }
-                | to yaml
+                | to json
                 | print $in
                 return
             }
