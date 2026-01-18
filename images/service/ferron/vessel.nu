@@ -5,39 +5,53 @@ use $utils *
 
 export def main [] {
     let n = $in
-    if ($env.REQUEST_URI | str ends-with '/') {
-        content -p
-        let pkgs = $env.PATH_INFO | path split | last | split row ','
-        let r = $"
-        for i in ($pkgs) {
-            install $i /usr/local
+    let path = $env.PATH_INFO | str downcase | path split | slice 1..
+    match $path {
+        [vessel install $pkgs] => {
+            content -p
+            let r = $"
+            for i in ($pkgs | split row ',') {
+                install ($env.HTTP_HOST)/vessel/download/$i /usr/local
+            }
+            "
+            | str trim
+            | str replace -rma '^ {12}' ''
+            [
+                (view source tar-ls)
+                (view source install)
+                $r
+            ]
+            | str join (char newline)
+            | print $in
         }
-        "
-        | str trim
-        | str replace -rma '^ {8}' ''
-        [
-            (view source tar-ls)
-            (view source install)
-            $r
-        ]
-        | str join (char newline)
-        | print $in
-    } else if ($env.PATH_INFO | str starts-with '/vessel/install') {
-        content -p
-        let base = $env.PATH_INFO | path split | get 1
-        $"
-        if ! command -v nu >/dev/null 2>&1; then
-            echo \"nu not found. Installing...\"
-            curl -SL --progress-bar ($env.HTTP_HOST)/($base)/download/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
-        fi
-        curl -sSL ($env.HTTP_HOST)($env.PATH_INFO)/ | nu -c -
-        "
-        | str trim
-        | str replace -rma '^ {8}' ''
-        | print $in
-    } else if ($env.PATH_INFO | str starts-with '/vessel/download') {
-        let file = $env.PATH_INFO | path split | last
-        send-file ('/opt/vessel' | path join $file)
+        [vessel download $pkg] => {
+            let f = '/opt/vessel' | path join $pkg | $"($in).tar.zst"
+            send-file $f
+        }
+        [vessel $args] => {
+            content -p
+            let ne = $args | split row ',' | where {|it|
+                '/opt/vessel' | path join $"($it).tar.zst" | path exists | not $in
+            }
+            if ($ne | is-not-empty) {
+                print $"pkgs not exists: [($ne | str join ', ')]"
+                return
+            }
+            $"
+            if ! command -v nu >/dev/null 2>&1; then
+                echo \"nu not found. Installing...\"
+                curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
+            fi
+            curl -sSL ($env.HTTP_HOST)/vessel/install/($args) | nu -c -
+            "
+            | str trim
+            | str replace -rma '^ {12}' ''
+            | print $in
+        }
+        _ => {
+            content -p
+            print $path
+        }
     }
 }
 
