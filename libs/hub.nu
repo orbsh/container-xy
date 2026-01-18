@@ -30,6 +30,8 @@ def arch2 [a] {
 
 export def install [
     tags
+    --user: string
+    --author(-A): string
     --target(-t): string = '/usr/local'
     --unpack(-u): closure
     --cache(-c): string = ''
@@ -37,13 +39,15 @@ export def install [
 ] {
     for t in $tags {
         trace o -p 'hub-install' $t
-        install-inner $t -t $target -u $unpack -c $cache --archive=$archive
+        install-inner $t -t $target -u $unpack -c $cache --archive=$archive --user $user -A $author
     }
 }
 
 
 def install-inner [
     tag
+    --user: string
+    --author(-A): string
     --target(-t): string
     --unpack(-u): closure
     --cache(-c): string
@@ -126,6 +130,8 @@ def install-inner [
             mount: $new
             target: $target
             workdir: $env.PWD
+            user: $user
+            author: $author
         }
         | to nuon
 

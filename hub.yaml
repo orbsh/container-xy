@@ -14,6 +14,22 @@ packages:
     - strip 1
     - filter nu nu_plugin_query
     - wrap bin
+  jujutsu:
+    repo: jj-vcs/jj
+    uri: download/{version}/jj-{version}-{arch}-unknown-linux-musl.tar.gz
+    unpack:
+    - filter jj
+    - wrap bin
+    hooks:
+      after: |
+        let ctx = $env.HUBHOOK | from nuon
+        use b.nu
+        use trace.nu
+
+        b run [
+            $'jj config set --user user.name "($ctx.author)"'
+            $'jj config set --user user.email "($author)@orbit"'
+        ]
   pueue:
     repo: Nukesor/pueue
     uri:
