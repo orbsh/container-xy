@@ -28,7 +28,7 @@ packages:
 
         b run [
             $'jj config set --user user.name "($ctx.author)"'
-            $'jj config set --user user.email "($author)@orbit"'
+            $'jj config set --user user.email "($ctx.author)@orbit"'
         ]
   pueue:
     repo: Nukesor/pueue
@@ -80,7 +80,7 @@ packages:
     unpack:
     - wrap bin
     hooks:
-      after: |
+      prepare: |
         let ctx = $env.HUBHOOK | from nuon
         use b.nu
         use trace.nu
@@ -98,7 +98,7 @@ packages:
         let exts = $exts
         | each {|x| $"INSTALL ($x)" }
         | str join '; '
-        b run [ $"duckdb -c '($exts)'" ]
+        bin/duckdb -c $"SET extension_directory = '($ctx.mount | path join $ctx.target share/duckdb/extensions)'; ($exts)"
     options:
       extensions:
       - httpfs
