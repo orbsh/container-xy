@@ -23,7 +23,7 @@ packages:
         cd bin
         ls nu_plugin_*
         | get name
-        | where $it not-in [nu_plugin_query]
+        | where $it not-in $plugin
         | each {|x| rm -f $x }
       post: |
         let ctx = $env.HUBHOOK | from nuon
