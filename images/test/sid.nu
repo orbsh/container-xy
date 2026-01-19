@@ -22,7 +22,7 @@ export def main [context: record = {}] {
         nushell setup '/usr/local' -c $ctx.cache? {
             user: $ctx.user
             dst: $xdg_config
-            plugin: [query]
+            plugins: [query]
         }
 
         hub install -c $ctx.cache [websocat pueue]

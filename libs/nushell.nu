@@ -17,16 +17,8 @@ export def setup [
 
     if not $skip_download {
         trace o -p 'install-nushell' $dir
-        let plugin = $config.plugin | each {|x| $"nu_plugin_($x)" }
-        hub install [nushell] -t $dir -c $cache -u {|x|
-            $x | each {|y|
-                if ($y | str starts-with "filter") {
-                    let f = [nu] | append $plugin | uniq
-                    $"filter ($f | str join ' ')"
-                } else {
-                    $y
-                }
-            }
+        hub install [nushell] -t $dir -c $cache -o {|x|
+            $x | upsert plugins $config.plugins
         }
     }
 

@@ -34,7 +34,7 @@ export def install [
     --user: string
     --author(-A): string
     --target(-t): string = '/usr/local'
-    --unpack(-u): closure
+    --option(-o): closure
     --cache(-c): string = ''
     --arch: string
     --bundle
@@ -42,7 +42,7 @@ export def install [
     trace inc-level
     for t in $tags {
         trace o -p 'hub-install' $t
-        install-inner $t -t $target -u $unpack -c $cache --bundle=$bundle --arch $arch --user $user -A $author
+        install-inner $t -t $target -o $option -c $cache --bundle=$bundle --arch $arch --user $user -A $author
     }
 }
 
@@ -52,7 +52,7 @@ def install-inner [
     --user: string
     --author(-A): string
     --target(-t): string
-    --unpack(-u): closure
+    --option(-o): closure
     --cache(-c): string
     --arch: string
     --bundle
@@ -107,10 +107,7 @@ def install-inner [
     }
 
 
-    let upk = if ($unpack | is-empty) { {|x| $x} } else { $unpack }
-    let upk = do $upk (
-        $cfg.unpack? | default [] | each {|x| $ev | format pattern $x}
-    )
+    let upk = $cfg.unpack? | default [] | each {|x| $ev | format pattern $x}
     let dst = extract unpack $upk | prepend $wd
 
     trace o -p 'temp-dirs' $dst
@@ -128,8 +125,10 @@ def install-inner [
         }
         cd $old
 
+        let opt = $cfg.options? | default {}
+        let opt = if ($option | is-empty) { $opt } else { do $option $opt }
         let envs = {
-            cfg: $cfg
+            options: $opt
             context: $origin
             mount: $new
             target: $target

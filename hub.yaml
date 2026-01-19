@@ -12,8 +12,22 @@ packages:
     - trim
     unpack:
     - strip 1
-    - filter nu nu_plugin_query
+    - filter nu nu_plugin_*
     - wrap bin
+    hooks:
+      prepare: |
+        let ctx = $env.HUBHOOK | from nuon
+        let plugin = $ctx.options?.plugins?
+        | default []
+        | each {|x| $"nu_plugin_($x)" }
+        cd $ctx.workdir
+        ls nu_plugin_*
+        | get name
+        | where $it not-in [nu_plugin_query]
+        | each {|x| rm -f $x }
+    options:
+      plugins:
+      - query
   jujutsu:
     repo: jj-vcs/jj
     uri: download/{version}/jj-{version}-{arch}-unknown-linux-musl.tar.gz
@@ -74,7 +88,7 @@ packages:
     hooks:
       prepare: |
         let ctx = $env.HUBHOOK | from nuon
-        let exts = $ctx.cfg.options?.extensions? | default []
+        let exts = $ctx.options?.extensions? | default []
         trace o -p duckdb-extensions $exts
         let exts = $exts
         | each {|x| $"INSTALL ($x)" }
