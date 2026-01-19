@@ -96,7 +96,7 @@ def install [url loc] {
         cd
         cat $file
         | zstd -d
-        | tar -Oxf -
+        | tar -Oxf - setup.nu
         | nu -c $in
     }
 }
