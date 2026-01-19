@@ -20,11 +20,22 @@ packages:
         let plugin = $ctx.options?.plugins?
         | default []
         | each {|x| $"nu_plugin_($x)" }
-        cd $ctx.workdir
+        cd bin
         ls nu_plugin_*
         | get name
         | where $it not-in [nu_plugin_query]
         | each {|x| rm -f $x }
+      post: |
+        let ctx = $env.HUBHOOK | from nuon
+        let cfg = $ctx.mount | path join root/.config/nushell
+        mkdir $cfg
+        [
+            '$env.config.show_banner = "short"'
+            'export alias pst = pueue status'
+            'export alias pf = pueue follow'
+        ]
+        | str join (char newline)
+        | save -a ($cfg | path join config.nu)
     options:
       plugins:
       - query
