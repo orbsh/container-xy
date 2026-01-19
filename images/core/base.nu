@@ -39,7 +39,7 @@ export def main [context: record = {}] {
         nushell setup '/usr/local' {
             user: $ctx.user
             dst: $xdg_config
-            plugin: [query]
+            plugins: [query]
         }
 
         hub install --user $ctx.user -A $ctx.author [

@@ -7,12 +7,12 @@ export def main [] {
     let n = $in
     let path = $env.PATH_INFO | str downcase | path split | slice 1..
     match $path {
-        [vessel install $pkgs] => {
+        [vessel install $arch $pkgs] => {
             content -p
             let r = $"
             for i in ($pkgs | split row ',') {
                 info $'install \($i\)'
-                install $'($env.HTTP_HOST)/vessel/download/\($i\).tar.zst' /usr/local
+                install $'($env.HTTP_HOST)/vessel/download/($arch)/\($i\).tar.zst' /usr/local
             }
             "
             | str trim
@@ -26,17 +26,18 @@ export def main [] {
             | str join (char newline)
             | print $in
         }
-        [vessel download $pkg] => {
-            let f = '/opt/vessel' | path join $pkg
+        [vessel download $arch $pkg] => {
+            let f = '/opt/vessel' | path join $arch $pkg
             send-file $f
         }
         [vessel $args] => {
+            let $arch = $nu.os-info.arch
             content -p
             let invalid = $args | split row ',' | where {|it|
-                '/opt/vessel' | path join $"($it).tar.zst" | path exists | not $in
+                '/opt/vessel' | path join $arch $"($it).tar.zst" | path exists | not $in
             }
             if ($invalid | is-not-empty) {
-                cd /opt/vessel
+                cd ('/opt/vessel' | path join $arch)
                 let pkgs = do -i { ls *.tar.zst }
                 | default []
                 | get name
@@ -46,15 +47,17 @@ export def main [] {
                     allowed: $pkgs
                 }
                 | to json
+                | $"cat << EOF\n($in)\nEOF"
                 | print $in
                 return
             }
             $"
+            ARCH=$\(uname -m\)
             if ! command -v nu >/dev/null 2>&1; then
                 echo \"nu not found. installing\"
-                curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
+                curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/${ARCH}/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/($args) | /usr/local/bin/nu --stdin -c 'nu -c $in'
+            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/${ARCH}/($args) | /usr/local/bin/nu --stdin -c 'nu -c $in'
             "
             | str trim
             | str replace -rma '^ {12}' ''
