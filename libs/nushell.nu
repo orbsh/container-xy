@@ -10,10 +10,6 @@ export def setup [
     --cache(-c): string = ''
 ] {
     trace inc-level
-    let injection = [
-        'export alias pst = pueue status'
-        'export alias pf = pueue follow'
-    ]
 
     if not $skip_download {
         trace o -p 'install-nushell' $dir
@@ -27,17 +23,6 @@ export def setup [
     ]
 
     b with-mount {
-        mkdir root/.config/nushell
-
-        [
-            '$env.config.show_banner = "short"'
-            ...$injection
-        ]
-        | str join (char newline)
-        | save -a root/.config/nushell/config.nu
-    }
-
-    b with-mount {
         let cfg = (open $CFG).settings.nushell
         let dst = relative-path $config.dst
         | path expand
@@ -46,7 +31,8 @@ export def setup [
 
         [
             '$env.NU_POWER_CONFIG.theme.color.normal = "xterm_olive"'
-            ...$injection
+            'export alias pst = pueue status'
+            'export alias pf = pueue follow'
         ]
         | str join (char newline)
         | save -a $'home/($config.user)/.nu'
@@ -55,7 +41,7 @@ export def setup [
         git log -1 --date=iso
     }
 
-    let reg = $config.plugin
+    let reg = $config.plugins
     | each {|x| $"plugin add ($dir | path join bin nu_plugin_($x))"}
     | str join '; '
 
