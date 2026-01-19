@@ -20,9 +20,9 @@ packages:
     unpack:
     - filter jj
     - wrap bin
-    exclude_vessel: true
+    exclude_vessel: false
     hooks:
-      after: |
+      post: |
         let ctx = $env.HUBHOOK | from nuon
         use b.nu
         use trace.nu
