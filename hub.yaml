@@ -107,8 +107,9 @@ packages:
         bin/duckdb -c $"SET extension_directory = '($ctx.workdir | path join share/duckdb/extensions)'; ($exts)"
       post: |
         let ctx = $env.HUBHOOK | from nuon
+        let td = "/" | path join $ctx.target share/duckdb/extensions
         [
-            $"SET extension_directory = '($ctx.mount | path join $ctx.target share/duckdb/extensions)';"
+            $"SET extension_directory = '($td)';"
             'SET autoinstall_known_extensions = true;'
             'SET autoload_known_extensions = true;'
         ]
