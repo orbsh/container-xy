@@ -248,7 +248,7 @@ export def gen-script [
     $ctx ++= [$m]
 
     let m = $"
-    with-env { ($key): ($envs | to nuon) } {
+    with-env { ($key): r#'($envs | to nuon)'# } {
         run
     }
     "
