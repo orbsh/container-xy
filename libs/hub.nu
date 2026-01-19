@@ -140,7 +140,12 @@ def install-inner [
 
         if $archive {
             if ($cfg.hooks?.post? | is-not-empty) {
-                $cfg.hooks.post | gen-script HUBHOOK $envs [ trace.nu ]
+                $cfg.hooks.post | gen-script HUBHOOK ($envs | merge {
+                    context: '~'
+                    mount: ''
+                    target: 'usr/local'
+                    workdir: '~'
+                }) [ trace.nu ]
                 | save -f setup.nu
             }
             tar -cvf - *
