@@ -135,9 +135,9 @@ def install-inner [
             author: $author
         }
 
+        tree
         $cfg.hooks?.prepare? | run-script HUBHOOK $envs [ trace.nu ]
 
-        tree
         if $archive {
             if ($cfg.hooks?.post? | is-not-empty) {
                 $cfg.hooks.post | gen-script HUBHOOK $envs [ trace.nu ]
@@ -152,7 +152,6 @@ def install-inner [
         }
 
     }
-    tree
 
     cd $origin
     for d in ($dst | uniq) {
