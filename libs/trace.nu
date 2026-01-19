@@ -12,7 +12,7 @@ export def parse_msg [args] {
 }
 
 export def --env inc-level [] {
-    $env.TRACE_LEVEL = ($env.TRACE_LEVEL? | default (-1)) + 1
+    $env.TRACE_LEVEL = ($env.TRACE_LEVEL? | default (-1) | into int) + 1
 }
 
 export def o [
