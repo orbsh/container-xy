@@ -24,9 +24,6 @@ packages:
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
-        use b.nu
-        use trace.nu
-
         b run [
             $'jj config set --user user.name "($ctx.author)"'
             $'jj config set --user user.email "($ctx.author)@orbit"'
@@ -77,9 +74,6 @@ packages:
     hooks:
       prepare: |
         let ctx = $env.HUBHOOK | from nuon
-        use b.nu
-        use trace.nu
-
         [
             $"SET extension_directory = '/($ctx.target | path join share/duckdb/extensions)';"
             'SET autoinstall_known_extensions = true;'

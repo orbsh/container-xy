@@ -143,7 +143,7 @@ def install-inner [
         if $archive {
             if ($cfg.hooks?.post? | is-not-empty) {
                 $cfg.hooks.post | gen-script HUBHOOK $envs [
-                    b.nu trace.nu
+                    trace.nu
                 ]
                 | save -f setup.nu
             }
@@ -180,21 +180,36 @@ export def run-script [
     trace o -p run-script $ctx
 
     const self = path self .
+    mut $r = []
     for m in $mods {
         let n = $m | path parse | get stem
-        let m = match $m {
-            'b.nu' => {
-                view source 'b run'
-                | save -f ($ctx | path join $m)
-            }
-            _ => {
-                cp ($self | path join $m) $ctx
-            }
+        let m = open -r ($self | path join $m)
+        | str replace -rma '^' '    '
+        | $"mod ($n) {\n($in)\n}\nuse ($n)"
+        $r ++= [$m]
+    }
+    let m = "
+    module b {
+        use trace.nu
+        export def run [cmd: list] {
+            trace inc-level
+            $cmd
+            | str join ' && '
+            | trace f run
+            | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
         }
     }
+    use b
+    "
+    | str trim
+    | str replace -rma '^ {4}' ''
+    $r ++= [$m]
+
+    $r ++= [$input]
 
     let main = $ctx | path join main.nu
-    $input | save -f $main
+    $r | str join "\n\n" | save -f $main
+    cat $main
     with-env { $key: ($envs | to nuon) } {
         nu $main
     }
@@ -215,25 +230,25 @@ export def gen-script [
     const self = path self .
     for m in $mods {
         let n = $m | path parse | get stem
-        let m = match $n {
-            'b' => {
-                $"
-                export def run [cmd: list] {
-                    $cmd
-                    | str join ' && '
-                    | bash -c $in
-                }
-                "
-                | str replace -rma '^ {16}' ''
-            }
-            _ => {
-                open -r ($self | path join $m)
-                | str replace -rma '^' '    '
-                | $"mod ($n) {\n($in)\n}"
-            }
-        }
+        let m = open -r ($self | path join $m)
+        | str replace -rma '^' '    '
+        | $"mod ($n) {\n($in)\n}\nuse ($n)"
         $ctx ++= [$m]
     }
+
+    let m = $"
+    mod b {
+        export def run [cmd: list] {
+            $cmd
+            | str join ' && '
+            | bash -c $in
+        }
+    }
+    use b
+    "
+    | str trim
+    | str replace -rma '^ {4}' ''
+    $ctx ++= [$m]
 
     let m = $input
     | str replace -rma '^' '    '
