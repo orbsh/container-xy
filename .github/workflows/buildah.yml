@@ -2,7 +2,7 @@ name: buildah
 
 on:
   push:
-    branches: [ main, buildah ]
+    branches: [ release, buildah ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   workflow_dispatch:
