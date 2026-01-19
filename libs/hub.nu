@@ -144,10 +144,10 @@ def install-inner [
             mkdir ($t | path join $arch)
             if ($cfg.hooks?.post? | is-not-empty) {
                 $cfg.hooks.post | gen-script HUBHOOK ($envs | merge {
-                    context: '~'
-                    mount: ''
+                    context: ''
+                    mount: '/'
                     target: 'usr/local'
-                    workdir: '~'
+                    workdir: ''
                 }) [ trace.nu ]
                 | save -f setup.nu
             }
