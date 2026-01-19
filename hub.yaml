@@ -108,12 +108,12 @@ packages:
       post: |
         let ctx = $env.HUBHOOK | from nuon
         [
-            $"SET extension_directory = '/($ctx.target | path join share/duckdb/extensions)';"
+            $"SET extension_directory = '($ctx.mount | path join $ctx.target share/duckdb/extensions)';"
             'SET autoinstall_known_extensions = true;'
             'SET autoload_known_extensions = true;'
         ]
         | str join (char newline)
-        | save -a ($ctx.mount)/root/.duckdbrc
+        | save -a ($ctx.mount | path join root/.duckdbrc)
     options:
       extensions:
       - httpfs
