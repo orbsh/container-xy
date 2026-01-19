@@ -180,25 +180,36 @@ export def run-script [
     trace o -p run-script $ctx
 
     const self = path self .
+    mut $r = []
     for m in $mods {
-        cp ($self | path join $m) $ctx
+        let n = $m | path parse | get stem
+        let m = open -r ($self | path join $m)
+        | str replace -rma '^' '    '
+        | $"mod ($n) {\n($in)\n}\nuse ($n)"
+        $r ++= [$m]
     }
-    "
-    use trace.nu
-    export def run [cmd: list] {
-        trace inc-level
-        $cmd
-        | str join ' && '
-        | trace f run
-        | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
+    let m = "
+    module b {
+        use trace.nu
+        export def run [cmd: list] {
+            trace inc-level
+            $cmd
+            | str join ' && '
+            | trace f run
+            | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
+        }
     }
+    use b
     "
     | str trim
     | str replace -rma '^ {4}' ''
-    | save -f ($ctx | path join 'b.nu')
+    $r ++= [$m]
+
+    $r ++= [$input]
 
     let main = $ctx | path join main.nu
-    $input | save -f $main
+    $r | str join "\n\n" | save -f $main
+    cat $main
     with-env { $key: ($envs | to nuon) } {
         nu $main
     }
@@ -221,7 +232,7 @@ export def gen-script [
         let n = $m | path parse | get stem
         let m = open -r ($self | path join $m)
         | str replace -rma '^' '    '
-        | $"mod ($n) {\n($in)\n}"
+        | $"mod ($n) {\n($in)\n}\nuse ($n)"
         $ctx ++= [$m]
     }
 
@@ -233,6 +244,7 @@ export def gen-script [
             | bash -c $in
         }
     }
+    use b
     "
     | str trim
     | str replace -rma '^ {4}' ''

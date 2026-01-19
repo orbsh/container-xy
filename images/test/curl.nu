@@ -2,15 +2,16 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'xy:sid'
+        from: 'debian:sid-slim'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
         image: test
+        tags: x
     }
     | merge $context
     | build --skip-push {|ctx|
-        hub install [duckdb jujutsu]
+        pkg install [curl zstd]
     }
 }
