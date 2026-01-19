@@ -141,16 +141,22 @@ def install-inner [
 
         tree
         if $archive {
+            if ($cfg.hooks?.post? | is-not-empty) {
+                $cfg.hooks.post | gen-script HUBHOOK $envs [
+                    trace.nu
+                ]
+                | save -f setup.nu
+            }
             tar -cvf - *
             | zstd -18 -T0
             | save -f ($t | path join $'($tag).tar.zst')
         } else {
             cp -r -v * $t
+            $cfg.hooks?.post? | run-script HUBHOOK $envs [
+                b.nu trace.nu
+            ]
         }
 
-        $cfg.hooks?.after? | run-script HUBHOOK $envs [
-            b.nu trace.nu
-        ]
     }
     tree
 
@@ -177,13 +183,73 @@ export def run-script [
     for m in $mods {
         cp ($self | path join $m) $ctx
     }
+    "
+    use trace.nu
+    export def run [cmd: list] {
+        trace inc-level
+        $cmd
+        | str join ' && '
+        | trace f run
+        | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
+    }
+    "
+    | str trim
+    | str replace -rma '^ {4}' ''
+    | save -f ($ctx | path join 'b.nu')
 
     let main = $ctx | path join main.nu
     $input | save -f $main
     with-env { $key: ($envs | to nuon) } {
-        print '<<<<<< prepare'
         nu $main
-        print '>>>>>> prepare'
     }
     rm -rf $ctx
+}
+
+export def gen-script [
+    key: string
+    envs: record
+    mods: list<string>
+]: any -> string {
+    let input = $in
+    if ($input | is-empty) { return }
+
+    mut ctx = []
+    trace o -p run-script
+
+    const self = path self .
+    for m in $mods {
+        let n = $m | path parse | get stem
+        let m = open -r ($self | path join $m)
+        | str replace -rma '^' '    '
+        | $"mod ($n) {\n($in)\n}"
+        $ctx ++= [$m]
+    }
+
+    let m = $"
+    mod b {
+        export def run [cmd: list] {
+            $cmd
+            | str join ' && '
+            | bash -c $in
+        }
+    }
+    "
+    | str trim
+    | str replace -rma '^ {4}' ''
+    $ctx ++= [$m]
+
+    let m = $input
+    | str replace -rma '^' '    '
+    | $"def run [] {\n($in)\n}"
+    $ctx ++= [$m]
+
+    let m = $"
+    with-env { ($key): ($envs | to nuon) } {
+        run
+    }
+    "
+    | str replace -rma  '^ {4}' ''
+    $ctx ++= [$m]
+
+    $ctx | str join "\n\n"
 }
