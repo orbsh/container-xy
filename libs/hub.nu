@@ -36,12 +36,13 @@ export def install [
     --target(-t): string = '/usr/local'
     --unpack(-u): closure
     --cache(-c): string = ''
-    --archive
+    --arch: string
+    --bundle
 ] {
     trace inc-level
     for t in $tags {
         trace o -p 'hub-install' $t
-        install-inner $t -t $target -u $unpack -c $cache --archive=$archive --user $user -A $author
+        install-inner $t -t $target -u $unpack -c $cache --bundle=$bundle --arch $arch --user $user -A $author
     }
 }
 
@@ -53,13 +54,15 @@ def install-inner [
     --target(-t): string
     --unpack(-u): closure
     --cache(-c): string
-    --archive
+    --arch: string
+    --bundle
 ] {
     trace inc-level
     let cfg = open $CFG | get packages | get $tag
+    let arch = if ($arch | is-empty) { $nu.os-info.arch } else { $arch }
     let ev = {
         version: (get-version $cfg | transformer run $cfg.version?)
-        arch: $nu.os-info.arch
+        arch: $arch
         arch2: (arch2 $nu.os-info.arch)
     }
     let uris = if ($cfg.uri | describe -d).type == list {
@@ -138,7 +141,8 @@ def install-inner [
         tree
         $cfg.hooks?.prepare? | run-script HUBHOOK $envs [ trace.nu ]
 
-        if $archive {
+        if $bundle {
+            mkdir ($t | path join $arch)
             if ($cfg.hooks?.post? | is-not-empty) {
                 $cfg.hooks.post | gen-script HUBHOOK ($envs | merge {
                     context: '~'
@@ -150,7 +154,7 @@ def install-inner [
             }
             tar -cvf - *
             | zstd -18 -T0
-            | save -f ($t | path join $'($tag).tar.zst')
+            | save -f ($t | path join $arch $'($tag).tar.zst')
         } else {
             cp -r -v * $t
             $cfg.hooks?.post? | run-script HUBHOOK $envs [ trace.nu ]

@@ -2,6 +2,16 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
+        from: 'ghcr.io/sagernet/sing-box:latest'
+        user: master
+        workdir: /home/master
+    }
+    | merge $context
+    | merge { tags: singbox }
+    | build {|ctx|
+    }
+
+    {
         from: $'($context.image):sid'
         user: master
         workdir: /home/master
@@ -46,15 +56,5 @@ export def main [context: record = {}] {
         conf expose [7890 7891 9090]
         conf cmd ['srv']
         conf workdir /data
-    }
-
-    {
-        from: 'ghcr.io/sagernet/sing-box:latest'
-        user: master
-        workdir: /home/master
-    }
-    | merge $context
-    | merge { tags: singbox }
-    | build {|ctx|
     }
 }
