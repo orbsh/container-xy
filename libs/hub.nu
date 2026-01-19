@@ -135,16 +135,12 @@ def install-inner [
             author: $author
         }
 
-        $cfg.hooks?.prepare? | run-script HUBHOOK $envs [
-            b.nu trace.nu
-        ]
-
         tree
+        $cfg.hooks?.prepare? | run-script HUBHOOK $envs [ trace.nu ]
+
         if $archive {
             if ($cfg.hooks?.post? | is-not-empty) {
-                $cfg.hooks.post | gen-script HUBHOOK $envs [
-                    trace.nu
-                ]
+                $cfg.hooks.post | gen-script HUBHOOK $envs [ trace.nu ]
                 | save -f setup.nu
             }
             tar -cvf - *
@@ -152,13 +148,10 @@ def install-inner [
             | save -f ($t | path join $'($tag).tar.zst')
         } else {
             cp -r -v * $t
-            $cfg.hooks?.post? | run-script HUBHOOK $envs [
-                b.nu trace.nu
-            ]
+            $cfg.hooks?.post? | run-script HUBHOOK $envs [ trace.nu ]
         }
 
     }
-    tree
 
     cd $origin
     for d in ($dst | uniq) {
@@ -185,12 +178,12 @@ export def run-script [
         let n = $m | path parse | get stem
         let m = open -r ($self | path join $m)
         | str replace -rma '^' '    '
-        | $"mod ($n) {\n($in)\n}\nuse ($n)"
+        | $"module ($n) {\n($in)\n}\nuse ($n)"
         $r ++= [$m]
     }
     let m = "
     module b {
-        use trace.nu
+        use trace
         export def run [cmd: list] {
             trace inc-level
             $cmd
@@ -209,7 +202,6 @@ export def run-script [
 
     let main = $ctx | path join main.nu
     $r | str join "\n\n" | save -f $main
-    cat $main
     with-env { $key: ($envs | to nuon) } {
         nu $main
     }
@@ -232,12 +224,12 @@ export def gen-script [
         let n = $m | path parse | get stem
         let m = open -r ($self | path join $m)
         | str replace -rma '^' '    '
-        | $"mod ($n) {\n($in)\n}\nuse ($n)"
+        | $"module ($n) {\n($in)\n}\nuse ($n)"
         $ctx ++= [$m]
     }
 
     let m = $"
-    mod b {
+    module b {
         export def run [cmd: list] {
             $cmd
             | str join ' && '
