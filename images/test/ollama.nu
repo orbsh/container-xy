@@ -2,30 +2,18 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'ollama/ollama'
+        from: 'ghcr.io/fj0r/xy:ollama'
+        author: unnamed
+        timezone: Asia/Shanghai
         user: master
         workdir: /home/master
+        image: test
+        tags: ollama
     }
     | merge $context
-    | build {|ctx|
-        pkg install [curl zstd git sudo]
+    | build --skip-push {|ctx|
         hub install [pueue]
         conf cmd [srv]
-
-        setup git $ctx.author
-        let xdg_config = $"/home/($ctx.user)/.config"
-        setup master $ctx.user $ctx.workdir $xdg_config
-
-        nushell setup '/usr/local' {
-            user: $ctx.user
-            dst: $xdg_config
-            plugins: [query]
-        }
-
-        conf volume [/root/.ollama]
-        copy entrypoint /entrypoint
-        conf entrypoint ["/entrypoint/init.nu"]
-
         with-mount {
             cd entrypoint
             r#'
@@ -47,7 +35,7 @@ export def main [context: record = {}] {
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
-            | save ollama.nu
+            | save -f ollama.nu
         }
     }
 }
