@@ -195,9 +195,17 @@ packages:
     unpack:
     - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
     - wrap bin
-  registry:
+  zot:
+    repo: project-zot/zot
     exclude_vessel: true
+    uri: download/{version}/zot-linux-{arch2}
+    unpack:
+    - mv zot-linux-{arch2} zot
+    - chmodx zot
+    - wrap bin
+  registry:
     repo: distribution/distribution
+    exclude_vessel: true
     version:
     - substr 1
     uri: download/v{version}/registry_{version}_linux_{arch2}.tar.gz
