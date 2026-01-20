@@ -9,7 +9,7 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tags: singbox }
     | build {|ctx|
-        pkg install [git]
+        pkg install [git sudo]
 
         setup git $ctx.author
         let xdg_config = $"/home/($ctx.user)/.config"
