@@ -16,7 +16,7 @@ export def get-version [cfg] {
         curl --retry 3 -fsSL $url | from json | get tag_name
     }
     trace o -p 'version' { repo: $cfg.repo, version: $ver }
-    $ver
+    $ver | transformer run $cfg.version?
 }
 
 def arch2 [a] {
@@ -89,7 +89,7 @@ def install-inner [
     }
 
     let ev = {
-        version: (get-version $cfg | transformer run $cfg.version?)
+        version: (get-version $cfg)
         arch: $arch
         arch2: (arch2 $arch)
         arch3: (arch3 $arch)

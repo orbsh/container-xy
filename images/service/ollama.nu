@@ -7,7 +7,7 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | merge { tags: singbox }
+    | merge { tags: ollama }
     | build {|ctx|
         pkg install [git sudo]
 
