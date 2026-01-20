@@ -2,25 +2,22 @@
 repo = "ghcr.io/fj0r"
 dest = '~/pub/Platform'
 
-tags = [
-  "latest",
-  "rust",
-  "z",
-  "marimo",
-  "ci",
-  # "haskell",
-  "sid",
-  "ferron",
-  # vessel
-  "surreal",
-  "mihomo",
-]
 [assets.image.manifest.io]
 xy = [
     "latest",
-    "z",
     "rust",
+    # "haskell",
+    "z",
 ]
+
+[assets.image.manifest.marimo]
+xy = ["marimo"]
+
+[assets.image.manifest.ci]
+xy = ["ci"]
+
+[assets.image.manifest.mihomo]
+xy = ["mihomo"]
 
 [assets.image.manifest.vessel]
 xy = ["vessel"]
@@ -28,20 +25,21 @@ xy = ["vessel"]
 [assets.image.manifest.ferron]
 xy = ["sid", "ferron"]
 
+[assets.image.manifest.surreal]
+xy = ["surreal"]
+
 [assets.image.manifest.pg18]
 pg = [
     "18",
     "18gis",
 ]
 
-[assets.image.manifest.surreal]
-xy = ["surreal"]
+[assets.image.manifest.llm]
+xy = ["ollama"]
 
 #[assets.image.manifest.php]
 #0x = [
-#    "openresty",
 #    "php7",
-#    "php72",
 #    "php8",
 #]
 
@@ -59,9 +57,3 @@ xy = ["surreal"]
 
 #[manifest.pyflink]
 #0x = ["pyflink"]
-
-[assets.image.manifest.llm]
-xy = ["ollama"]
-
-[assets.image.manifest.marimo]
-xy = ["marimo"]

@@ -157,17 +157,28 @@ export module action {
 }
 
 export module image {
-    export def pull [] {
+    export def pull [--archive] {
+        use libs/trace.nu
         let cfg = open $CFG | get assets.image
-        for t in $cfg.tags {
-            use libs/trace.nu
-            let img = ($cfg.repo):($t)
-            trace o pull $img
-            ^$env.CNTRCTL pull $img
-            use entrypoint/init.nu now
-            notify-send $"(now)($img)"
-            ^$env.CNTRCTL tag $img ($cfg.repo | path split | last):($t)
-            ^$env.CNTRCTL rmi $img
+        for i in ($cfg.manifest | transpose k v) {
+            mut images = []
+            for j in ($i.v | transpose k v) {
+                for t in $j.v {
+                    let img = ($cfg.repo)/($j.k):($t)
+                    trace o pull $img
+                    ^$env.CNTRCTL pull $img
+                    use entrypoint/init.nu now
+                    let short = ($cfg.repo | path split | last):($t)
+                    notify-send $"(now)($short)"
+                    $images ++= [$short]
+                    ^$env.CNTRCTL tag $img $short
+                    ^$env.CNTRCTL rmi $img
+                }
+            }
+            if $archive {
+                ^$env.CNTRCTL save ...$images | zstd -18 -T0
+                | save -pf  $"($cfg.dest)/($i.k).tar.zst"
+            }
         }
     }
 
