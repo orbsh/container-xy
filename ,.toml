@@ -47,8 +47,8 @@ xy = ["ollama"]
 #0x = ["java17"]
 
 [assets.image.manifest.vpn]
+xy = ["wireguard"]
 0x = [
-    "wg",
     "warpgate",
 ]
 
