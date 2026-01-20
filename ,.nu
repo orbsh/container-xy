@@ -168,9 +168,10 @@ export module image {
                     trace o pull $img
                     ^$env.CNTRCTL pull $img
                     use entrypoint/init.nu now
-                    let short = ($cfg.repo | path split | last):($t)
+                    let short = ($j.k):($t)
                     notify-send $"(now)($short)"
                     $images ++= [$short]
+                    trace o move $short
                     ^$env.CNTRCTL tag $img $short
                     ^$env.CNTRCTL rmi $img
                 }
