@@ -29,6 +29,13 @@ def arch2 [a] {
     }
 }
 
+def arch3 [a] {
+    match $a {
+        'x86_64' => 'x64',
+        _ => $a
+    }
+}
+
 export def install [
     tags
     --user: string
@@ -38,11 +45,23 @@ export def install [
     --cache(-c): string = ''
     --arch: string
     --bundle
+    --with-python
 ] {
     trace inc-level
     for t in $tags {
         trace o -p 'hub-install' $t
-        install-inner $t -t $target -o $option -c $cache --bundle=$bundle --arch $arch --user $user -A $author
+        (
+            install-inner
+            $t
+            -t $target
+            -o $option
+            -c $cache
+            --bundle=$bundle
+            --arch $arch
+            --user $user
+            -A $author
+            --with-python=$with_python
+        )
     }
 }
 
@@ -56,15 +75,27 @@ def install-inner [
     --cache(-c): string
     --arch: string
     --bundle
+    --with-python
 ] {
     trace inc-level
     let cfg = open $CFG | get packages | get $tag
     let arch = if ($arch | is-empty) { $nu.os-info.arch } else { $arch }
+
+    let python_version = if $with_python {
+        http get https://www.python.org/downloads/source/
+        | grep -oP 'Latest Python 3 Release - Python \K[0-9.]+'
+    } else {
+        ''
+    }
+
     let ev = {
         version: (get-version $cfg | transformer run $cfg.version?)
         arch: $arch
-        arch2: (arch2 $nu.os-info.arch)
+        arch2: (arch2 $arch)
+        arch3: (arch3 $arch)
+        python_version: $python_version
     }
+
     let uris = if ($cfg.uri | describe -d).type == list {
         $cfg.uri
     } else {

@@ -116,6 +116,22 @@ packages:
     - strip 1
     - filter wasmtime wasmtime-min
     - wrap bin
+  zellij:
+    repo: zellij-org/zellij
+    uri: download/{version}/zellij-{arch}-unknown-linux-musl.tar.gz
+    unpack:
+    - wrap bin
+  bun:
+    repo: oven-sh/bun
+    uri: download/{version}/bun-linux-{arch3}.zip
+    unpack:
+    - strip 1
+    - wrap bin
+  python:
+    repo: astral-sh/python-build-standalone
+    uri: download/{version}/cpython-{python_version}+{version}-{arch}_v4-unknown-linux-gnu-install_only_stripped.tar.gz
+    unpack:
+    - strip 1
   dust:
     repo: bootandy/dust
     uri: download/{version}/dust-{version}-{arch}-unknown-linux-musl.tar.gz
