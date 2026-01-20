@@ -20,6 +20,6 @@ export def main [context: record = {}] {
                 $a | append $i.k
             }
         }
-        hub install $pkg -c $ctx.cache? -t /opt/vessel --bundle
+        hub install $pkg -c $ctx.cache? -t /opt/vessel --bundle --with-python
     }
 }
