@@ -23,7 +23,19 @@ export module image {
         ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
     }
 
-    export def update-nu-in-actions [version] {
+    def cmpl-version [] {
+        open ($CWD | path join hub.yaml)
+        | get packages
+        | columns
+    }
+
+    export def hub-version [hub:string@cmpl-version] {
+        use libs/hub.nu
+        hub get-version (open hub.yaml | get packages | get $hub)
+    }
+
+    export def update-nu-in-actions [] {
+        let version = hub-version nushell
         for f in (ls .github/workflows/* | get name) {
             let txt = open -r $f | lines
             let occ = $txt
@@ -55,8 +67,8 @@ export module image {
         --reg:string = "ghcr.io"
         --user:string = "fj0r"
         --image:string = xy
-        --nu-ver: string = "0.110.0"
     ] {
+        let nu_ver = hub-version nushell
         cd ($CWD | path join images)
         let fs = ls */*.nu
         | get name
