@@ -8,7 +8,7 @@ name: clean
 on:
   workflow_run:
     workflows: ["ext"]
-    branches: [ release ]
+    branches: [ main, release ]
     types:
       - completed
 

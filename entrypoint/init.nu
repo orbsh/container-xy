@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-def init [] {
+def init [...args] {
     if ($env.DEBUG? == 'true') { $env.config.show_errors = true }
 
     if ($env.PREBOOT? | is-not-empty) {
@@ -21,6 +21,7 @@ def init [] {
         mut script = [
             $"use ($this) now"
             $'cd ($basedir)'
+            $'$env.ENTRYPOINT_ARGS = ($args | to nuon)'
         ]
         for file in $files {
             let cmd = $"source ($file)"
@@ -45,7 +46,7 @@ def init [] {
 }
 
 export def main [...args] {
-    init
+    init ...$args
 
     if ($args | is-empty) {
         print $"(now)entering interactive mode..."
