@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-def init [...args] {
+def init [args] {
     if ($env.DEBUG? == 'true') { $env.config.show_errors = true }
 
     if ($env.PREBOOT? | is-not-empty) {
@@ -46,7 +46,7 @@ def init [...args] {
 }
 
 export def main [...args] {
-    init ...$args
+    init $args
 
     if ($args | is-empty) {
         print $"(now)entering interactive mode..."
