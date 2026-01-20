@@ -123,13 +123,13 @@ packages:
     - wrap bin
   bun:
     repo: oven-sh/bun
-    uri: download/{version}/bun-linux-{arch3}-musl.zip
+    uri: download/{version}/bun-linux-{arch3}.zip
     unpack:
     - strip 1
     - wrap bin
   python:
     repo: astral-sh/python-build-standalone
-    uri: download/{version}/cpython-{python_version}+{version}-{arch}_v4-unknown-linux-musl-install_only_stripped.tar.gz
+    uri: download/{version}/cpython-{python_version}+{version}-{arch}_v4-unknown-linux-gnu-install_only_stripped.tar.gz
     unpack:
     - strip 1
   dust:
