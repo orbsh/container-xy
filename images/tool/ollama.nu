@@ -21,6 +21,7 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
+        conf volume [/root/.ollama]
         copy entrypoint /entrypoint
         conf entrypoint ["/entrypoint/init.nu"]
 
