@@ -9,6 +9,24 @@ export def main [] {
     match $path {
         [vessel install $arch $pkgs] => {
             content -p
+            let invalid = $pkgs | split row ',' | where {|it|
+                '/opt/vessel' | path join $arch $"($it).tar.zst" | path exists | not $in
+            }
+            if ($invalid | is-not-empty) {
+                cd ('/opt/vessel' | path join $arch)
+                let pkgs = do -i { ls *.tar.zst }
+                | default []
+                | get name
+                | each { $in | split row '.' | first }
+
+                {
+                    invalid: $invalid
+                    allowed: $pkgs
+                }
+                | $"($in) | to json | print $in"
+                | print $in
+                return
+            }
             let r = $"
             for i in ($pkgs | split row ',') {
                 info $'install \($i\)'
@@ -31,26 +49,7 @@ export def main [] {
             send-file $f
         }
         [vessel $args] => {
-            let $arch = $nu.os-info.arch
             content -p
-            let invalid = $args | split row ',' | where {|it|
-                '/opt/vessel' | path join $arch $"($it).tar.zst" | path exists | not $in
-            }
-            if ($invalid | is-not-empty) {
-                cd ('/opt/vessel' | path join $arch)
-                let pkgs = do -i { ls *.tar.zst }
-                | default []
-                | get name
-                | each { $in | split row '.' | first }
-                {
-                    invalid: $invalid
-                    allowed: $pkgs
-                }
-                | to json
-                | $"cat << EOF\n($in)\nEOF"
-                | print $in
-                return
-            }
             $"
             ARCH=$\(uname -m\)
             if ! command -v nu >/dev/null 2>&1; then

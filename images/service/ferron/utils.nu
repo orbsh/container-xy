@@ -33,7 +33,7 @@ export def is-binary-file []: binary -> bool {
 }
 
 export def query [] {
-    $env.QUERY_STRING? | default '' | url split-query
+    $env.QUERY_STRING? | default '' | url split-query | reduce -f {} {|i,a| $a | insert $i.key $i.value }
 }
 
 export def path-to-file [] {
