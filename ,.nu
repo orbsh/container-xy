@@ -134,6 +134,19 @@ export module action {
                                     | str replace -rma '^ {36}' ''
                                     )
                             },
+                            {
+                                name: "Delete untagged ghcr",
+                                uses: "Chizkiyahu/delete-untagged-ghcr-action@v3",
+                                with: {
+                                    token: "${{ secrets.GHCR_TOKEN }}",
+                                    repository: "${{ github.repository }}",
+                                    repository_owner: "${{ github.repository_owner }}",
+                                    package_name: "",
+                                    untagged_only: true,
+                                    except_untagged_multiplatform: false,
+                                    owner_type: user
+                                }
+                            }
                         ]
                     }
                 }
