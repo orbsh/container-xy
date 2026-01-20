@@ -39,6 +39,109 @@ packages:
     options:
       plugins:
       - query
+  helix:
+    repo: helix-editor/helix
+    uri: download/{version}/helix-{version}-{arch}-linux.tar.xz
+    unpack:
+    - strip 1
+    - filter hx runtime
+    - wrap bin
+    hooks:
+      post: |
+        let ctx = $env.HUBHOOK | from nuon
+        let cfg = $ctx.mount | path join root/.config/helix
+        mkdir $cfg
+        if ($ctx.options?.config? | is-not-empty) {
+            $ctx.options.config | save -a ($cfg | path join config.toml)
+        }
+    options:
+      config: |
+        #theme = "gruvbox_light"
+        theme = "zenburn"
+
+        [editor]
+        line-number = "relative"
+        middle-click-paste = true
+        mouse = true
+        # enable-steel = true
+        trim-trailing-whitespace = true
+        trim-final-newlines	= true
+        popup-border = "none"
+        # commandline = false
+
+        [editor.auto-save]
+        focus-lost = true
+        idle = true
+
+        [editor.cursor-shape]
+        insert = "bar"
+        select = "underline"
+
+        [editor.soft-wrap]
+        enable = true
+
+        [keys.insert]
+        "A-;" = "normal_mode"
+
+        [keys.normal]
+        "A-j" = "page_cursor_half_down"
+        "A-k" = "page_cursor_half_up"
+
+        "A-s" = "save_selection"
+        "C-s" = "split_selection_on_newline"
+
+        "A-h" = "jump_backward"
+        "A-l" = "jump_forward"
+
+        [keys.normal.space]
+        space = "goto_word"
+        o = [
+          ':sh rm -f /tmp/unique-file',
+          ':insert-output yazi %{buffer_name} --chooser-file=/tmp/unique-file',
+          ':insert-output echo "\x1b[?1049h\x1b[?2004h" > /dev/tty',
+          ':open %sh{cat /tmp/unique-file}',
+          ':redraw',
+        ]
+
+        [keys.select]
+        space = { space = "goto_word" }
+        "A-;" = "normal_mode"
+        "A-'" = "flip_selections"
+        "A-j" = "page_cursor_half_down"
+        "A-k" = "page_cursor_half_up"
+  wasmtime:
+    repo: bytecodealliance/wasmtime
+    uri: download/{version}/wasmtime-{version}-{arch}-linux.tar.xz
+    unpack:
+    - strip 1
+    - filter wasmtime wasmtime-min
+    - wrap bin
+  dust:
+    repo: bootandy/dust
+    uri: download/{version}/dust-{version}-{arch}-unknown-linux-musl.tar.gz
+    unpack:
+    - strip 1
+    - filter dust
+    - wrap bin
+  dua:
+    repo: Byron/dua-cli
+    uri: download/{version}/dua-{version}-{arch}-unknown-linux-musl.tar.gz
+    unpack:
+    - strip 1
+    - filter dua
+    - wrap bin
+  btm:
+    repo: ClementTsang/bottom
+    uri: download/{version}/bottom_{arch}-unknown-linux-musl.tar.gz
+    unpack:
+    - filter btm
+    - wrap bin
+  bdwh:
+    repo: imsnif/bandwhich
+    uri: download/{version}/bandwhich-{version}-{arch}-unknown-linux-musl.tar.gz
+    unpack:
+    - filter bandwhich
+    - wrap bin
   jujutsu:
     repo: jj-vcs/jj
     uri: download/{version}/jj-{version}-{arch}-unknown-linux-musl.tar.gz
