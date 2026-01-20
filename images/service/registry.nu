@@ -84,7 +84,7 @@ export def main [context: record = {}] {
                             delay: "0h",
                             policies: [
                                 {
-                                    repositories: [ infra/**, base/**, mid/** ],
+                                    repositories: [ infra/**, base/** ],
                                     deleteReferrers: false,
                                     deleteUntagged: true,
                                     KeepTags: [
@@ -96,7 +96,7 @@ export def main [context: record = {}] {
                                     deleteReferrers: false,
                                     deleteUntagged: true,
                                     keepTags: [
-                                        { patterns: [latest, __] }
+                                        { patterns: [ latest, __ ] }
                                     ]
                                 },
                                 ...$retention,
@@ -105,7 +105,7 @@ export def main [context: record = {}] {
                                     deleteReferrers: true,
                                     deleteUntagged: true,
                                     keepTags: [
-                                        { patterns: [".*"], mostRecentlyPushedCount: 5}
+                                        { patterns: [".*"], mostRecentlyPushedCount: 5 }
                                     ]
                                 }
                             ]
