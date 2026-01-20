@@ -23,11 +23,39 @@ export module image {
         ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
     }
 
+    export def update-nu-in-actions [version] {
+        for f in (ls .github/workflows/* | get name) {
+            let txt = open -r $f | lines
+            let occ = $txt
+            | enumerate
+            | where {|x| $x.item | find 'setup-nu' | is-not-empty }
+            | first
+            | get index?
+            if ($occ | is-not-empty) {
+                $txt
+                | enumerate
+                | each {|x|
+                    if $x.index == $occ + 2 {
+                        let r = $x.item
+                        | parse -r  "^(?<t>.*version: )(?<v>.+)"
+                        | first
+                        $"($r.t)($version)"
+                    } else {
+                        $x.item
+                    }
+                }
+                | append ''
+                | str join (char newline)
+                | save -f $f
+            }
+        }
+    }
+
     export def gen-actions [
         --reg:string = "ghcr.io"
         --user:string = "fj0r"
         --image:string = xy
-        --nu-ver: string = "0.109.1"
+        --nu-ver: string = "0.110.0"
     ] {
         cd ($CWD | path join images)
         let fs = ls */*.nu
