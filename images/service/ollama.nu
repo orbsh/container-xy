@@ -7,9 +7,9 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | merge { tags: singbox }
+    | merge { tags: ollama }
     | build {|ctx|
-        pkg install [git]
+        pkg install [git sudo]
 
         setup git $ctx.author
         let xdg_config = $"/home/($ctx.user)/.config"

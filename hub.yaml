@@ -195,6 +195,15 @@ packages:
     unpack:
     - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
     - wrap bin
+  registry:
+    exclude_vessel: true
+    repo: distribution/distribution
+    version:
+    - substr 1
+    uri: download/v{version}/registry_{version}_linux_{arch2}.tar.gz
+    unpack:
+    - filter registry
+    - wrap bin
   kubectl:
     repo: https://storage.googleapis.com/kubernetes-release/release/stable.txt
     uri: https://dl.k8s.io/{version}/kubernetes-node-linux-{arch2}.tar.gz
