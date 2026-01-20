@@ -1,41 +1,23 @@
 const CWD = path self .
 const CFG = path self ,.toml
 
-export module image {
-    export def pull [] {
-        let cfg = open $CFG | get assets.image
-        for t in $cfg.tags {
-            use libs/trace.nu
-            let img = ($cfg.repo):($t)
-            trace o pull $img
-            ^$env.CNTRCTL pull $img
-            use entrypoint/init.nu now
-            notify-send $"(now)($img)"
-            ^$env.CNTRCTL tag $img ($cfg.repo | path split | last):($t)
-            ^$env.CNTRCTL rmi $img
-        }
-    }
-
-    export def archive [] {
-        let cfg = open $CFG | get assets.image
-        let imgs = $cfg.tags
-        | each {|x| ($cfg.repo):($x) }
-        ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
-    }
-
+export module hub {
     def cmpl-version [] {
         open ($CWD | path join hub.yaml)
         | get packages
         | columns
     }
 
-    export def hub-version [hub:string@cmpl-version] {
+    export def version [hub:string@cmpl-version] {
         use libs/hub.nu
         hub get-version (open hub.yaml | get packages | get $hub)
     }
+}
 
-    export def update-nu-in-actions [] {
-        let version = hub-version nushell
+export module action {
+    export def update-nu-version [] {
+        use hub
+        let version = hub version nushell
         for f in (ls .github/workflows/* | get name) {
             let txt = open -r $f | lines
             let occ = $txt
@@ -63,12 +45,13 @@ export module image {
         }
     }
 
-    export def gen-actions [
+    export def gen [
         --reg:string = "ghcr.io"
         --user:string = "fj0r"
         --image:string = xy
     ] {
-        let nu_ver = hub-version nushell
+        use hub
+        let nu_ver = hub version nushell
         cd ($CWD | path join images)
         let fs = ls */*.nu
         | get name
@@ -157,6 +140,29 @@ export module image {
             }
             | save -f ($CWD)/.github/workflows/branch_($f.stem).yaml
         }
+    }
+}
+
+export module image {
+    export def pull [] {
+        let cfg = open $CFG | get assets.image
+        for t in $cfg.tags {
+            use libs/trace.nu
+            let img = ($cfg.repo):($t)
+            trace o pull $img
+            ^$env.CNTRCTL pull $img
+            use entrypoint/init.nu now
+            notify-send $"(now)($img)"
+            ^$env.CNTRCTL tag $img ($cfg.repo | path split | last):($t)
+            ^$env.CNTRCTL rmi $img
+        }
+    }
+
+    export def archive [] {
+        let cfg = open $CFG | get assets.image
+        let imgs = $cfg.tags
+        | each {|x| ($cfg.repo):($x) }
+        ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
     }
 }
 

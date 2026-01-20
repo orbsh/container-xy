@@ -39,6 +39,8 @@ packages:
     options:
       plugins:
       - query
+  helix:
+    repo: helix-editor/helix
   jujutsu:
     repo: jj-vcs/jj
     uri: download/{version}/jj-{version}-{arch}-unknown-linux-musl.tar.gz
