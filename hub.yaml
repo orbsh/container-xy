@@ -52,7 +52,7 @@ packages:
         mkdir $cfg
         cp -r ($ctx.mount | path join $ctx.target etc helix) $cfg
         if ($ctx.options?.config? | is-not-empty) {
-            $ctx.options.config | save -a ($cfg | path join helix config.toml)
+            $ctx.options.config | save -f ($cfg | path join helix config.toml)
         }
     options:
       config: |
