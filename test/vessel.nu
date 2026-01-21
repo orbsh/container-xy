@@ -1,17 +1,17 @@
-use ../../libs *
+use ../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'debian:sid-slim'
+        from: 'xy:ferron'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
         image: test
-        tags: z
+        tags: y
     }
     | merge $context
-    | build --skip-push {|ctx|
-        pkg install [curl zstd sudo]
+    | build {|ctx|
+        hub install [duckdb jujutsu] -c $ctx.cache? -t /opt/vessel --bundle
     }
 }

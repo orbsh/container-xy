@@ -1,9 +1,8 @@
-use ../../libs *
+use ../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'debian:sid-slim'
-        author: unnamed
+        from: 'ghcr.lizzie.fun/fj0r/io:base'
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
@@ -18,37 +17,16 @@ export def main [context: record = {}] {
             MASTER: $ctx.user
             PYTHONUNBUFFERED: x
         }
-        pkg update
-        pkg install [
-            sudo attr procps htop cron tzdata
-            # base-devel
-            # nushell
-            # dropbear
-            openssh-client rsync s3fs
-            tcpdump socat
-            sqlite3 patch tree
-            xz-utils zstd zip unzip
-            lsof inetutils-ping iproute2 iptables net-tools
-        ]
-        setup timezone $ctx.timezone
-        setup sudo
-
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config
-        nushell setup '/usr/local' {
+        nushell setup '/usr/local' -c $ctx.cache? {
             user: $ctx.user
             dst: $xdg_config
             plugins: [query]
         }
 
-        hub install [pueue websocat]
+        hub install -c $ctx.cache [websocat pueue]
 
-        conf env {
-            DEBUGE: ''
-            PREBOOT: ''
-            POSTBOOT: ''
-            CRONFILE: ''
-        }
         conf workdir $ctx.workdir
         conf cmd []
         copy entrypoint /entrypoint

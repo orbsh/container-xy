@@ -1,17 +1,17 @@
-use ../../libs *
+use ../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'xy:ferron'
+        from: 'xy:sid'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
         image: test
-        tags: y
+        tags: x
     }
     | merge $context
-    | build --skip-push {|ctx|
-        hub install [duckdb jujutsu] -c $ctx.cache? -t /opt/vessel --bundle
+    | build {|ctx|
+        hub install -c $ctx.cache? [duckdb jujutsu]
     }
 }

@@ -10,6 +10,9 @@ xy = [
     "z",
 ]
 
+[assets.image.manifest.ferron]
+xy = ["sid", "ferron"]
+
 [assets.image.manifest.marimo]
 xy = ["marimo"]
 
@@ -21,9 +24,6 @@ xy = ["mihomo"]
 
 [assets.image.manifest.vessel]
 xy = ["vessel"]
-
-[assets.image.manifest.ferron]
-xy = ["sid", "ferron"]
 
 [assets.image.manifest.surreal]
 xy = ["surreal"]

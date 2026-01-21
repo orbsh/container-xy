@@ -84,10 +84,22 @@ jobs:
             tags: test
           }
 
+      - name: build ubuntu
+        shell: buildah unshare nu {0}
+        run: |-
+          overlay use ${{ github.workspace }}/images/core/ubuntu.nu as build
+          build {
+            from: 'ubuntu'
+            author: ${{ env.USERNAME }}
+            password: ${{ secrets.GHCR_TOKEN }}
+            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+            tags: ubuntu
+          }
+
       - name: build sid
         shell: buildah unshare nu {0}
         run: |-
-          overlay use ${{ github.workspace }}/images/core/sid.nu as build
+          overlay use ${{ github.workspace }}/images/core/ubuntu.nu as build
           build {
             from: 'debian:sid-slim'
             author: ${{ env.USERNAME }}
