@@ -12,7 +12,7 @@ export def main [context: record = {}] {
         image: test
     }
     | merge $context
-    | build --skip-push {|ctx|
+    | build {|ctx|
         # --debug $ctx.uptermd_addr
         rust prefetch --test $ctx.user $ctx.workdir 'buildah-test' [
         ]

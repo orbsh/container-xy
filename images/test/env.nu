@@ -2,16 +2,16 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'xy:ferron'
+        from: 'xy:z'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master
         image: test
-        tags: y
+        tags: x
     }
     | merge $context
     | build {|ctx|
-        hub install [duckdb jujutsu] -c $ctx.cache? -t /opt/vessel --bundle
+        hub install -c $ctx.cache? [duckdb jujutsu]
     }
 }

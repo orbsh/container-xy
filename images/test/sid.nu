@@ -8,7 +8,7 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | build --skip-push {|ctx|
+    | build {|ctx|
         conf expose [22]
         conf env {
             LANG: C.UTF-8

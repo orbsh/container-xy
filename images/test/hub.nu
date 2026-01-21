@@ -11,7 +11,7 @@ export def main [context: record = {}] {
         tags: x
     }
     | merge $context
-    | build --skip-push {|ctx|
+    | build {|ctx|
         hub install -c $ctx.cache? [duckdb jujutsu]
     }
 }

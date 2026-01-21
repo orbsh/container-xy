@@ -11,7 +11,7 @@ export def main [context: record = {}] {
         tags: ollama
     }
     | merge $context
-    | build --skip-push {|ctx|
+    | build {|ctx|
         hub install [pueue]
         conf cmd [srv]
         with-mount {

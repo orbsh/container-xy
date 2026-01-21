@@ -11,7 +11,7 @@ export def main [context: record = {}] {
         tags: z
     }
     | merge $context
-    | build --skip-push {|ctx|
+    | build {|ctx|
         pkg install [curl zstd sudo]
     }
 }
