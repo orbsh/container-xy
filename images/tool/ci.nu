@@ -15,8 +15,10 @@ export def main [context: record = {}] {
         hub install [kubectl helm]
 
         pkg pip install [
+            furl markdown
             ansible kubernetes
-            'psycopg[binary]'
+            psycopg[binary] kafka-python
+            pymongo github3.py
         ]
         [
             ansible.posix

@@ -84,15 +84,7 @@ def install [url loc] {
     curl -SL --progress-bar $url -o $file
     let fs = tar-fs $file
     info --lv 1 $'extract'
-    cat $file | zstd -d | tar -xvf - -C $loc ...($fs | where $it not-in [config setup.nu])
-    if 'config' in $fs {
-        info --lv 1 $'config'
-        cat $file
-        | zstd -d
-        | tar -xf - --strip-component=1 config -C (
-            $env.HOME | path join '.config'
-        )
-    }
+    cat $file | zstd -d | tar -xvf - -C $loc ...($fs | where $it not-in [setup.nu])
     if 'setup.nu' in $fs {
         info --lv 1 $'setup'
         cd
