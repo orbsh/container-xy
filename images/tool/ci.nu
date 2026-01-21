@@ -11,6 +11,7 @@ export def main [context: record = {}] {
     | build {|ctx|
         pkg install [
             buildah skopeo podman
+            jq fd ripgrep
         ]
         hub install [kubectl helm]
 
