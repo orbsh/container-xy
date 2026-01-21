@@ -56,7 +56,7 @@ export def main [] {
                 echo \"nu not found. installing\"
                 curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/${ARCH}/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/${ARCH}/($args) | /usr/local/bin/nu --stdin -c 'nu -c $in'
+            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/${ARCH}/($args) | $\(command -v nu\) --stdin -c 'nu -c $in'
             "
             | str trim
             | str replace -rma '^ {12}' ''
