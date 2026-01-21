@@ -27,10 +27,12 @@ export def main [] {
                 | print $in
                 return
             }
+            let q = query
+            let dest = $q.dest? | default $q.target? | default /usr/local
             let r = $"
             for i in ($pkgs | split row ',') {
                 info $'install \($i\)'
-                install $'($env.HTTP_HOST)/vessel/download/($arch)/\($i\).tar.zst' /usr/local
+                install $'($env.HTTP_HOST)/vessel/download/($arch)/\($i\).tar.zst' ($dest)
             }
             "
             | str trim
