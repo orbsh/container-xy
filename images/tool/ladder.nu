@@ -12,7 +12,7 @@ export def main [context: record = {}] {
     }
 
     {
-        from: $'($context.image):sid'
+        from: $'($context.image):ubuntu'
         user: master
         workdir: /home/master
     }
