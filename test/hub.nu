@@ -12,6 +12,6 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        hub install -c $ctx.cache? [duckdb jujutsu]
+        hub install -c $ctx.cache? [helix]
     }
 }

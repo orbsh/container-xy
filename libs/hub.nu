@@ -200,7 +200,7 @@ def install-inner [
                 }) [ trace.nu ]
                 | save -f setup.nu
             }
-            tar -cvf - *
+            tar -cvf - .
             | zstd -18 -T0
             | save -f ($new_target | path join $arch $'($tag).tar.zst')
         } else {
