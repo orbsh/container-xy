@@ -11,7 +11,7 @@ xy = [
 ]
 
 [assets.image.manifest.ferron]
-xy = ["sid", "ferron"]
+xy = ["sid", "ubuntu", "ferron"]
 
 [assets.image.manifest.marimo]
 xy = ["marimo"]
