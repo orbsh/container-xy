@@ -2,7 +2,7 @@
 repo = "ghcr.io/fj0r"
 dest = '~/pub/Platform'
 
-[assets.image.manifest.io]
+[assets.image.manifest.xy]
 xy = [
     "latest",
     "rust",
