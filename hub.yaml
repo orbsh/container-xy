@@ -40,19 +40,19 @@ packages:
       plugins:
       - query
   helix:
-    repo: helix-editor/helix
-    uri: download/{version}/helix-{version}-{arch}-linux.tar.xz
-    unpack:
-    - strip 1
-    - filter hx runtime
-    - wrap bin
+    type: ImageVolume
+    uri: ghcr.io/fj0r/data:helix
+    path: '' # opt/helix
+    unpack: []
+    # - filter bin etc
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
-        let cfg = $ctx.mount | path join root/.config/helix
+        let cfg = $ctx.mount | path join root/.config
         mkdir $cfg
+        cp -r ($ctx.mount | path join $ctx.target etc helix) $cfg
         if ($ctx.options?.config? | is-not-empty) {
-            $ctx.options.config | save -a ($cfg | path join config.toml)
+            $ctx.options.config | save -a ($cfg | path join helix config.toml)
         }
     options:
       config: |

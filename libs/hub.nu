@@ -1,4 +1,5 @@
 use trace.nu
+use build.nu
 use transformer.nu
 use extract.nu
 use b.nu
@@ -6,7 +7,9 @@ const CFG = path self ../hub.yaml
 
 export def get-version [cfg] {
     trace inc-level
-    let ver = if ($cfg.repo | str starts-with 'http') {
+    let ver = if $cfg.type? in ['ImageVolume'] {
+        ''
+    } else if ($cfg.repo | str starts-with 'http') {
         curl --retry 3 -fsSL $cfg.repo
     } else if ($cfg.with_prerelease? | default false) {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases"
@@ -15,8 +18,27 @@ export def get-version [cfg] {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases/latest"
         curl --retry 3 -fsSL $url | from json | get tag_name
     }
-    trace o -p 'version' { repo: $cfg.repo, version: $ver }
+    trace o -p 'version' { repo: ($cfg.repo? | default {$cfg.type}), version: $ver }
     $ver | transformer run $cfg.version?
+}
+
+export def format-uri [cfg] {
+    let vers = $in
+    if ($cfg.uri | describe -d).type == list {
+        $cfg.uri
+    } else {
+        [$cfg.uri]
+    }
+    | each {|x|
+        let u = $vers | format pattern $x
+        if $cfg.type? in ['ImageVolume'] {
+            $u
+        } else if ($u | str starts-with 'http') {
+            $u
+        } else {
+            $'https://github.com/($cfg.repo)/releases' | path join $u
+        }
+    }
 }
 
 def arch2 [a] {
@@ -88,7 +110,7 @@ def install-inner [
         ''
     }
 
-    let ev = {
+    let pkgv = {
         version: (get-version $cfg)
         arch: $arch
         arch2: (arch2 $arch)
@@ -96,19 +118,7 @@ def install-inner [
         python_version: $python_version
     }
 
-    let uris = if ($cfg.uri | describe -d).type == list {
-        $cfg.uri
-    } else {
-        [$cfg.uri]
-    }
-    | each {|x|
-        let u = $ev | format pattern $x
-        if ($u | str starts-with 'http') {
-            $u
-        } else {
-            $'https://github.com/($cfg.repo)/releases' | path join $u
-        }
-    }
+    let uris = $pkgv | format-uri $cfg
 
     let origin = pwd
 
@@ -116,29 +126,37 @@ def install-inner [
     cd $wd
 
     for uri in $uris {
-        let f = $uri | url parse | get path | path parse
-        let f = [$f.stem $f.extension]
-        | where { $in | is-not-empty }
-        | str join '.'
-
-        let cache = if ($cache | is-not-empty) {
-            ($cache)/($f) | path expand
-        }
-        if ($cache | is-empty) {
-            curl --retry 3 -fsSL $uri -o $f
+        if $cfg.type? in ['ImageVolume'] {
+            let ctx = { from: $uri } | build --no-commit {|ctx| }
+            cd ($ctx.BUILDAH_WORKING_MOUNTPOINT | path join $cfg.path)
+            cp -r * $wd
+            buildah unmount $ctx.BUILDAH_WORKING_CONTAINER
+            cd $wd
         } else {
-            if not ($cache | path exists) {
-                curl --retry 3 -fsSL $uri -o $cache
-            }
-            cp $cache $f
-        }
+            let f = $uri | url parse | get path | path parse
+            let f = [$f.stem $f.extension]
+            | where { $in | is-not-empty }
+            | str join '.'
 
-        let ext = $uri | split row '.' | last 2
-        cat $f | extract as $ext $f
+            let cache = if ($cache | is-not-empty) {
+                ($cache)/($f) | path expand
+            }
+            if ($cache | is-empty) {
+                curl --retry 3 -fsSL $uri -o $f
+            } else {
+                if not ($cache | path exists) {
+                    curl --retry 3 -fsSL $uri -o $cache
+                }
+                cp $cache $f
+            }
+
+            let ext = $uri | split row '.' | last 2
+            cat $f | extract as $ext $f
+        }
     }
 
 
-    let upk = $cfg.unpack? | default [] | each {|x| $ev | format pattern $x}
+    let upk = $cfg.unpack? | default [] | each {|x| $pkgv | format pattern $x}
     let dst = extract unpack $upk | prepend $wd
 
     trace o -p 'temp-dirs' $dst
@@ -146,10 +164,10 @@ def install-inner [
     trace o -p 'files-ready' $env.PWD
     b with-mount {|new, old|
         let target = b relative-path $target
-        let t = $new | path join $target
-        mkdir $t
-        let d = $t | path parse | get parent
-        trace o -p 'target' {t : $t, target: $target, d: $d}
+        let new_target = $new | path join $target
+        mkdir $new_target
+        let d = $new_target | path parse | get parent
+        trace o -p 'target' {new_target : $new_target, target: $target, d: $d}
         if not ($d | path exists) {
             trace o -p 'create-dir' $d
             mkdir $d
@@ -172,7 +190,7 @@ def install-inner [
         $cfg.hooks?.prepare? | run-script HUBHOOK $envs [ trace.nu ]
 
         if $bundle {
-            mkdir ($t | path join $arch)
+            mkdir ($new_target | path join $arch)
             if ($cfg.hooks?.post? | is-not-empty) {
                 $cfg.hooks.post | gen-script HUBHOOK ($envs | merge {
                     context: ''
@@ -184,9 +202,9 @@ def install-inner [
             }
             tar -cvf - *
             | zstd -18 -T0
-            | save -f ($t | path join $arch $'($tag).tar.zst')
+            | save -f ($new_target | path join $arch $'($tag).tar.zst')
         } else {
-            cp -r -v * $t
+            cp -r -v * $new_target
             $cfg.hooks?.post? | run-script HUBHOOK $envs [ trace.nu ]
         }
 

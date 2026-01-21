@@ -25,7 +25,7 @@ export def main [context: record = {}] {
             # nushell
             git
             openssh rsync dropbear s3fs
-            tcpdump socat websocat
+            strace tcpdump socat websocat
             ripgrep dust
             pueue # entrypoint
         ]

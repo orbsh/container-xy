@@ -9,15 +9,11 @@ export def main --env [
     let ctx = $in
     let working_container = buildah from $ctx.from
     let mountpoint = buildah mount $working_container
-    buildah config --author $ctx.author $working_container
-
-    let os_id = open -r ($mountpoint | path join etc/os-release)
-    | lines
-    | reduce -f {} {|i, a|
-        let i = $i | split row '='
-        $a | insert ($i.0 | str downcase) $i.1
+    if ($ctx.author? | is-not-empty) {
+        buildah config --author $ctx.author $working_container
     }
-    let os_id = $os_id.id_like? | default $os_id.id
+
+    let os_id = $mountpoint | path join etc/os-release | os-id
 
     let envs = {
         OS_RELEASE_ID: $os_id
@@ -54,4 +50,19 @@ export def main --env [
         trace o push $image
         buildah push --creds ($ctx.author):($ctx.password) $image
     }
+}
+
+export def os-id [] {
+    let file = $in
+    # ImageVolume
+    if not ($file | path exists) {
+        return ''
+    }
+    let os_id = open -r $file
+    | lines
+    | reduce -f {} {|i, a|
+        let i = $i | split row '='
+        $a | insert ($i.0 | str downcase) $i.1
+    }
+    $os_id.id_like? | default $os_id.id
 }
