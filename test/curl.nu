@@ -1,4 +1,4 @@
-use ../../libs *
+use ../libs *
 
 export def main [context: record = {}] {
     {

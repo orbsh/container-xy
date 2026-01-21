@@ -2,7 +2,7 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'debian:sid-slim'
+        from: 'ubuntu'
         author: unnamed
         timezone: Asia/Shanghai
         user: master

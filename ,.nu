@@ -193,14 +193,14 @@ export module image {
 
 export module test {
     def cmpl-build [] {
-        glob ($env.PWD)/images/*/*.nu
+        glob ($env.PWD)/test/*.nu
         | path split
         | each { $in | last 2 | path join }
     }
 
     export def build [s: string@cmpl-build] {
         buildah unshare nu -c $"
-            overlay use images/($s) as build
+            overlay use ($s) as build
             build {
                 cache: ~/Downloads
                 image: test
