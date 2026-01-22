@@ -14,7 +14,7 @@ export def run [cmd: list] {
     | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
 }
 
-export def nu [cmd: list] {
+export def exec [cmd: list] {
     trace inc-level
     $cmd
     | str join (char newline)
