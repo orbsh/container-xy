@@ -186,7 +186,6 @@ def install-inner [
             author: $author
         }
 
-        tree
         $cfg.hooks?.prepare? | run-script HUBHOOK $envs [ trace.nu ]
 
         if $bundle {
@@ -204,7 +203,7 @@ def install-inner [
             | zstd -18 -T0
             | save -f ($new_target | path join $arch $'($tag).tar.zst')
         } else {
-            cp -r -v * $new_target
+            cp -r * $new_target
             $cfg.hooks?.post? | run-script HUBHOOK $envs [ trace.nu ]
         }
 
@@ -241,12 +240,13 @@ export def run-script [
     let m = "
     module b {
         use trace
-        export def run [cmd: list] {
+        export def nu [cmd: list] {
             trace inc-level
             $cmd
-            | str join ' && '
-            | trace f run
-            | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
+            # | prepend 'set -eux'
+            | str join (char newline)
+            | trace f run-with-nu
+            | buildah run $env.BUILDAH_WORKING_CONTAINER nu -c $in
         }
     }
     use b
@@ -285,12 +285,14 @@ export def gen-script [
         $ctx ++= [$m]
     }
 
-    let m = $"
+    let m = "
     module b {
-        export def run [cmd: list] {
+        use trace
+        export def nu [cmd: list] {
             $cmd
-            | str join ' && '
-            | bash -c $in
+            | str join (char newline)
+            | trace f run-with-bash
+            | nu -c $in
         }
     }
     use b

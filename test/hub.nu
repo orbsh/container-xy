@@ -2,7 +2,7 @@ use ../libs *
 
 export def main [context: record = {}] {
     {
-        from: 'xy:sid'
+        from: 'xy'
         author: unnamed
         timezone: Asia/Shanghai
         user: master

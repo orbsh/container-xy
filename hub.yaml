@@ -27,15 +27,21 @@ packages:
         | each {|x| rm -f $x }
       post: |
         let ctx = $env.HUBHOOK | from nuon
-        let cfg = $ctx.mount | path join root/.config/nushell
-        mkdir $cfg
+        mut cmd = [
+            'cd ~/.config'
+            'mkdir nushell'
+        ]
         [
             '$env.config.show_banner = "short"'
             'export alias pst = pueue status'
             'export alias pf = pueue follow'
         ]
         | str join (char newline)
-        | save -a ($cfg | path join config.nu)
+        | save -a ($ctx.mount| path join tmp config.nu)
+        $cmd ++= [
+            'mv /tmp/config.nu nushell/config.nu'
+        ]
+        b nu $cmd
     options:
       plugins:
       - query
@@ -44,16 +50,29 @@ packages:
     uri: ghcr.io/fj0r/data:helix
     path: '' # opt/helix
     unpack: []
-    # - filter bin etc
     hooks:
+      prepare: |
+        tree -L 2
       post: |
         let ctx = $env.HUBHOOK | from nuon
-        let cfg = $ctx.mount | path join root/.config
-        mkdir $cfg
-        cp -r ($ctx.mount | path join $ctx.target etc helix) $cfg
+        mut cmd = [
+            'cd ~/.config'
+            'rm -rf helix'
+            $'cp -r /($ctx.target)/etc/helix .'
+        ]
         if ($ctx.options?.config? | is-not-empty) {
-            $ctx.options.config | save -f ($cfg | path join helix config.toml)
+            $ctx.options.config | save -f ($ctx.mount | path join tmp config.toml)
+            $cmd ++= [
+                'rm -f helix/config.toml'
+                'mv /tmp/config.toml helix/config.toml'
+            ]
+            $cmd ++= [
+                'mkdir ~/.local/share'
+                'cd ~/.local/share'
+                $'cp -r /($ctx.target)/share/steel .'
+            ]
         }
+        b nu $cmd
     options:
       config: |
         #theme = "gruvbox_light"
@@ -168,7 +187,7 @@ packages:
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
-        b run [
+        b nu [
             $'jj config set --user user.name "($ctx.author)"'
             $'jj config set --user user.email "($ctx.author)@orbit"'
         ]

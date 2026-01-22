@@ -14,6 +14,14 @@ export def run [cmd: list] {
     | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
 }
 
+export def nu [cmd: list] {
+    trace inc-level
+    $cmd
+    | str join (char newline)
+    | trace f run-with-nu
+    | buildah run $env.BUILDAH_WORKING_CONTAINER nu -c $in
+}
+
 export def commit [image] {
     buildah commit $env.BUILDAH_WORKING_CONTAINER $image
 }
