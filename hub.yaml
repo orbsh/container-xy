@@ -28,6 +28,7 @@ packages:
       post: |
         let ctx = $env.HUBHOOK | from nuon
         mut cmd = [
+            'mkdir ~/.config'
             'cd ~/.config'
             'mkdir nushell'
         ]
@@ -56,6 +57,7 @@ packages:
       post: |
         let ctx = $env.HUBHOOK | from nuon
         mut cmd = [
+            'mkdir ~/.config'
             'cd ~/.config'
             'rm -rf helix'
             $'cp -r /($ctx.target)/etc/helix .'
