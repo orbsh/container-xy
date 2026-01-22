@@ -91,9 +91,9 @@ def install [tag url loc] {
     if 'setup.nu' in $fs {
         let f = '/tmp' | path join ($tag)_setup.nu
         info --lv 1 $'run ($f)'
-        cat $file | zstd -d | tar -Oxf - $f
+        cat $file | zstd -d | tar -Oxf - setup.nu | save -f $f
         cd
-        nu $f
+        nu $f $'{target: ($loc)}'
     }
 }
 

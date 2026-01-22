@@ -307,8 +307,16 @@ export def gen-script [
     $ctx ++= [$m]
 
     let m = $"
-    with-env { ($key): r#'($envs | to nuon)'# } {
-        run
+    export def main [ctx] {
+        let envs = r#'
+        ($envs | to nuon)
+        '#
+        | from nuon
+        | merge \($ctx | from nuon\)
+        | to nuon
+        with-env { ($key): $envs } {
+            run
+        }
     }
     "
     | str replace -rma  '^ {4}' ''
