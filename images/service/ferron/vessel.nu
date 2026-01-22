@@ -32,7 +32,7 @@ export def main [] {
             let r = $"
             for i in ($pkgs | split row ',') {
                 info $'install \($i\)'
-                install $'($env.HTTP_HOST)/vessel/download/($arch)/\($i\).tar.zst' ($dest)
+                install \($i\) $'($env.HTTP_HOST)/vessel/download/($arch)/\($i\).tar.zst' ($dest)
             }
             "
             | str trim
@@ -52,13 +52,14 @@ export def main [] {
         }
         [vessel $args] => {
             content -p
+            let q = if ($env.QUERY_STRING? | is-not-empty) { $'?($env.QUERY_STRING)' } else { '' }
             $"
             ARCH=$\(uname -m\)
             if ! command -v nu >/dev/null 2>&1; then
                 echo \"nu not found. installing\"
                 curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/${ARCH}/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/${ARCH}/($args) | $\(command -v nu\) --stdin -c 'nu -c $in'
+            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/${ARCH}/($args)($q) | $\(command -v nu\) --stdin -c 'nu -c $in'
             "
             | str trim
             | str replace -rma '^ {12}' ''
@@ -80,7 +81,7 @@ def tar-fs [f] {
     | columns
 }
 
-def install [url loc] {
+def install [tag url loc] {
     let file = $url | path split | last
     let file = '/tmp' | path join $file
     curl -SL --progress-bar $url -o $file
@@ -88,12 +89,11 @@ def install [url loc] {
     info --lv 1 $'extract'
     cat $file | zstd -d | tar -xvf - -C $loc ...($fs | where $it not-in [setup.nu])
     if 'setup.nu' in $fs {
-        info --lv 1 $'setup'
+        let f = '/tmp' | path join ($tag)_setup.nu
+        info --lv 1 $'run ($f)'
+        cat $file | zstd -d | tar -Oxf - $f
         cd
-        cat $file
-        | zstd -d
-        | tar -Oxf - setup.nu
-        | nu -c $in
+        nu $f
     }
 }
 
