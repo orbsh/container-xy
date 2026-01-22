@@ -240,7 +240,7 @@ export def run-script [
     let m = "
     module b {
         use trace
-        export def nu [cmd: list] {
+        export def exec [cmd: list] {
             trace inc-level
             $cmd
             # | prepend 'set -eux'
@@ -288,10 +288,10 @@ export def gen-script [
     let m = "
     module b {
         use trace
-        export def nu [cmd: list] {
+        export def exec [cmd: list] {
             $cmd
             | str join (char newline)
-            | trace f run-with-bash
+            | trace f run-with-nu
             | nu -c $in
         }
     }

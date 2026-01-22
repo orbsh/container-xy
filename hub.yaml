@@ -41,7 +41,7 @@ packages:
         $cmd ++= [
             'mv /tmp/config.nu nushell/config.nu'
         ]
-        b nu $cmd
+        b exec $cmd
     options:
       plugins:
       - query
@@ -72,7 +72,7 @@ packages:
                 $'cp -r /($ctx.target)/share/steel .'
             ]
         }
-        b nu $cmd
+        b exec $cmd
     options:
       config: |
         #theme = "gruvbox_light"
@@ -187,7 +187,7 @@ packages:
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
-        b nu [
+        b exec [
             $'jj config set --user user.name "($ctx.author)"'
             $'jj config set --user user.email "($ctx.author)@orbit"'
         ]
