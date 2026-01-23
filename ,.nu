@@ -177,17 +177,12 @@ export module image {
                 }
             }
             if $archive {
+                trace o begin archive $images
                 ^$env.CNTRCTL save ...$images | zstd -18 -T0
                 | save -pf  $"($cfg.dest)/($i.k).tar.zst"
+                trace o end archive
             }
         }
-    }
-
-    export def archive [] {
-        let cfg = open $CFG | get assets.image
-        let imgs = $cfg.tags
-        | each {|x| ($cfg.repo):($x) }
-        ^$env.CNTRCTL save ...$imgs | zstd -18 -T0 | save -f $cfg.archive
     }
 }
 
