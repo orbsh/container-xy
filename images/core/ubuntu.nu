@@ -28,7 +28,8 @@ export def main [context: record = {}] {
             strace tcpdump socat
             sqlite3 patch tree
             xz-utils zstd zip unzip
-            lsof inetutils-ping iproute2 iptables net-tools
+            lsof inetutils-ping iproute2 net-tools
+            nftables iptables
         ]
         setup timezone $ctx.timezone
         setup sudo
