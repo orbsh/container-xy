@@ -9,6 +9,21 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
+        let boringtun = { from: rust } | build --no-commit {|ctx|
+            run [
+                'mkdir /target'
+                'cargo install --locked boringtun-cli'
+                "bin_file=$(whereis boringtun-cli | awk '{print $2}')"
+                'strip -s $bin_file'
+                'cp $bin_file /target'
+            ]
+        }
+        with-mount {
+            cp ($boringtun.BUILDAH_WORKING_MOUNTPOINT
+               | path join target boringtun-cli
+               ) usr/local/bin
+        }
+
         pkg install [
             wireguard-tools resolvconf
         ]

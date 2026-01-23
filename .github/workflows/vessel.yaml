@@ -76,17 +76,6 @@ jobs:
             tags: ci
           }
 
-      - name: build wireguard
-        shell: buildah unshare nu {0}
-        run: |-
-          overlay use ${{ github.workspace }}/images/tool/wireguard.nu as build
-          build {
-            author: ${{ env.USERNAME }}
-            password: ${{ secrets.GHCR_TOKEN }}
-            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: wireguard
-          }
-
       - name: build registry
         shell: buildah unshare nu {0}
         run: |-
