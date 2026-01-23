@@ -53,10 +53,15 @@ export def main [context: record = {}] {
                 | get name
                 | each {|x| $x | path parse | get stem }
 
-                pueue-extend default ($its | length)
                 for i in $its {
-                    pueue add --group default -l wireguard -- wg-quick up $i
+                    wg-quick up $i
+                    print $"==> wg entrypoint: ($i)"
                 }
+
+                # pueue-extend default ($its | length)
+                # for i in $its {
+                #     pueue add --group default -l wireguard -- wg-quick up $i
+                # }
             }
 
             run-wireguard
