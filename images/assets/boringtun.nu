@@ -6,7 +6,7 @@ export def main [context: record = {}] {
         tags: 'boringtun'
     }
     | merge ($context | reject tags | update image {|x|
-        $x.image | path split | slice ..-2 | append data | path join
+        $x.image | path split | slice ..-2 | append 'assets' | path join
     })
     | build {|ctx|
         let boringtun = { from: rust } | build --no-commit {|ctx|

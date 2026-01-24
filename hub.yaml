@@ -48,7 +48,7 @@ packages:
       - query
   helix:
     type: ImageVolume
-    uri: ghcr.io/fj0r/data:helix
+    uri: ghcr.io/fj0r/assets:helix
     path: '' # opt/helix
     unpack: []
     hooks:
@@ -388,6 +388,6 @@ packages:
     - wrap bin
   boringtun:
     type: ImageVolume
-    uri: ghcr.io/fj0r/data:boringtun
+    uri: ghcr.io/fj0r/assets:boringtun
     path: ''
     unpack: []
