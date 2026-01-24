@@ -22,6 +22,7 @@ export def main [context: record = {}] {
         rust up $ctx.user $ctx.rust.channel --component [
             rust-src clippy rustfmt
             rust-analyzer
+            # rustc-codegen-cranelift #nightly
         ] --target [
             x86_64-unknown-linux-musl
             wasm32-wasip1 wasm32-wasip2 wasm32-unknown-unknown

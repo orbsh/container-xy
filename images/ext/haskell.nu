@@ -2,12 +2,59 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):z'
+        from: $'($context.image):latest'
         user: master
         workdir: /home/master
     }
     | merge $context
     | build {|ctx|
+        pkg install [
+            ghc cabal-install
+            # stack
+            haskell-language-server
+            stylish-haskell hlint
+        ]
+        [
+            ghcid implicit-hie
+            haskell-dap ghci-dap haskell-debug-adapter
+            deepseq call-stack primitive ghc-prim
+            template-haskell aeson yaml
+            classy-prelude base binary bytestring text
+            containers unordered-containers vector transformers
+            time directory filepath
+            shelly process unix
+            req websockets network servant wai warp network-uri
+            # extensible-effects extensible-exceptio
+            lens recursion-schemes free
+            megaparsec Earley
+            singletons
+            monad-par parallel async stm
+            regex-base regex-posix regex-compat
+            pipes conduit machines
+            QuickCheck falsify hspec
+            # hmatrix linear
+            # statistics ad integrati
+            # parsers dimension
+            # scot
+            # http-conduit HTTP html taggy multipart
+            # optparse-applicative
+            # clock hpc pretty
+            # array hashtables dlist
+            # hashable
+            # fixed mtl fgl
+            # boomerang
+            # bound unbound-generics transformers-compat
+            # syb uniplate
+            # persistent memory cryptonite
+            # mwc-random MonadRandom random
+            # katip monad-logger
+        ]
+        | str join ' '
+        | run [
+            'cabal update'
+            $'cabal install ($in)'
+            'cabal clean'
+        ]
         with-mount {
             r#'
             :set prompt "λ: "
@@ -76,7 +123,8 @@ export def main [context: record = {}] {
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
+            | save -f root/.ghci
         }
-          
+
     }
 }
