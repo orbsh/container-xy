@@ -31,7 +31,7 @@ export def main [context: record = {}] {
             monad-par parallel async stm
             regex-base regex-posix regex-compat
             pipes conduit machines
-            QuickCheck falsify #hspec
+            # QuickCheck falsify hspec
             # hmatrix linear
             # statistics ad integrati
             # parsers dimension
