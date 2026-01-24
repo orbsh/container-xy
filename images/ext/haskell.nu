@@ -15,8 +15,8 @@ export def main [context: record = {}] {
             stylish-haskell hlint
         ]
         [
-            ghcid implicit-hie
-            haskell-dap ghci-dap haskell-debug-adapter
+            ghcid # implicit-hie
+            # haskell-dap ghci-dap haskell-debug-adapter
             deepseq call-stack primitive ghc-prim
             template-haskell aeson yaml
             classy-prelude base binary bytestring text
@@ -50,11 +50,11 @@ export def main [context: record = {}] {
             # katip monad-logger
         ]
         | str join ' '
-        | run [
-            'cabal update'
-            $'cabal install ($in)'
-            'cabal clean'
-        ]
+        # | run [
+        #     'cabal update'
+        #     $'cabal install ($in)'
+        #     'cabal clean'
+        # ]
         with-mount {
             r#'
             :set prompt "λ: "
