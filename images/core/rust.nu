@@ -36,7 +36,7 @@ export def main [context: record = {}] {
             #cargo-leptos
         ]
         rust prefetch $ctx.user $ctx.workdir 'cargo-fetch' [
-            clap figment knuffel kdl-rs toml tempdir
+            clap figment knuffel kdl toml tempdir
             snafu anyhow thiserror
             proc-macro2 syn quote macro_rules_attribute
             linkme regex jiff moka bumpalo

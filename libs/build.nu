@@ -7,6 +7,8 @@ export def main --env [
     --squash
 ] {
     let ctx = $in
+    trace o -p build $ctx
+
     let working_container = buildah from $ctx.from
     let mountpoint = buildah mount $working_container
     if ($ctx.author? | is-not-empty) {
