@@ -391,3 +391,8 @@ packages:
     uri: ghcr.io/fj0r/assets:boringtun
     path: ''
     unpack: []
+  dropbear:
+    type: ImageVolume
+    uri: ghcr.io/fj0r/assets:dropbear
+    path: ''
+    unpack: []
