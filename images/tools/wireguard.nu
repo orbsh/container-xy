@@ -2,37 +2,6 @@ use ../../libs *
 
 export def main [context: record = {}] {
     {
-        from: scratch
-        tags: 'boringtun'
-    }
-    | merge ($context | reject tags | update image {|x|
-        $x.image | path split | slice ..-2 | append data | path join
-    })
-    | build {|ctx|
-        let boringtun = { from: rust } | build --no-commit {|ctx|
-            run [
-                'mkdir /target'
-                'cargo install --locked boringtun-cli'
-                "bin_file=$(whereis boringtun-cli | awk '{print $2}')"
-                'strip -s $bin_file'
-                'cp $bin_file /target'
-            ]
-        }
-
-        let version = with-mount {
-            mkdir bin
-            cp ($boringtun.BUILDAH_WORKING_MOUNTPOINT
-               | path join target boringtun-cli
-               ) bin
-            bin/boringtun-cli | split row -r '\s+' | last
-        }
-
-        trace o -p 'image-volumes' {boringtun: $version}
-
-        buildah unmount $boringtun.BUILDAH_WORKING_CONTAINER
-    }
-
-    {
         from: $'($context.image):ubuntu'
         user: master
         workdir: /home/master
@@ -43,7 +12,9 @@ export def main [context: record = {}] {
         pkg install [
             wireguard-tools resolvconf
         ]
-        hub install [boringtun]
+        hub install [
+            boringtun
+        ]
         conf env {
             WG_LOG_LEVEL: info
             WG_THREADS: 4
