@@ -16,17 +16,25 @@ export def main [context: record = {}] {
             CARGO_HOME: '/opt/cargo'
             RUSTC_WRAPPER: '/usr/bin/sccache'
         }
+
         pkg install [
             rustup lldb sccache
         ]
+
+        mut cmps = []
+        if $ctx.rust.channel == 'nightly' {
+            $cmps ++= [rustc-codegen-cranelift]
+        }
+
         rust up $ctx.user $ctx.rust.channel --component [
             rust-src clippy rustfmt
             rust-analyzer
+            ...$cmps
         ] --target [
             x86_64-unknown-linux-musl
             wasm32-wasip1 wasm32-wasip2 wasm32-unknown-unknown
         ] --bin [
-            bacon
+            bacon cross
             cargo-pgo cargo-bloat # cargo-profiler
             cargo-expand cargo-eval cargo-tree
             cargo-feature cargo-edit cargo-rail
