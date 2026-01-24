@@ -26,17 +26,17 @@ export def main [context: record = {}] {
             req websockets network servant wai warp network-uri
             # extensible-effects extensible-exceptio
             lens recursion-schemes free
-            megaparsec Earley
+            megaparsec # Earley
             singletons
             monad-par parallel async stm
             regex-base regex-posix regex-compat
             pipes conduit machines
-            QuickCheck falsify hspec
+            QuickCheck falsify #hspec
             # hmatrix linear
             # statistics ad integrati
             # parsers dimension
             # scot
-            # http-conduit HTTP html taggy multipart
+            http-conduit html taggy multipart
             # optparse-applicative
             # clock hpc pretty
             # array hashtables dlist
