@@ -1,6 +1,4 @@
 use b.nu
-use trace.nu
-use hub.nu
 
 export def install [pkgs] {
     let pkgs = $pkgs | str join ' '
@@ -92,7 +90,7 @@ export def 'setup python' [pkgs] {
     pip install $pkgs
 }
 
-          
+
 export def 'bun install' [
     pkgs
 ] {
