@@ -25,10 +25,9 @@ export def main [context: record = {}] {
             cp ($boringtun.BUILDAH_WORKING_MOUNTPOINT
                | path join target boringtun-cli
                ) bin
-            bin/boringtun-cli | split row -r '\s+' | last
+            # ./bin/boringtun-cli | split row -r '\s+' | last
+            # trace o -p 'image-volumes' {boringtun: $version}
         }
-
-        trace o -p 'image-volumes' {boringtun: $version}
 
         buildah unmount $boringtun.BUILDAH_WORKING_CONTAINER
     }
