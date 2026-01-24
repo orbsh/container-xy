@@ -386,3 +386,8 @@ packages:
     - mv mihomo-linux-{arch2}-v3-{version} mihomo
     - chmodx mihomo
     - wrap bin
+  boringtun:
+    type: ImageVolume
+    uri: ghcr.io/fj0r/data:boringtun
+    path: ''
+    unpack: []
