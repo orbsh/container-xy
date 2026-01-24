@@ -6,7 +6,7 @@ dest = '~/pub/Platform'
 xy = [
     "latest",
     "rust",
-    # "haskell",
+    "haskell",
     "z",
 ]
 
