@@ -84,7 +84,7 @@ export def main [context: record = {}] {
                             delay: "0h",
                             policies: [
                                 {
-                                    repositories: [ infra/**, base/** ],
+                                    repositories: [ infra/**, base/**, library/** ],
                                     deleteReferrers: false,
                                     deleteUntagged: true,
                                     KeepTags: [
