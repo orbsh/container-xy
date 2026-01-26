@@ -1,8 +1,8 @@
-name: buildah
+name: core
 
 on:
   push:
-    branches: [ release, buildah ]
+    branches: [ release, core ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   workflow_dispatch:

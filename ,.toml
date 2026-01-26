@@ -48,12 +48,6 @@ xy = ["ollama"]
 
 [assets.image.manifest.vpn]
 xy = ["wireguard"]
-0x = [
-    "warpgate",
-]
-
-[assets.image.manifest.typst]
-0x = ["typst"]
 
 #[manifest.pyflink]
 #0x = ["pyflink"]

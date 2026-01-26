@@ -7,8 +7,8 @@ name: vessel
 
 on:
   workflow_run:
-    workflows: [ buildah ]
-    branches: [ release, buildah ]
+    workflows: [ core ]
+    branches: [ release, core ]
     types:
       - completed
 
