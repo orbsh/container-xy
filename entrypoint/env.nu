@@ -3,7 +3,7 @@
 let env_to_save = $env
     | transpose key value
     | where key =~ '_|HOME|ROOT|PATH|TIMEZONE|HOSTNAME|DIR|VERSION|LANG|TIME|MODULE|BUFFERED'
-    | where key !~ '^(NU_|PROMPT_COMMAND|ENV_CONVERSIONS$|PROCESS_PATH$|_$|HOME$|USER$|LS_COLORS$)'
+    | where key !~ '^(NU_|PROMPT_COMMAND|ENV_CONVERSIONS$|PATH$|PROCESS_PATH$|_$|HOME$|USER$|LS_COLORS$)'
 
 let env_lines = $env_to_save
     | each { |row| $"($row.key)=($row.value)" }

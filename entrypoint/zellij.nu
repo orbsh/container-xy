@@ -1,13 +1,22 @@
 #!/usr/bin/env nu
 use init.nu [pueue-extend now]
 
+def cert-file [] {
+    $in
+    | path parse
+    | update stem {
+        $in | split row '-' | slice ..-2 | append cert | str join '-'
+    }
+    | path join
+}
 let b = $env.HOME | path join '.config' 'zellij'
 let keyfile = $b | path join zellij-key.pem
-let certfile = $b | path join zellij-cert.pem
+let certfile = $keyfile | cert-file
 
-if ($env.ZELLIJ | is-not-empty) {
+if ($env.MKCERT? | is-not-empty) {
     mkcert -install
-    mkcert -key-file $keyfile -cert-file $certfile localhost 127.0.0.1 0.0.0.0
+    let cert = $env.MKCERT | cert-file
+    mkcert -key-file $env.MKCERT -cert-file $cert localhost 127.0.0.1 0.0.0.0
 }
 
 if ($keyfile | path exists) {
