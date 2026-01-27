@@ -237,6 +237,7 @@ export module test {
     --socat
     --s3
     --ssh
+    --image(-i): string = 'ghcr.io/fj0r/xy:z'
     --check: duration = 1sec
     ...args
     ] {
@@ -257,9 +258,7 @@ export module test {
             $flag ++= [
                 -e SSH_HOSTKEY_ED25519=AAAAC3NzaC1lZDI1NTE5AAAAQNX1odF2vYCSKM1jjij7nxZgikenc2NmzPn+60QIuVBJctmdoUdXGLWexsg4QfyJkwdA9igQEHPzUoBxbSvr15c=
                 -e SSH_SUDO_GROUP=wheel
-                -e ed25519_root=AAAAC3NzaC1lZDI1NTE5AAAAIM7kcdz6dTumkC1PftC8dM2ZFt2f3kpRt7pAdsNGYjsI
-                -e ed25519_a:1001=AAAAC3NzaC1lZDI1NTE5AAAAIM7kcdz6dTumkC1PftC8dM2ZFt2f3kpRt7pAdsNGYjsI
-                -e ed25519_b:1002=AAAAC3NzaC1lZDI1NTE5AAAAIM7kcdz6dTumkC1PftC8dM2ZFt2f3kpRt7pAdsNGYjsI
+                -e ed25519_root=AAAAC3NzaC1lZDI1NTE5AAAAIK2Q46WeaBZ9aBkS3TF2n9laj1spUkpux/zObmliHUOI
                 -p 2266:22
             ]
         }
@@ -279,7 +278,7 @@ export module test {
         }
         ^$env.CNTRCTL run ...[
             ...$flag
-            ghcr.io/fj0r/xy:z
+            $image
             ...$args
         ]
     }

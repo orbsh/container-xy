@@ -32,7 +32,7 @@ def set_user [user_info: string, pubkey: string] {
     let home_dir = (sudo getent passwd $name | split row ":" | get 5)
 
     let profile = $"($home_dir)/.profile"
-    $"\nPATH=($env.PATH)\n" | sudo tee -a $profile | ignore
+    $"\nexport PATH=($env.PATH | str join ':')\n" | sudo tee -a $profile | ignore
 
     let ssh_dir = $"($home_dir)/.ssh"
     if not ($ssh_dir | path exists) {
@@ -49,8 +49,7 @@ def init_ssh [config] {
     }
 
     for r in $config {
-        let user_info = ($r.k | str replace "ed25519_" "")
-        set_user $user_info $r.v
+        set_user $r.k $r.v
     }
 }
 
@@ -72,7 +71,12 @@ def run_ssh [] {
     pueue add --group default -l "sshd" -- $"($cmd)"
 }
 
-let ssh_config = $env | transpose k v | where k starts-with 'ed25519_'
+let ssh_config = $env
+| transpose k v
+| where k starts-with 'ed25519_'
+| each {|x|
+    $x | update k { $in  | str replace 'ed25519_' '' }
+}
 
 if ($ssh_config | is-not-empty) {
     if not ('/etc/dropbear' | path exists) {
