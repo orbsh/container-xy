@@ -23,7 +23,6 @@ export def main [context: record = {}] {
             sudo attr procps htop cron tzdata
             # base-devel
             # nushell
-            # dropbear
             curl openssh-client rsync s3fs
             strace tcpdump socat
             sqlite3 patch tree
@@ -42,7 +41,7 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
-        hub install [pueue websocat]
+        hub install [pueue websocat dropbear]
 
         conf env {
             DEBUGE: ''
