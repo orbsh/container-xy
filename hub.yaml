@@ -396,3 +396,10 @@ packages:
     uri: ghcr.io/fj0r/assets:dropbear
     path: ''
     unpack: []
+  mkcert:
+    repo: FiloSottile/mkcert
+    uri: download/{version}/mkcert-{version}-linux-{arch2}
+    unpack:
+    - mv mkcert-{version}-linux-{arch2} mkcert
+    - chmodx mkcert
+    - wrap bin
