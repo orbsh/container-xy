@@ -19,6 +19,7 @@ export def main [context: record = {}] {
 
         pkg install [
             rustup lldb sccache
+            musl
         ]
 
         mut cmps = []
