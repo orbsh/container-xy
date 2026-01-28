@@ -224,7 +224,7 @@ export module test {
             --name $name
             -v ($CWD)/images/service/ferron:/srv/ferron
             -e CONFIGFILE=/srv/ferron/($config).kdl
-            -p 8888:8080
+            -p 9900:8080
         ]
         ^$env.CNTRCTL run ...[
             ...$flag

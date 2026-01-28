@@ -242,6 +242,7 @@ packages:
     - strip 1
     - wrap bin
   python:
+    exclude_vessel: true
     repo: astral-sh/python-build-standalone
     uri: download/{version}/cpython-{python_version}+{version}-{arch}_v4-unknown-linux-gnu-install_only_stripped.tar.gz
     unpack:
@@ -403,4 +404,9 @@ packages:
     unpack:
     - mv mkcert-{version}-linux-{arch2} mkcert
     - chmodx mkcert
+    - wrap bin
+  mmdr:
+    repo: 1jehuang/mermaid-rs-renderer
+    uri: download/{version}/mmdr-{arch}-unknown-linux-gnu.tar.gz
+    unpack:
     - wrap bin
