@@ -7,7 +7,7 @@ xy = [
     "latest",
     "rust",
     "haskell",
-    "z",
+    "moon",
 ]
 
 [assets.image.manifest.ferron]

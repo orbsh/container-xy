@@ -153,7 +153,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: z
+            tags: moon
           }
 
       - name: build haskell
