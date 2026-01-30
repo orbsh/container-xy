@@ -11,7 +11,8 @@ export def main [context: record = {}] {
         model: 'Qwen/Qwen3-4B-Instruct-2507'
     }
     | build {|ctx|
-        let r = { from: $'($context.image):mistralrs' }
+        let r = $ctx
+        | merge { from: $'($context.image):mistralrs' }
         | build --no-commit {|ctx|
             run [
                 $"'\\exit' | mistralrs run -m ($ctx.model)"

@@ -46,7 +46,7 @@ jobs:
     - name: build qwen
       shell: buildah unshare nu {0}
       run: |-
-        overlay use ${{ github.workspace }}/images/llms/qwen.nu as build
+        overlay use ${{ github.workspace }}/images/assets/qwen.nu as build
         build {
           author: ${{ env.USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
