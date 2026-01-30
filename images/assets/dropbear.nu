@@ -10,7 +10,8 @@ export def main [context: record = {}] {
         tags: 'dropbear'
     }
     | build {|ctx|
-        let dropbear = { from: 'debian:trixie-slim' } | build --no-commit {|ctx|
+        let dropbear = { from: 'debian:trixie-slim' }
+        | build --no-commit {|ctx|
             pkg install [
                 # curl jq ca-certificates
                 # git gnupg
