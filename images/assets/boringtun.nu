@@ -10,7 +10,8 @@ export def main [context: record = {}] {
         tags: 'boringtun'
     }
     | build {|ctx|
-        let boringtun = { from: rust } | build --no-commit {|ctx|
+        let boringtun = { from: rust }
+        | build --no-commit {|ctx|
             run [
                 'mkdir /target'
                 'cargo install --locked boringtun-cli'

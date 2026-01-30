@@ -10,7 +10,8 @@ export def main [context: record = {}] {
         tags: 'nvim'
     }
     | build {|ctx|
-        let nvim = { from: $'($context.image):latest' } | build --no-commit {|ctx|
+        let nvim = { from: $'($context.image):latest' }
+        | build --no-commit {|ctx|
             pkg install [
                 base-devel
                 curl
