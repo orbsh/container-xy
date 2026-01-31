@@ -77,18 +77,17 @@ packages:
         b exec $cmd
     options:
       config: |
-        #theme = "gruvbox_light"
-        theme = "zenburn"
+        theme = "gruvbox"
 
         [editor]
         line-number = "relative"
         middle-click-paste = true
         mouse = true
-        # enable-steel = true
+        enable-steel = true
         trim-trailing-whitespace = true
         trim-final-newlines	= true
         popup-border = "none"
-        # commandline = false
+        commandline = false
 
         [editor.auto-save]
         focus-lost = true
