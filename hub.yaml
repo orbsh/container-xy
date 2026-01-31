@@ -410,3 +410,20 @@ packages:
     uri: download/{version}/mmdr-{arch}-unknown-linux-gnu.tar.gz
     unpack:
     - wrap bin
+  nvim:
+    type: ImageVolume
+    uri: ghcr.io/fj0r/assets:nvim
+    path: '' # opt/helix
+    unpack: []
+    hooks:
+      prepare: |
+        tree -L 2
+      post: |
+        let ctx = $env.HUBHOOK | from nuon
+        mut cmd = [
+            'mkdir ~/.config'
+            'cd ~/.config'
+            'rm -rf nvim'
+            $'cp -r /($ctx.target)/etc/nvim .'
+        ]
+        b exec $cmd

@@ -10,11 +10,11 @@ export def main [context: record = {}] {
         tags: 'nvim'
     }
     | build {|ctx|
-        let nvim = { from: $'($context.image):latest' }
+        let nvim = { from: $'($context.image):ubuntu' }
         | build --no-commit {|ctx|
             pkg install [
-                base-devel
-                curl
+                build-essential
+                curl jq ca-certificates
                 git
             ]
             let version = curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest | from json | get tag_name
@@ -26,15 +26,17 @@ export def main [context: record = {}] {
                 let target = pwd
                 trace o -p download $url
                 curl -fsSL $url | tar -zxf - -C . --strip-components=1
-                mkdir etc/nvim
-                let gurl = 'https://github.com/fj0r/nvim-lua.git'
-                trace o -p config $gurl
-                git clone --depth=3 $gurl etc/nvim
+                mkdir etc
             }
             trace o -p setup-extensions
+            let gurl = 'https://github.com/fj0r/nvim-lua.git'
+            trace o -p config $gurl
             run [
-                'bin/nvim -u etc/nvim/init.lua --headless "+Lazy! sync" +qa'
-                'rm -rf etc/nvim/lazy/packages/*/.git'
+                'cd ~/.config'
+                $'git clone --depth=3 ($gurl) nvim'
+                '/target/bin/nvim --headless "+Lazy! sync" +qa'
+                'rm -rf nvim/lazy/packages/*/.git'
+                'mv nvim /target/etc'
             ]
         }
 
