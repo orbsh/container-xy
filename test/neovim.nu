@@ -1,8 +1,8 @@
 use ../libs *
 
-export def main [context: record = {}] {
+export def --env main [context: record = {}] {
     { from: $'($context.image):latest' }
-    | build --no-commit {|ctx|
+    | build --no-commit --expose {|ctx|
         pkg install [
             base-devel
             curl

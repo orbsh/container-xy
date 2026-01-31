@@ -1,8 +1,8 @@
 use trace.nu
 
-export def main --env [
+export def --env main [
     acts
-    --export
+    --expose
     --no-commit
     --squash
 ] {
@@ -30,11 +30,11 @@ export def main --env [
         do $acts $ctx
     }
 
-    if $export {
+    if $expose {
         $envs | trace f inject-environment | load-env
     }
 
-    if $no_commit or $export {
+    if $no_commit or $expose {
         return $envs
     }
 
