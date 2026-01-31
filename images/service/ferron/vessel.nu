@@ -87,7 +87,7 @@ def install [tag url loc] {
     curl -SL --progress-bar $url -o $file
     let fs = tar-fs $file
     info --lv 1 $'extract'
-    cat $file | zstd -d | tar -xvf - -C $loc ...($fs | where $it not-in [setup.nu])
+    cat $file | zstd -d | tar -xvf - --no-overwrite-dir -C $loc ...($fs | where $it not-in [setup.nu])
     if 'setup.nu' in $fs {
         let f = '/tmp' | path join ($tag)_setup.nu
         info --lv 1 $'run ($f)'
