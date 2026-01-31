@@ -30,10 +30,12 @@ export def main [context: record = {}] {
                 let gurl = 'https://github.com/fj0r/nvim-lua.git'
                 trace o -p config $gurl
                 git clone --depth=3 $gurl etc/nvim
-                trace o -p setup-extensions
-                bin/nvim -u etc/nvim/init.lua --headless "+Lazy! sync" +qa
-                'rm -rf etc/nvim/lazy/packages/*/.git'
             }
+            trace o -p setup-extensions
+            run [
+                'bin/nvim -u etc/nvim/init.lua --headless "+Lazy! sync" +qa'
+                'rm -rf etc/nvim/lazy/packages/*/.git'
+            ]
         }
 
         let version = with-mount {|new, old|

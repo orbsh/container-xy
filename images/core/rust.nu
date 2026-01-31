@@ -52,7 +52,7 @@ export def main [context: record = {}] {
             bon indoc itertools derive_more
             refined_type dashmap indexmap maplit arc-swap bitflags num
             url reqwest scraper markdown
-            serde serde_derive serde_with serde_json_path
+            serde serde_derive typetag serde_with serde_json_path
             serde_json postcard serde_cbor schemars serde_yaml
             tracing tracing-subscriber tracing-serde
             rayon polars nalgebra linfa burn
