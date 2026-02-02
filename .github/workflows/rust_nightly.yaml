@@ -1,5 +1,10 @@
-name: branch_rust
+name: rust-nightly
 on:
+  workflow_run:
+    workflows: [ core ]
+    branches: [ release, core ]
+    types:
+      - completed
   push:
     branches:
     - rust-nightly
