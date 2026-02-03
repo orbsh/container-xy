@@ -368,10 +368,12 @@ packages:
     options:
       extensions:
       - httpfs
+      - vortex
       - delta
       - ducklake
       - iceberg
       - postgres
+      - mysql
       - sqlite
       - fts
   surrealdb:

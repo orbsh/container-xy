@@ -54,6 +54,7 @@ export def main [context: record = {}] {
             url reqwest scraper markdown
             serde serde_derive typetag serde_with serde_json_path
             serde_json postcard serde_cbor schemars serde_yaml
+            rkyv
             tracing tracing-subscriber tracing-serde
             rayon polars nalgebra linfa burn
             crossbeam parking_lot specs
