@@ -44,7 +44,19 @@ export def main [context: record = {}] {
             #dioxus-cli
             #cargo-leptos
         ]
+        let experimental = [
+            rkyv # Zero-copy deserialization framework
+            dumpster # Cycle-tracking garbage collector library
+        ]
+        let frontend = [
+            # wasm-pack wee_alloc leptos
+            wasm-bindgen wasm-bindgen-futures wasm-logger
+            #dioxus dioxus-web
+            sycamore gloo-net
+        ]
         rust prefetch $ctx.user $ctx.workdir 'cargo-fetch' [
+            ...$experimental
+            ...$frontend
             clap figment knuffel kdl toml tempdir
             snafu anyhow thiserror
             proc-macro2 syn quote macro_rules_attribute
@@ -54,7 +66,6 @@ export def main [context: record = {}] {
             url reqwest scraper markdown
             serde serde_derive typetag serde_with serde_json_path
             serde_json postcard serde_cbor schemars serde_yaml
-            rkyv
             tracing tracing-subscriber tracing-serde
             rayon polars nalgebra linfa burn
             crossbeam parking_lot specs
@@ -63,12 +74,8 @@ export def main [context: record = {}] {
             tokio tokio-util tokio-tungstenite smol async-compat
             futures futures-util async-stream async-trait
             async-fs async-graphql sqlx
-            warp async-graphql-warp
+            # warp async-graphql-warp
             axum async-graphql-axum
-            # wasm-pack wee_alloc leptos
-            wasm-bindgen wasm-bindgen-futures wasm-logger
-            #dioxus dioxus-web
-            sycamore gloo-net
         ]
     }
 }
