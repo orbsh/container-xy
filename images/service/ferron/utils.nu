@@ -2,16 +2,29 @@ export def content [
   --json(-j)
   --plain(-p)
   --html(-h)
+  --length(-l): int
+  --no-newline(-n)
 ] {
+    mut hs = []
     if $json {
-        print "Content-Type: application/json; charset=utf-8\n"
+        $hs ++= ["Content-Type: application/json; charset=utf-8"]
     } else if $plain {
-        print "Content-Type: text/plain\n"
+        $hs ++= ["Content-Type: text/plain"]
     } else if $html {
-        print "Content-Type: text/html; charset=utf-8\n"
+        $hs ++= ["Content-Type: text/html; charset=utf-8"]
     } else {
-        print "Content-Type: application/octet-stream\n"
+        $hs ++= ["Content-Type: application/octet-stream"]
     }
+    if ($length | is-not-empty) {
+        $hs ++= [$"Content-Length: ($length)"]
+    }
+    if not $no_newline {
+        $hs ++= ['']
+    }
+
+    $hs
+    | str join (char newline)
+    | print $in
 }
 
 export def status [code] {
@@ -44,11 +57,12 @@ export def send-file [file] {
     match ($file | path type) {
         file => {
             let is_bin = open -r $file | into binary | is-binary-file
+            let sz = ls $file | first | get size | into int
             if $is_bin {
-                content
+                content --length $sz
                 cat $file
             } else {
-                content -p
+                content -p --length $sz
                 open -r $file
             }
         }
