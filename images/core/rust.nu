@@ -70,7 +70,9 @@ export def main [context: record = {}] {
             rayon polars nalgebra linfa burn
             crossbeam parking_lot specs
             nom minijinja
-            wasmtime wasmi steel-core rune koto
+            wasmtime wasmi
+            steel-core steel-repl
+            rune koto
             notify listenfd libc mimalloc
             tokio tokio-util tokio-tungstenite smol async-compat
             futures futures-util async-stream async-trait
