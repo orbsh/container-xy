@@ -67,12 +67,10 @@ export def main [context: record = {}] {
             serde serde_derive typetag serde_with serde_json_path
             serde_json postcard serde_cbor schemars serde_yaml
             tracing tracing-subscriber tracing-serde
-            rayon polars nalgebra linfa burn
+            rayon polars nalgebra linfa burn plotlars
             crossbeam parking_lot specs
             nom minijinja
-            wasmtime wasmi
-            steel-core steel-repl
-            rune koto
+            wasmtime wasmi steel-core steel-repl koto rune
             notify listenfd libc mimalloc
             tokio tokio-util tokio-tungstenite smol async-compat
             futures futures-util async-stream async-trait
