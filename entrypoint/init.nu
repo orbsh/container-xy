@@ -105,12 +105,12 @@ export def pueue-spawn [
     label
     --group(-g): string = 'default'
     --unsafe
-] {
+]: string -> nothing {
     let cmd = $in
     if not $unsafe {
         pueue-extend $group 1
     }
-    pueue add --group $group -l $label -- $"($cmd) | tee /dev/tty"
+    pueue add --group $group -l $label -- $"nu -c '($cmd) out+err>| tee { save -f /dev/tty }'"
 }
 
 export def now [] {

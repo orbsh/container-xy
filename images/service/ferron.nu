@@ -27,7 +27,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
             def run-ferron [config?] {
                 mut cmd = ["/usr/local/bin/ferron"]
@@ -38,8 +38,7 @@ export def main [context: record = {}] {
                 }
                 print $"(now)($config | str join ' ')"
                 $cmd ++= $config
-                pueue-extend default 1
-                pueue add --group default -l ferron -- ($cmd | str join " ")
+                $cmd | str join " " | pueue-spawn ferron
             }
 
             run-ferron $env.CONFIGFILE?

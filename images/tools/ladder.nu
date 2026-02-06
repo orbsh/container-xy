@@ -37,19 +37,21 @@ export def main [context: record = {}] {
                 curl --retry 3 -fsSL https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/($x.u) -o opt/($x.f)
             }
 
-            $"
+            let tmpl = r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
-            for i in ($m | get f | to nuon) {
-                ln -fs /opt/\($i\) /data
-            }
+            for i in {files} {{
+                ln -fs /opt/($i) /data
+            }}
 
-            pueue-extend default 1
-            pueue add --group default -l mihomo -- mihomo -d /data -ext-ctl 0.0.0.0:9090
-            "
+            'mihomo -d /data -ext-ctl 0.0.0.0:9090' | pueue-spawn mihomo
+            '#
             | str trim
             | str replace -rma '^ {12}' ''
+
+            { files: ($m | get f | to nuon) }
+            | format pattern $tmpl
             | save entrypoint/mihomo.nu
         }
 

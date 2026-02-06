@@ -30,7 +30,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
             def run-ollama [model?] {
                 let act = if $env.ENTRYPOINT_ARGS?.0? == 'srv' {
@@ -38,9 +38,9 @@ export def main [context: record = {}] {
                 } else {
                     $env.ENTRYPOINT_ARGS
                 }
-                mut cmd = ["/bin/ollama" ...$act]
-                pueue-extend default 1
-                pueue add --group default -l ferron -- ($cmd | str join " ")
+                ["/bin/ollama" ...$act]
+                | str join " "
+                | pueue-spawn ollama
             }
 
             run-ollama $env.MODEL_PATH?

@@ -24,7 +24,7 @@ export def main [context: record = {}] {
         with-mount {
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
             export def wg-ip [interface] {
                 ip addr show $interface
@@ -46,9 +46,8 @@ export def main [context: record = {}] {
                     print $"==> wg entrypoint: ($i)"
                 }
 
-                # pueue-extend default ($its | length)
                 # for i in $its {
-                #     pueue add --group default -l wireguard -- wg-quick up $i
+                #     [wg-quick up $i] | str join ' ' | pueue-spawn wireguard_($i)
                 # }
             }
 
@@ -60,7 +59,7 @@ export def main [context: record = {}] {
 
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
             if ($env.COREFILE? | is-not-empty) {
                 let p = $env.COREFILE
@@ -106,8 +105,7 @@ export def main [context: record = {}] {
                 | save -f ($p | path join self)
 
                 def run-coredns [] {
-                    pueue-extend default 1
-                    pueue add --group default -l coredns -- coredns -conf $env.COREFILE
+                    'coredns -conf $env.COREFILE' | pueue-spawn coredns
                 }
 
                 run-coredns

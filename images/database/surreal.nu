@@ -21,13 +21,18 @@ export def main [context: record = {}] {
         conf expose [$port]
 
         with-mount {
-            $"
+            r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
-            pueue-extend default 1
-            pueue add --group default -l surreal -- /usr/local/bin/surreal start -A \($env.SURREAL_STORE? | default rocksdb\):///var/lib/surrealdb
-            "
+            [
+                /usr/local/bin/surreal
+                start -A
+                ($env.SURREAL_STORE? | default rocksdb):///var/lib/surrealdb
+            ]
+            | str join " "
+            | pueue-spawn surreal
+            '#
             | str trim
             | str replace -rma '^ {12}' ''
             | save entrypoint/surreal.nu

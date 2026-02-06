@@ -32,16 +32,16 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
             def run-marimo [] {
-                mut cmd = [
+                [
                     marimo edit --no-token
                     -p $env.PORT
                     --host $env.HOST
                 ]
-                pueue-extend default 1
-                pueue add --group default -l marimo -- ($cmd | str join " ")
+                | str join " "
+                | pueue-spawn marimo
             }
 
             run-marimo

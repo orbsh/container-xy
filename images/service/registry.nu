@@ -35,7 +35,7 @@ export def main [context: record = {}] {
 
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-extend now]
+            use init.nu [pueue-spawn now]
 
             def run-zot [] {
                 let s3 = if ($env.S3_BACKEND? | is-empty) {
@@ -132,9 +132,9 @@ export def main [context: record = {}] {
                 }
                 | to json
                 | save -f /etc/zot/config.json
-                mut cmd = ["/usr/local/bin/zot" serve /etc/zot/config.json]
-                pueue-extend default 1
-                pueue add --group default -l ferron -- ($cmd | str join " ")
+                ["/usr/local/bin/zot" serve /etc/zot/config.json]
+                | str join " "
+                | pueue-spawn zot
             }
 
             run-zot
