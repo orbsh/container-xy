@@ -428,3 +428,11 @@ packages:
             $'cp -r /($ctx.target)/etc/nvim .'
         ]
         b exec $cmd
+  oras:
+    repo: oras-project/oras
+    uri: download/v{version}/oras_{version}_linux_{arch2}.tar.gz
+    version:
+    - substr 1
+    unpack:
+    - filter oras
+    - wrap bin
