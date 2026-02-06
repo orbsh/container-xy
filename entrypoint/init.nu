@@ -56,6 +56,8 @@ export def main [...args] {
         let interval = $env.CHECK_INTERVAL? | default '5sec' | into duration
         print $"(now)entering service mode, monitoring process status."
 
+        # :TODO: wait for https://github.com/Nukesor/pueue/issues/614
+        # pueue follow --group default
         mut finished = []
         loop {
             $finished = ^pueue status --json -g $g
@@ -97,6 +99,18 @@ export def pueue-extend [group, num = 1] {
     let status = pueue status -g $group -j | from json
     let running = $status | get tasks | columns | length
     pueue parallel -g $group ($running + $num)
+}
+
+export def pueue-spawn [
+    label
+    --group(-g): string = 'default'
+    --unsafe
+] {
+    let cmd = $in
+    if not $unsafe {
+        pueue-extend $group 1
+    }
+    pueue add --group $group -l $label -- $"($cmd) | tee /dev/tty"
 }
 
 export def now [] {

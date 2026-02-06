@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-use init.nu [pueue-extend now]
+use init.nu [pueue-spawn now]
 
 # user:uid:gid:comment
 def set_user [user_info: string, pubkey: string] {
@@ -62,13 +62,12 @@ def run_ssh [] {
         []
     }
 
-    let cmd = [
+    [
         "sudo" "dropbear" "-REFems" "-p" "22"
         ...$timeout_args
-    ] | str join " "
-
-    pueue-extend default 1
-    pueue add --group default -l "sshd" -- $"($cmd)"
+    ]
+    | str join " "
+    | pueue-spawn sshd
 }
 
 let ssh_config = $env

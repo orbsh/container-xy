@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-use init.nu pueue-extend
+use init.nu [pueue-extend, pueue-spawn]
 
 # s3fs if s3_id=mount,user,endpoint,region,bucket,accesskey,secretkey,opts...
 # opts: nonempty,use_path_request_style,use_xattr,a=1,b=2
@@ -52,7 +52,7 @@ def run_s3 [s3_id: string, s3_args: string] {
         ["-o" $"endpoint=($o.region)"]
     }
 
-    let s3fs_cmd = [
+    [
         "sudo" "-u" $o.user "s3fs" "-f"
         ...$opt_args
         "-o" $"bucket=($o.bucket)"
@@ -60,11 +60,11 @@ def run_s3 [s3_id: string, s3_args: string] {
         "-o" $"url=($o.endpoint)"
         ...$region_opts
         $o.mount_point
-    ] | str join " "
+    ]
+    | str join " "
+    | pueue-spawn --unsafe $"s3fs_($s3_id)"
 
     print $"Starting s3fs ($s3_id) for ($o.mount_point)"
-
-    pueue add --group default -l $"s3fs_($s3_id)" -- $"($s3fs_cmd)"
 }
 
 let s3_configs = $env | transpose k v | where k starts-with "s3_"

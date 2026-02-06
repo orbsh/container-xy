@@ -215,6 +215,7 @@ export module test {
 
     export def ferron [
         config:string@cmpl-ferron
+        --ssh(-s)
         --image(-i): string = 'xy:ferron'
     ] {
         let name = 'test-ferron'
@@ -222,10 +223,21 @@ export module test {
         mut flag = [
             -it
             --name $name
+            -v ($CWD)/entrypoint/init.nu:/entrypoint/init.nu
+            -v ($CWD)/entrypoint/ssh.nu:/entrypoint/ssh.nu
             -v ($CWD)/images/service/ferron:/srv/ferron
             -e CONFIGFILE=/srv/ferron/($config).kdl
             -p 9900:8080
         ]
+        if $ssh {
+            $flag ++= [
+                -e SSH_HOSTKEY_ED25519=AAAAC3NzaC1lZDI1NTE5AAAAQNX1odF2vYCSKM1jjij7nxZgikenc2NmzPn+60QIuVBJctmdoUdXGLWexsg4QfyJkwdA9igQEHPzUoBxbSvr15c=
+                -e SSH_SUDO_GROUP=wheel
+                -e ed25519_root=AAAAC3NzaC1lZDI1NTE5AAAAIK2Q46WeaBZ9aBkS3TF2n9laj1spUkpux/zObmliHUOI
+                -p 2266:22
+                -p 2311:2311
+            ]
+        }
         ^$env.CNTRCTL run ...[
             ...$flag
             $image
@@ -237,7 +249,7 @@ export module test {
     --socat
     --s3
     --ssh
-    --image(-i): string = 'ghcr.io/fj0r/xy:z'
+    --image(-i): string = 'xy:rust'
     --check: duration = 1sec
     ...args
     ] {

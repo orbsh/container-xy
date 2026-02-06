@@ -1,13 +1,13 @@
 #!/usr/bin/env nu
-use init.nu [pueue-extend now]
+use init.nu [pueue-extend pueue-spawn now]
 
 def run_socat [job] {
     if ($job | is-empty) { return }
     let g = 'default'
     pueue-extend $g ($job | length)
     for j in $job {
-        let cmd = $"sudo socat ($j.proto)-listen:($j.port),reuseaddr,fork ($j.proto):($j.target)"
-        pueue add -g $g -l $"socat_($j.proto)_($j.port)" -- $"($cmd)"
+        $"sudo socat ($j.proto)-listen:($j.port),reuseaddr,fork ($j.proto):($j.target)"
+        | pueue-spawn --unsafe $"socat_($j.proto)_($j.port)"
         print $"(now)($j.proto):($j.port) --> ($j.target)"
     }
 }
