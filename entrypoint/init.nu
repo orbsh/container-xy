@@ -110,7 +110,11 @@ export def pueue-spawn [
     if not $unsafe {
         pueue-extend $group 1
     }
-    pueue add --group $group -l $label -- $"nu -c '($cmd) out+err>| tee { save -f /dev/tty }'"
+    if false {
+        pueue add --group $group -l $label -- $"nu -c '($cmd) out+err>| tee { save -f /dev/tty }'"
+    } else {
+        pueue add --group $group -l $label -- $"bash -c '($cmd) |& tee /dev/tty'"
+    }
 }
 
 export def now [] {

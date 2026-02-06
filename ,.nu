@@ -259,7 +259,7 @@ export module test {
             -it
             --name $name
             --device /dev/fuse --privileged
-            -v ($CWD)/entrypoint:/entrypoint
+            -v ($CWD)/entrypoint/init.nu:/entrypoint/init.nu
             --entrypoint /entrypoint/init.nu
             -e CHECK_INTERVAL=($check)
         ]
