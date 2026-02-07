@@ -56,7 +56,7 @@ jobs:
           author: ${{ env.USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
           image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-          tags: rust-nightly
+          tags: r9
           rust: {
             channel: nightly
           }

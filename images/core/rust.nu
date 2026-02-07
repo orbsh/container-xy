@@ -73,7 +73,7 @@ export def main [context: record = {}] {
             wasm-tools wit-deps-cli wit-bindgen-cli
             ...$bins
         ]
-        rust prefetch $ctx.user $ctx.workdir 'cargo-fetch' [
+        rust prefetch $ctx.user $ctx.workdir 'rust-labs' [
             ...$experimental
             ...$frontend
             clap figment knuffel kdl toml tempdir
