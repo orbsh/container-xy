@@ -18,8 +18,10 @@ export def setup [
         }
     }
 
+    let install_path = $dir | path join bin "nu"
     b run [
-        $'usermod -s ($dir | path join bin "nu") ($config.user)'
+        $"echo '($install_path)' >> /etc/shells"
+        $'usermod -s ($install_path) ($config.user)'
     ]
 
     b with-mount {

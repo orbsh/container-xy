@@ -270,10 +270,14 @@ export module test {
             $flag ++= [
                 -e SSH_HOSTKEY_ED25519=AAAAC3NzaC1lZDI1NTE5AAAAQNX1odF2vYCSKM1jjij7nxZgikenc2NmzPn+60QIuVBJctmdoUdXGLWexsg4QfyJkwdA9igQEHPzUoBxbSvr15c=
                 -e SSH_SUDO_GROUP=wheel
-                -e ed25519_root=AAAAC3NzaC1lZDI1NTE5AAAAIK2Q46WeaBZ9aBkS3TF2n9laj1spUkpux/zObmliHUOI
                 -p 2266:22
                 -p 2311:2311
             ]
+            if $user {
+                $flag ++= [-e ed25519_master=AAAAC3NzaC1lZDI1NTE5AAAAIK2Q46WeaBZ9aBkS3TF2n9laj1spUkpux/zObmliHUOI]
+            } else {
+                $flag ++= [-e ed25519_root=AAAAC3NzaC1lZDI1NTE5AAAAIK2Q46WeaBZ9aBkS3TF2n9laj1spUkpux/zObmliHUOI]
+            }
         }
         if $s3 {
             $flag ++= [

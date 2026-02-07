@@ -65,7 +65,7 @@ export def main [context: record = {}] {
             x86_64-unknown-linux-musl
             wasm32-wasip1 wasm32-wasip2 wasm32-unknown-unknown
         ] --bin [
-            bacon cross
+            bacon cross bugstalker
             cargo-pgo cargo-bloat # cargo-profiler
             cargo-expand cargo-eval cargo-tree
             cargo-feature cargo-edit cargo-rail
@@ -79,7 +79,7 @@ export def main [context: record = {}] {
             clap figment knuffel kdl toml tempdir
             snafu anyhow thiserror
             proc-macro2 syn quote macro_rules_attribute
-            linkme regex jiff moka bumpalo
+            linkme regex jiff bumpalo #moka
             nom minijinja bon indoc itertools derive_more
             refined_type dashmap indexmap maplit arc-swap bitflags num
             url reqwest scraper markdown
@@ -88,7 +88,7 @@ export def main [context: record = {}] {
             tracing tracing-subscriber tracing-serde
             rayon polars nalgebra linfa burn plotlars
             crossbeam parking_lot specs
-            wasmtime wasmtime_wasi wasmi
+            wasmtime wasmi
             steel-core steel-repl koto rune
             notify listenfd libc mimalloc
             tokio tokio-util tokio-tungstenite smol async-compat
