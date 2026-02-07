@@ -88,7 +88,8 @@ export def main [context: record = {}] {
             tracing tracing-subscriber tracing-serde
             rayon polars nalgebra linfa burn plotlars
             crossbeam parking_lot specs
-            wasmtime wasmi steel-core steel-repl koto rune
+            wasmtime wasmtime_wasi wasmi
+            steel-core steel-repl koto rune
             notify listenfd libc mimalloc
             tokio tokio-util tokio-tungstenite smol async-compat
             futures futures-util async-stream async-trait
