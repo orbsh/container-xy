@@ -27,6 +27,36 @@ export def main [context: record = {}] {
             $cmps ++= [rustc-codegen-cranelift]
         }
 
+        mut bins = []
+        if $ctx.rust.channel == 'nightly' {
+            $bins ++= []
+        } else {
+            $bins ++= [rust-script]
+        }
+
+        mut experimental = [
+            rkyv # Zero-copy deserialization framework
+            dumpster # Cycle-tracking garbage collector library
+        ]
+
+        mut frontend = [
+            wasm-bindgen wasm-bindgen-futures
+            wasm-logger gloo-net
+        ]
+        match $ctx.rust.frontend? {
+            'leptos' => {
+                $frontend ++= [wasm-pack wee_alloc leptos]
+                $bins ++= [cargo-leptos]
+            }
+            'dioxus' => {
+                $frontend ++= [dioxus dioxus-web]
+                $bins ++= [dioxus-cli]
+            }
+            _ => {
+                $frontend ++= [sycamore]
+            }
+        }
+
         rust up $ctx.user $ctx.rust.channel --component [
             rust-src clippy rustfmt
             rust-analyzer
@@ -39,20 +69,9 @@ export def main [context: record = {}] {
             cargo-pgo cargo-bloat # cargo-profiler
             cargo-expand cargo-eval cargo-tree
             cargo-feature cargo-edit cargo-rail
-            rust-script trunk cargo-wasi
+            trunk cargo-wasi
             wasm-tools wit-deps-cli wit-bindgen-cli
-            #dioxus-cli
-            #cargo-leptos
-        ]
-        let experimental = [
-            rkyv # Zero-copy deserialization framework
-            dumpster # Cycle-tracking garbage collector library
-        ]
-        let frontend = [
-            # wasm-pack wee_alloc leptos
-            wasm-bindgen wasm-bindgen-futures wasm-logger
-            #dioxus dioxus-web
-            sycamore gloo-net
+            ...$bins
         ]
         rust prefetch $ctx.user $ctx.workdir 'cargo-fetch' [
             ...$experimental
