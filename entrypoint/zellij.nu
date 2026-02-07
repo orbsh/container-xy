@@ -1,7 +1,7 @@
 #!/usr/bin/env nu
 use init.nu [pueue-extend pueue-spawn now]
 
-def cert-file [] {
+def cert-file []: path -> path {
     $in
     | path parse
     | update stem {

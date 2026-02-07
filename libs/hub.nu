@@ -5,7 +5,7 @@ use extract.nu
 use b.nu
 const CFG = path self ../hub.yaml
 
-export def get-version [cfg] {
+export def get-version [cfg]: nothing -> string {
     trace inc-level
     let ver = if $cfg.type? in ['ImageVolume'] {
         ''
@@ -22,7 +22,7 @@ export def get-version [cfg] {
     $ver | transformer run $cfg.version?
 }
 
-export def format-uri [cfg] {
+export def format-uri [cfg]: record -> string {
     let vers = $in
     if ($cfg.uri | describe -d).type == list {
         $cfg.uri

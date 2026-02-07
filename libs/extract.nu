@@ -2,7 +2,7 @@ use trace.nu
 
 export def as [
     ext file
-] {
+]: any -> nothing {
     let n = $in
     trace inc-level
     mut del = true

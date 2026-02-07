@@ -61,7 +61,7 @@ export def main [context: record = {}] {
             snafu anyhow thiserror
             proc-macro2 syn quote macro_rules_attribute
             linkme regex jiff moka bumpalo
-            bon indoc itertools derive_more
+            nom minijinja bon indoc itertools derive_more
             refined_type dashmap indexmap maplit arc-swap bitflags num
             url reqwest scraper markdown
             serde serde_derive typetag serde_with serde_json_path
@@ -69,7 +69,6 @@ export def main [context: record = {}] {
             tracing tracing-subscriber tracing-serde
             rayon polars nalgebra linfa burn plotlars
             crossbeam parking_lot specs
-            nom minijinja
             wasmtime wasmi steel-core steel-repl koto rune
             notify listenfd libc mimalloc
             tokio tokio-util tokio-tungstenite smol async-compat

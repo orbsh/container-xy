@@ -43,7 +43,7 @@ export def o [
     print $"($msg)(ansi reset)"
 }
 
-export def f [...prefix] {
+export def f [...prefix]: any -> any {
     let n = $in
     o -p ($prefix | str join '-') $n
     $n

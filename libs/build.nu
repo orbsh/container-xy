@@ -5,7 +5,7 @@ export def --env main [
     --expose
     --no-commit
     --squash
-] {
+]: record -> any {
     let ctx = $in
     trace o -p build $ctx
 
@@ -54,7 +54,7 @@ export def --env main [
     }
 }
 
-export def os-id [] {
+export def os-id []: path -> string {
     let file = $in
     # ImageVolume
     if not ($file | path exists) {
