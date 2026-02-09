@@ -57,17 +57,19 @@ export def main [context: record = {}] {
                     }
                 }
 
-                let retention = (if $env.RETENTION_REPO? | is-empty) {
-                    {}
+                let retention = if ($env.RETENTION_REPO? | is-empty) {
+                    []
                 } else {
-                    {
-                        repositories: $env.RETENTION_REPO,
-                        deleteReferrers: false,
-                        deleteUntagged: true,
-                        KeepTags: [
-                            { patterns: [".*"] }
-                        ]
-                    }
+                    [
+                        {
+                            repositories: $env.RETENTION_REPO,
+                            deleteReferrers: false,
+                            deleteUntagged: true,
+                            KeepTags: [
+                                { patterns: [".*"] }
+                            ]
+                        }
+                    ]
                 }
 
                 {
