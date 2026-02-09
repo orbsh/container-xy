@@ -111,9 +111,9 @@ export def pueue-spawn [
         pueue-extend $group 1
     }
     if false {
-        pueue add --group $group -l $label -- $"nu -c '($cmd) out+err>| tee { save -f /dev/tty }'"
+        pueue add --group $group -l $label -- $"nu -c '($cmd) out+err>| tee { save -f /proc/1/fd/1 }'"
     } else {
-        pueue add --group $group -l $label -- $"bash -c '($cmd) |& tee /dev/tty'"
+        pueue add --group $group -l $label -- $"bash -c '($cmd) |& tee /proc/1/fd/1'"
     }
 }
 
