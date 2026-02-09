@@ -45,14 +45,14 @@ export def main [context: record = {}] {
                     {
                         storageDriver: {
                             name: "s3",
-                            regionendpoint: $s3.endpoint,
-                            forcepathstyle: $s3.pathstyle?,
-                            region: $s3.region,
-                            bucket: $s3.bucket,
-                            secure: $s3.secure,
-                            skipverify: $s3.skipverify?,
-                            accesskey: $s3.accessKey,
-                            secretkey: $s3.secretKe"
+                            regionendpoint: $o.endpoint,
+                            forcepathstyle: $o.pathstyle?,
+                            region: $o.region,
+                            bucket: $o.bucket,
+                            secure: $o.secure,
+                            skipverify: $o.skipverify?,
+                            accesskey: $o.accessKey,
+                            secretkey: $o.secretKe
                         },
                     }
                 }
@@ -60,16 +60,18 @@ export def main [context: record = {}] {
                 let retention = if ($env.RETENTION_REPO? | is-empty) {
                     []
                 } else {
-                    [
+                    $env.RETENTION_REPO
+                    | split row ','
+                    | each {|x|
                         {
-                            repositories: $env.RETENTION_REPO,
+                            repositories: $x,
                             deleteReferrers: false,
                             deleteUntagged: true,
                             KeepTags: [
                                 { patterns: [".*"] }
                             ]
                         }
-                    ]
+                    }
                 }
 
                 {
@@ -134,7 +136,7 @@ export def main [context: record = {}] {
                 }
                 | to json
                 | save -f /etc/zot/config.json
-                ["/usr/local/bin/zot" serve /etc/zot/config.json]
+                [/usr/local/bin/zot serve /etc/zot/config.json]
                 | str join " "
                 | pueue-spawn zot
             }
