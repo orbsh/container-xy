@@ -198,7 +198,7 @@ export module test {
             overlay use ($s) as build
             build {
                 cache: ~/Downloads
-                image: test
+                image: xy
                 author: orbit
                 skip_push: true
             }
