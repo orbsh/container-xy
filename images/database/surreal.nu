@@ -14,8 +14,8 @@ export def main [context: record = {}] {
 
         conf volume [/var/lib/surrealdb]
         conf env {
-            SURREAL_USER: foo
-            SURREAL_PASS: foo
+            SURREAL_USER: $ctx.user
+            SURREAL_PASS: $ctx.user
             SURREAL_BIND: $'0.0.0.0:($port)'
         }
         conf expose [$port]
