@@ -75,7 +75,11 @@ export def 'pip install' [
     pkgs
     --index-url: string
 ] {
-    mut cmd = [pip install --no-cache-dir --break-system-packages]
+    let pip = match $env.OS_RELEASE_ID {
+        debian => "pip3"
+        _ => "pip",
+    }
+    mut cmd = [$pip install --no-cache-dir --break-system-packages]
     if ($index_url | is-not-empty) {
         $cmd ++= [--index-url $index_url]
     }
@@ -84,9 +88,11 @@ export def 'pip install' [
 }
 
 export def 'setup python' [pkgs] {
-    install [
-        python python-pip
-    ]
+    let bin = match $env.OS_RELEASE_ID {
+        debian => [ python3 python3-pip ],
+        _ => [ python python-pip ],
+    }
+    install $bin
     pip install $pkgs
 }
 
