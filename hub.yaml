@@ -241,8 +241,8 @@ packages:
     - strip 1
     - wrap bin
   python:
-    exclude_vessel: true
     repo: astral-sh/python-build-standalone
+    exclude_vessel: true
     uri: download/{version}/cpython-{python_version}+{version}-{arch}_v4-unknown-linux-gnu-install_only_stripped.tar.gz
     unpack:
     - strip 1
@@ -274,11 +274,11 @@ packages:
     - wrap bin
   jujutsu:
     repo: jj-vcs/jj
+    exclude_vessel: false
     uri: download/{version}/jj-{version}-{arch}-unknown-linux-musl.tar.gz
     unpack:
     - filter jj
     - wrap bin
-    exclude_vessel: false
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
@@ -435,4 +435,12 @@ packages:
     - substr 1
     unpack:
     - filter oras
+    - wrap bin
+  lightpanda:
+    repo: lightpanda-io/browser
+    exclude_vessel: true
+    uri: download/{version}/lightpanda-{arch}-linux
+    unpack:
+    - mv lightpanda-{arch}-linux lightpanda
+    - chmodx lightpanda
     - wrap bin
