@@ -37,7 +37,7 @@ export def main [context: record = {}] {
         setup master $ctx.user $ctx.workdir $xdg_config
         nushell setup '/usr/local' {
             user: $ctx.user
-            dst: $xdg_config
+            xdg_config: $xdg_config
             plugins: [query]
         }
 

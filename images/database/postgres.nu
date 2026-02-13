@@ -8,7 +8,7 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | update from {|x| postgres:($x.pg_version_major) }
+    | update from {|x| $'postgres:($x.pg_version_major)' }
     | build {|ctx|
 
         setup timezone $ctx.timezone
@@ -16,7 +16,6 @@ export def main [context: record = {}] {
             LANG: C.UTF-8
             LC_ALL: C.UTF-8
             TIMEZONE: $ctx.timezone
-            MASTER: $ctx.user
             PYTHONUNBUFFERED: x
         }
 
@@ -51,7 +50,7 @@ export def main [context: record = {}] {
 
         nushell setup '/usr/local' {
             user: root
-            dst: '/root/config'
+            xdg_config: '/root/.config'
             plugins: [query]
         }
 
