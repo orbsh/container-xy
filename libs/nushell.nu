@@ -39,7 +39,7 @@ export def setup [
 
         cd $xdg_config
         git log -1 --date=iso
-        $prev_config | save -a config.nu
+        $"(char newline)($prev_config)" | save -a config.nu
     }
 
     let reg = $config.plugins
