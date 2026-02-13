@@ -97,16 +97,16 @@ export def main [context: record = {}] {
         # ] {
         # }
 
-        run [
-            r#'mkdir /tmp/paradedb'#
-            r#'cd /tmp/paradedb'#
-            r#'code_name=$(cat /etc/os-release | grep '^VERSION_CODENAME' | cut -d '=' -f 2)'#
-            r#'version=$(curl --retry 3 -fsSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/paradedb/paradedb/releases | jq -r '.[0].tag_name' | cut -c 2-)'#
-            r#'curl --retry 3 -fsSL https://github.com/paradedb/paradedb/releases/download/v${version}/postgresql-${PG_VERSION_MAJOR}-pg-search_${version}-1PARADEDB-${code_name}_amd64.deb -o pg-search.deb'#
-            r#'dpkg -i pg-search.deb'#
-            r#'cd /tmp'#
-            r#'rm -rf paradedb'#
-        ]
+        # run [
+        #     r#'mkdir /tmp/paradedb'#
+        #     r#'cd /tmp/paradedb'#
+        #     r#'code_name=$(cat /etc/os-release | grep '^VERSION_CODENAME' | cut -d '=' -f 2)'#
+        #     r#'version=$(curl --retry 3 -fsSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/paradedb/paradedb/releases | jq -r '.[0].tag_name' | cut -c 2-)'#
+        #     r#'curl --retry 3 -fsSL https://github.com/paradedb/paradedb/releases/download/v${version}/postgresql-${PG_VERSION_MAJOR}-pg-search_${version}-1PARADEDB-${code_name}_amd64.deb -o pg-search.deb'#
+        #     r#'dpkg -i pg-search.deb'#
+        #     r#'cd /tmp'#
+        #     r#'rm -rf paradedb'#
+        # ]
 
 
     }
