@@ -9,11 +9,11 @@ packages:
     repo: nushell/nushell
     uri: download/{version}/nu-{version}-{arch}-unknown-linux-musl.tar.gz
     version:
-    - trim
+      - trim
     unpack:
-    - strip 1
-    - filter nu nu_plugin_*
-    - wrap bin
+      - strip 1
+      - filter nu nu_plugin_*
+      - wrap bin
     hooks:
       prepare: |
         let ctx = $env.HUBHOOK | from nuon
@@ -34,22 +34,23 @@ packages:
         ]
         [
             '$env.config.show_banner = "short"'
+            '$env.NU_POWER_CONFIG.theme.color.normal = "xterm_olive"'
             'export alias pst = pueue status'
             'export alias pf = pueue follow'
         ]
         | str join (char newline)
         | save -a ($ctx.mount| path join tmp config.nu)
         $cmd ++= [
-            'mv /tmp/config.nu nushell/config.nu'
+            'cat /tmp/config.nu >> nushell/config.nu'
         ]
         b exec $cmd
     options:
       plugins:
-      - query
+        - query
   helix:
     type: ImageVolume
     uri: ghcr.io/fj0r/assets:helix
-    path: '' # opt/helix
+    path: "" # opt/helix
     unpack: []
     hooks:
       prepare: |
@@ -133,14 +134,14 @@ packages:
     repo: bytecodealliance/wasmtime
     uri: download/{version}/wasmtime-{version}-{arch}-linux.tar.xz
     unpack:
-    - strip 1
-    - filter wasmtime wasmtime-min
-    - wrap bin
+      - strip 1
+      - filter wasmtime wasmtime-min
+      - wrap bin
   zellij:
     repo: zellij-org/zellij
     uri: download/{version}/zellij-{arch}-unknown-linux-musl.tar.gz
     unpack:
-    - wrap bin
+      - wrap bin
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
@@ -238,47 +239,47 @@ packages:
     repo: oven-sh/bun
     uri: download/{version}/bun-linux-{arch3}.zip
     unpack:
-    - strip 1
-    - wrap bin
+      - strip 1
+      - wrap bin
   python:
     repo: astral-sh/python-build-standalone
     exclude_vessel: true
     uri: download/{version}/cpython-{python_version}+{version}-{arch}_v4-unknown-linux-gnu-install_only_stripped.tar.gz
     unpack:
-    - strip 1
+      - strip 1
   dust:
     repo: bootandy/dust
     uri: download/{version}/dust-{version}-{arch}-unknown-linux-musl.tar.gz
     unpack:
-    - strip 1
-    - filter dust
-    - wrap bin
+      - strip 1
+      - filter dust
+      - wrap bin
   dua:
     repo: Byron/dua-cli
     uri: download/{version}/dua-{version}-{arch}-unknown-linux-musl.tar.gz
     unpack:
-    - strip 1
-    - filter dua
-    - wrap bin
+      - strip 1
+      - filter dua
+      - wrap bin
   btm:
     repo: ClementTsang/bottom
     uri: download/{version}/bottom_{arch}-unknown-linux-musl.tar.gz
     unpack:
-    - filter btm
-    - wrap bin
+      - filter btm
+      - wrap bin
   bdwh:
     repo: imsnif/bandwhich
     uri: download/{version}/bandwhich-{version}-{arch}-unknown-linux-musl.tar.gz
     unpack:
-    - filter bandwhich
-    - wrap bin
+      - filter bandwhich
+      - wrap bin
   jujutsu:
     repo: jj-vcs/jj
     exclude_vessel: false
     uri: download/{version}/jj-{version}-{arch}-unknown-linux-musl.tar.gz
     unpack:
-    - filter jj
-    - wrap bin
+      - filter jj
+      - wrap bin
     hooks:
       post: |
         let ctx = $env.HUBHOOK | from nuon
@@ -289,63 +290,63 @@ packages:
   pueue:
     repo: Nukesor/pueue
     uri:
-    - download/{version}/pueue-{arch}-unknown-linux-musl
-    - download/{version}/pueued-{arch}-unknown-linux-musl
+      - download/{version}/pueue-{arch}-unknown-linux-musl
+      - download/{version}/pueued-{arch}-unknown-linux-musl
     unpack:
-    - mv pueue-{arch}-unknown-linux-musl pueue
-    - mv pueued-{arch}-unknown-linux-musl pueued
-    - chmodx pueue pueued
-    - wrap bin
+      - mv pueue-{arch}-unknown-linux-musl pueue
+      - mv pueued-{arch}-unknown-linux-musl pueued
+      - chmodx pueue pueued
+      - wrap bin
   websocat:
     repo: vi/websocat
     uri: download/{version}/websocat.{arch}-unknown-linux-musl
     unpack:
-    - mv websocat.{arch}-unknown-linux-musl websocat
-    - chmodx websocat
-    - wrap bin
+      - mv websocat.{arch}-unknown-linux-musl websocat
+      - chmodx websocat
+      - wrap bin
   ferron:
     repo: ferronweb/ferron
     uri: download/{version}/ferron-{version}-{arch}-unknown-linux-musl.zip
     unpack:
-    - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
-    - wrap bin
+      - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
+      - wrap bin
   zot:
     repo: project-zot/zot
     exclude_vessel: true
     uri: download/{version}/zot-linux-{arch2}
     unpack:
-    - mv zot-linux-{arch2} zot
-    - chmodx zot
-    - wrap bin
+      - mv zot-linux-{arch2} zot
+      - chmodx zot
+      - wrap bin
   registry:
     repo: distribution/distribution
     exclude_vessel: true
     version:
-    - substr 1
+      - substr 1
     uri: download/v{version}/registry_{version}_linux_{arch2}.tar.gz
     unpack:
-    - filter registry
-    - wrap bin
+      - filter registry
+      - wrap bin
   kubectl:
     repo: https://storage.googleapis.com/kubernetes-release/release/stable.txt
     uri: https://dl.k8s.io/{version}/kubernetes-node-linux-{arch2}.tar.gz
     unpack:
-    - filter kubernetes/node/bin/kubectl kubernetes/node/bin/kubeadm
-    - strip 3
-    - chmodx kubectl kubeadm
-    - wrap bin
+      - filter kubernetes/node/bin/kubectl kubernetes/node/bin/kubeadm
+      - strip 3
+      - chmodx kubectl kubeadm
+      - wrap bin
   helm:
     repo: helm/helm
     uri: https://get.helm.sh/helm-{version}-linux-{arch2}.tar.gz
     unpack:
-    - filter linux-{arch2}/helm
-    - strip 1
-    - wrap bin
+      - filter linux-{arch2}/helm
+      - strip 1
+      - wrap bin
   duckdb:
     repo: duckdb/duckdb
     uri: download/{version}/duckdb_cli-linux-{arch2}.zip
     unpack:
-    - wrap bin
+      - wrap bin
     hooks:
       prepare: |
         let ctx = $env.HUBHOOK | from nuon
@@ -367,54 +368,54 @@ packages:
         | save -a ($ctx.mount | path join root/.duckdbrc)
     options:
       extensions:
-      - httpfs
-      - vortex
-      - delta
-      - ducklake
-      - iceberg
-      - postgres
-      - mysql
-      - sqlite
-      - fts
+        - httpfs
+        - vortex
+        - delta
+        - ducklake
+        - iceberg
+        - postgres
+        - mysql
+        - sqlite
+        - fts
   surrealdb:
     repo: surrealdb/surrealdb
     with_prerelease: true
     uri: download/{version}/surreal-{version}.linux-{arch2}.tgz
     unpack:
-    - wrap bin
+      - wrap bin
   mihomo:
     repo: MetaCubeX/mihomo
     uri: download/{version}/mihomo-linux-{arch2}-v3-{version}.gz
     unpack:
-    - mv mihomo-linux-{arch2}-v3-{version} mihomo
-    - chmodx mihomo
-    - wrap bin
+      - mv mihomo-linux-{arch2}-v3-{version} mihomo
+      - chmodx mihomo
+      - wrap bin
   boringtun:
     type: ImageVolume
     uri: ghcr.io/fj0r/assets:boringtun
-    path: ''
+    path: ""
     unpack: []
   dropbear:
     type: ImageVolume
     uri: ghcr.io/fj0r/assets:dropbear
-    path: ''
+    path: ""
     unpack: []
   mkcert:
     repo: FiloSottile/mkcert
     uri: download/{version}/mkcert-{version}-linux-{arch2}
     unpack:
-    - mv mkcert-{version}-linux-{arch2} mkcert
-    - chmodx mkcert
-    - wrap bin
+      - mv mkcert-{version}-linux-{arch2} mkcert
+      - chmodx mkcert
+      - wrap bin
   mmdr:
     repo: 1jehuang/mermaid-rs-renderer
     uri: download/{version}/mmdr-{arch}-unknown-linux-gnu.tar.gz
     unpack:
-    - wrap bin
+      - wrap bin
   nvim:
     type: ImageVolume
     uri: ghcr.io/fj0r/assets:nvim
-    path: '' # opt/helix
+    path: "" # opt/helix
     unpack: []
     hooks:
       prepare: |
@@ -432,15 +433,15 @@ packages:
     repo: oras-project/oras
     uri: download/v{version}/oras_{version}_linux_{arch2}.tar.gz
     version:
-    - substr 1
+      - substr 1
     unpack:
-    - filter oras
-    - wrap bin
+      - filter oras
+      - wrap bin
   lightpanda:
     repo: lightpanda-io/browser
     exclude_vessel: true
     uri: download/{version}/lightpanda-{arch}-linux
     unpack:
-    - mv lightpanda-{arch}-linux lightpanda
-    - chmodx lightpanda
-    - wrap bin
+      - mv lightpanda-{arch}-linux lightpanda
+      - chmodx lightpanda
+      - wrap bin
