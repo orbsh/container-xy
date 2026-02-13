@@ -34,7 +34,10 @@ export def setup [
         let xdg_config = relative-path $config.xdg_config
         | path expand
         | path join nushell
-        rm -rf $xdg_config
+
+        if ($xdg_config | path exists) {
+            rm -rf $xdg_config
+        }
         git clone --depth=($cfg.clone?.depth? | default 3) $cfg.git $xdg_config
 
         [
