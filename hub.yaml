@@ -41,7 +41,7 @@ packages:
         | str join (char newline)
         | save -a ($ctx.mount| path join tmp config.nu)
         $cmd ++= [
-            'cat /tmp/config.nu >> nushell/config.nu'
+            'cat /tmp/config.nu | save -a nushell/config.nu'
         ]
         b exec $cmd
     options:
