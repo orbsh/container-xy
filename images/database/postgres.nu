@@ -5,6 +5,17 @@ export def main [context: record = {}] {
         pg_version_major: '18'
         from: 'postgres'
         timezone: Asia/Shanghai
+    }
+    | merge $context
+    | update from {|x| $'postgres:($x.pg_version_major)' }
+    | merge { tags: pgrx }
+    | build {|ctx|
+    }
+
+    {
+        pg_version_major: '18'
+        from: 'postgres'
+        timezone: Asia/Shanghai
         workdir: /home/master
     }
     | merge $context
