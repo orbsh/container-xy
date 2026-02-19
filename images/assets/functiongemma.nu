@@ -7,7 +7,7 @@ export def main [context: record = {}] {
     }
     | merge {
         from: 'scratch'
-        tags: functiongemma-270m
+        tag: functiongemma-270m
         model: 'google/functiongemma-270m-it'
     }
     | build {|ctx|

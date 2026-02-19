@@ -51,7 +51,7 @@ jobs:
           author: ${{ env.USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
           image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-          tags: ladder
+          tag: ladder
         }
     - name: Delete untagged ghcr
       uses: Chizkiyahu/delete-untagged-ghcr-action@v3

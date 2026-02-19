@@ -127,7 +127,7 @@ export module action {
                                       author: ${{ env.USERNAME }}
                                       password: ${{ secrets.GHCR_TOKEN }}
                                       image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-                                      tags: ($f.stem)
+                                      tag: ($f.stem)
                                     }
                                     "
                                     | str trim

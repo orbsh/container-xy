@@ -2,9 +2,9 @@ name: core
 
 on:
   push:
-    branches: [ release, core ]
+    branches: [release, core]
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags: ["v*.*.*"]
   workflow_dispatch:
 
 env:
@@ -12,10 +12,8 @@ env:
   USERNAME: fj0r
   IMAGE_NAME: xy
 
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     if: ${{ !endsWith(github.event.head_commit.message, '~') }}
     permissions:
@@ -26,7 +24,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          submodules: 'true'
+          submodules: "true"
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
@@ -62,7 +60,6 @@ jobs:
             rust:
               - 'images/core/rust.nu'
 
-
       - name: Setup upterm session
         uses: owenthereal/action-upterm@v1
         if: contains(github.event.head_commit.message, '+test')
@@ -81,7 +78,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: test
+            tag: test
           }
 
       - name: build ubuntu
@@ -93,7 +90,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: ubuntu
+            tag: ubuntu
           }
 
       - name: build sid
@@ -105,7 +102,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: sid
+            tag: sid
           }
 
       - name: Build ferron
@@ -116,7 +113,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: ferron
+            tag: ferron
           }
 
       - name: build base
@@ -129,7 +126,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: latest
+            tag: latest
           }
 
       - name: build rust
@@ -141,7 +138,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: rust
+            tag: rust
           }
 
       - name: build haskell
@@ -153,5 +150,5 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: haskell
+            tag: haskell
           }

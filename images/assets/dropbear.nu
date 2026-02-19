@@ -7,7 +7,7 @@ export def main [context: record = {}] {
     }
     | merge {
         from: scratch
-        tags: 'dropbear'
+        tag: 'dropbear'
     }
     | build {|ctx|
         let dropbear = { from: 'debian:trixie-slim' }

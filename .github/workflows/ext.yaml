@@ -7,8 +7,8 @@ name: ext
 
 on:
   workflow_run:
-    workflows: [ core ]
-    branches: [ release, core ]
+    workflows: [core]
+    branches: [release, core]
     types:
       - completed
 
@@ -16,7 +16,6 @@ env:
   REGISTRY: ghcr.io
   USERNAME: fj0r
   IMAGE_NAME: xy
-
 
 jobs:
   build:
@@ -41,7 +40,7 @@ jobs:
           username: fj0r
           password: ${{ secrets.GHCR_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
+      # Extract metadata (tag, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
         id: meta
@@ -62,7 +61,18 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: marimo
+            tag: marimo
+          }
+
+      - name: build postgres
+        shell: buildah unshare nu {0}
+        run: |-
+          overlay use ${{ github.workspace }}/images/database/postgres.nu as build
+          build {
+            author: ${{ env.USERNAME }}
+            password: ${{ secrets.GHCR_TOKEN }}
+            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+            tag: postgres
           }
 
       - name: build surreal
@@ -73,7 +83,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: surreal
+            tag: surreal
           }
 
       - name: Build ollama
@@ -84,5 +94,5 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: ollama
+            tag: ollama
           }

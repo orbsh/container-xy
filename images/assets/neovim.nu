@@ -7,7 +7,7 @@ export def main [context: record = {}] {
     }
     | merge {
         from: scratch
-        tags: 'nvim'
+        tag: 'nvim'
     }
     | build {|ctx|
         let nvim = { from: $'($context.image):ubuntu' }

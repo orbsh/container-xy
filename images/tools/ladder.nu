@@ -7,7 +7,7 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | merge { tags: singbox }
+    | merge { tag: singbox }
     | build {|ctx|
     }
 
@@ -17,7 +17,7 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | merge { tags: mihomo }
+    | merge { tag: mihomo }
     | build {|ctx|
         hub install -c $ctx.cache? [mihomo]
         with-mount {

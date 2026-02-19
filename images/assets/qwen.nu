@@ -7,7 +7,7 @@ export def main [context: record = {}] {
     }
     | merge {
         from: 'scratch'
-        tags: qwen3-4b
+        tag: qwen3-4b
         model: 'Qwen/Qwen3-4B-Instruct-2507'
     }
     | build {|ctx|

@@ -7,7 +7,7 @@ export def main [context: record = {}] {
     }
     | merge {
         from: scratch
-        tags: 'boringtun'
+        tag: 'boringtun'
     }
     | build {|ctx|
         let boringtun = { from: rust }

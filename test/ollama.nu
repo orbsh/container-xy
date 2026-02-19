@@ -8,7 +8,7 @@ export def main [context: record = {}] {
         user: master
         workdir: /home/master
         image: test
-        tags: ollama
+        tag: ollama
     }
     | merge $context
     | build {|ctx|

@@ -68,15 +68,13 @@ export def main [context: record = {}] {
         trace o $tag exists
     }
 
-    return
-
-    {
-        timezone: Asia/Shanghai
-    }
-    | merge $context
-    | merge { from: 'scratch', tags: pgrx }
-    | build {|ctx|
-    }
+    # {
+    #     timezone: Asia/Shanghai
+    # }
+    # | merge $context
+    # | merge { from: 'scratch', tag: pgrx }
+    # | build {|ctx|
+    # }
 
     {
         pg_version_major: '18'

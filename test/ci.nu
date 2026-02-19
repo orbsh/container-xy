@@ -5,7 +5,7 @@ export def main [context: record = {}] {
         from: $'($context.image):latest'
         user: master
         workdir: /home/master
-        tags: ci
+        tag: ci
     }
     | merge $context
     | build {|ctx|

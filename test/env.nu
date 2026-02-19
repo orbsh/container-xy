@@ -8,7 +8,7 @@ export def --env main [context: record = {}] {
         user: master
         workdir: /home/master
         image: test
-        tags: x
+        tag: x
         skip_push: true
     }
     | build --expose {|ctx| }

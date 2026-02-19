@@ -5,7 +5,7 @@ export def main [context: record = {}] {
         from: $'($context.image):ferron'
         user: master
         workdir: /home/master
-        tags: vessel
+        tag: vessel
     }
     | merge $context
     | build {|ctx|

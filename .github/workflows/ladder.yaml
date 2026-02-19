@@ -7,8 +7,8 @@ name: vpn
 
 on:
   workflow_run:
-    workflows: [ core ]
-    branches: [ release, core ]
+    workflows: [core]
+    branches: [release, core]
     types:
       - completed
 
@@ -16,7 +16,6 @@ env:
   REGISTRY: ghcr.io
   USERNAME: fj0r
   IMAGE_NAME: xy
-
 
 jobs:
   build:
@@ -62,7 +61,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: wireguard
+            tag: wireguard
           }
 
       - name: Build ladder
@@ -73,5 +72,5 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: ''
+            tag: ''
           }

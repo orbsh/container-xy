@@ -7,8 +7,8 @@ name: vessel
 
 on:
   workflow_run:
-    workflows: [ core ]
-    branches: [ release, core ]
+    workflows: [core]
+    branches: [release, core]
     types:
       - completed
 
@@ -16,7 +16,6 @@ env:
   REGISTRY: ghcr.io
   USERNAME: fj0r
   IMAGE_NAME: xy
-
 
 jobs:
   build:
@@ -62,7 +61,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: vessel
+            tag: vessel
           }
 
       - name: build ci
@@ -73,7 +72,7 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: ci
+            tag: ci
           }
 
       - name: build registry
@@ -84,5 +83,5 @@ jobs:
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tags: registry
+            tag: registry
           }
