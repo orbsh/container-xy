@@ -4,6 +4,7 @@ use trace.nu
 export def up [
     owner
     channel
+    --cargo-home: string
     --component: list
     --target: list
     --bin: list
@@ -11,7 +12,7 @@ export def up [
     trace inc-level
     b run [
         $"rustup default ($channel)"
-        $"rustup toolchain install"
+        $"rustup toolchain install ($channel)"
     ]
     if ($component | is-not-empty) {
         b run [
@@ -45,13 +46,25 @@ export def up [
             $"cargo binstall -y ($bin | str join ' ')"
         ]
     }
-    b run [
-        "rm -rf ${CARGO_HOME}/registry/src/*"
-        $'chown ($owner):($owner) -R ${CARGO_HOME}'
-    ]
+
+    if ($cargo_home | is-not-empty) {
+        b run [
+            $'rm -rf ($cargo_home)/registry/src/*'
+            $'chown ($owner):($owner) -R ($cargo_home)'
+        ]
+    }
+
 }
 
-export def prefetch [owner workdir proj pkgs --test --debug: string] {
+export def prefetch [
+    owner
+    workdir
+    proj
+    pkgs
+    --test
+    --debug: string
+    --cargo-home: string
+] {
     trace inc-level
     # mkdir $dst
     b run [
@@ -90,12 +103,18 @@ export def prefetch [owner workdir proj pkgs --test --debug: string] {
         return
     }
 
-    b run [
+    mut post = [
         $"cd ($workdir | path join $proj)"
         "cargo fetch"
         $"cd ($workdir)"
         $"chown ($owner):($owner) -R ($proj)"
-        "rm -rf ${CARGO_HOME}/registry/src/*"
-        $'chown ($owner):($owner) -R ${CARGO_HOME}'
     ]
+
+    if ($cargo_home | is-not-empty) {
+        $post ++= [
+            $'rm -rf ($cargo_home)/registry/src/*'
+            $'chown ($owner):($owner) -R ($cargo_home)'
+        ]
+    }
+    b run $post
 }

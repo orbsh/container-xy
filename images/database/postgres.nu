@@ -1,14 +1,80 @@
 use ../../libs *
 
 export def main [context: record = {}] {
+    let pgrx_version = hub get-version {
+        repo: 'pgcentralfoundation/pgrx'
+        version: ['substr 1']
+    }
+
+    let tag = $'pgrx_($pgrx_version)'
+
+    let repo = $context.image
+    | split row '/'
+    | slice 1..
+    | str join '/'
+
+    let tags = ghcr tags $repo
+
+    if ($tag not-in $tags) {
+        {
+            pg_version_major: '18'
+            pgrx_version: $pgrx_version
+            from: 'postgres'
+            timezone: Asia/Shanghai
+        }
+        | merge $context
+        | merge { tag: $tag }
+        | build {|ctx|
+            pkg update
+            pkg install [
+                sudo
+                ca-certificates
+                build-essential
+                gnupg
+                curl
+                jq
+                git
+                make
+                gcc
+                g++
+                cmake
+                clang
+                ninja-build
+                libssl-dev
+                libcurl4-openssl-dev
+                liblz4-dev
+                pkg-config
+                postgresql-server-dev-($ctx.pg_version_major)
+                tree
+                rustup
+            ]
+            setup timezone $ctx.timezone
+            setup git 'root'
+            nushell setup '/usr/local' {
+                user: 'root'
+                xdg_config: '/root/.config'
+                plugins: [query]
+            }
+
+            rust up 'root' stable
+
+            run [
+                'cargo install cargo-get'
+                $'cargo install --locked cargo-pgrx --version ($ctx.pgrx_version)'
+                $'cargo pgrx init --pg($ctx.pg_version_major)=/usr/lib/postgresql/($ctx.pg_version_major)/bin/pg_config'
+            ]
+        }
+    } else {
+        trace o $tag exists
+    }
+
+    return
+
     {
-        pg_version_major: '18'
-        from: 'postgres'
         timezone: Asia/Shanghai
     }
     | merge $context
-    | update from {|x| $'postgres:($x.pg_version_major)' }
-    | merge { tags: pgrx }
+    | merge { from: 'scratch', tags: pgrx }
     | build {|ctx|
     }
 

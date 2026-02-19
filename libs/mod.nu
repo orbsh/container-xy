@@ -10,3 +10,4 @@ export use upterm.nu
 export use hub.nu
 export use transformer.nu
 export use extract.nu
+export use ghcr.nu

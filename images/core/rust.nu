@@ -8,14 +8,15 @@ export def main [context: record = {}] {
         rust: {
             channel: stable
         }
-    }
-    | merge $context
-    | build {|ctx|
-        conf env {
+        env: {
             RUSTUP_HOME: '/opt/rustup'
             CARGO_HOME: '/opt/cargo'
             RUSTC_WRAPPER: '/usr/bin/sccache'
         }
+    }
+    | merge $context
+    | build {|ctx|
+        conf env $ctx.env
 
         pkg install [
             rustup lldb sccache
@@ -72,7 +73,8 @@ export def main [context: record = {}] {
             trunk cargo-wasi
             wasm-tools wit-deps-cli wit-bindgen-cli
             ...$bins
-        ]
+        ] --cargo-home $ctx.env.CARGO_HOME
+
         rust prefetch $ctx.user $ctx.workdir 'rust-labs' [
             ...$experimental
             ...$frontend
@@ -96,6 +98,6 @@ export def main [context: record = {}] {
             async-fs async-graphql sqlx
             # warp async-graphql-warp
             axum async-graphql-axum
-        ]
+        ] --cargo-home $ctx.env.CARGO_HOME
     }
 }
