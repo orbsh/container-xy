@@ -1,12 +1,8 @@
 use ../../libs *
+use ./pg_ext
+
 
 export def main [context: record = {}] {
-    let pgrx_version = hub get-version {
-        repo: 'pgcentralfoundation/pgrx'
-        version: ['substr 1']
-    }
-
-    let tag = $'pgrx_($pgrx_version)'
 
     let repo = $context.image
     | split row '/'
@@ -15,66 +11,13 @@ export def main [context: record = {}] {
 
     let tags = ghcr tags $repo
 
-    if ($tag not-in $tags) {
-        {
-            pg_version_major: '18'
-            pgrx_version: $pgrx_version
-            from: 'postgres'
-            timezone: Asia/Shanghai
-        }
-        | merge $context
-        | merge { tag: $tag }
-        | build {|ctx|
-            pkg update
-            pkg install [
-                sudo
-                ca-certificates
-                build-essential
-                gnupg
-                curl
-                jq
-                git
-                make
-                gcc
-                g++
-                cmake
-                clang
-                ninja-build
-                libssl-dev
-                libcurl4-openssl-dev
-                liblz4-dev
-                pkg-config
-                postgresql-server-dev-($ctx.pg_version_major)
-                tree
-                rustup
-            ]
-            setup timezone $ctx.timezone
-            setup git 'root'
-            nushell setup '/usr/local' {
-                user: 'root'
-                xdg_config: '/root/.config'
-                plugins: [query]
-            }
+    let pgrx = pg_ext pgrx $tags $context
 
-            rust up 'root' stable
+    let pg_duckdb = pg_ext duckdb $pgrx $tags $context
 
-            run [
-                'cargo install cargo-get'
-                $'cargo install --locked cargo-pgrx --version ($ctx.pgrx_version)'
-                $'cargo pgrx init --pg($ctx.pg_version_major)=/usr/lib/postgresql/($ctx.pg_version_major)/bin/pg_config'
-            ]
-        }
-    } else {
-        trace o $tag exists
-    }
+    let pg_vector = pg_ext vector $pgrx $tags $context
 
-    # {
-    #     timezone: Asia/Shanghai
-    # }
-    # | merge $context
-    # | merge { from: 'scratch', tag: pgrx }
-    # | build {|ctx|
-    # }
+    let pg_search = pg_ext search $pgrx $tags $context
 
     {
         pg_version_major: '18'
@@ -153,6 +96,10 @@ export def main [context: record = {}] {
             PGCONF_LOG_MIN_DURATION_STATEMENT: 1000
             PARADEDB_TELEMETRY: 'false'
         }
+
+        copy postgres/extend-entrypoint.nu /entrypoint/extend-entrypoint.nu
+
+        conf entrypoint [nu /entrypoint/extend-entrypoint.nu]
 
         # pkg with [
         #     git
