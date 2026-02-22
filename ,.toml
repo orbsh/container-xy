@@ -28,11 +28,11 @@ xy = ["vessel"]
 [assets.image.manifest.surreal]
 xy = ["surreal"]
 
-# [assets.image.manifest.pg18]
-# pg = [
-#     "18",
-#     "18gis",
-# ]
+[assets.image.manifest.pg]
+xy = [
+    "postgres",
+    # "18gis",
+]
 
 [assets.image.manifest.llm]
 xy = ["ollama"]
