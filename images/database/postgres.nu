@@ -15,12 +15,9 @@ export def main [context: record = {}] {
     let tags = ghcr tags $repo
 
     let pgrx = pg_ext pgrx $tags $context
-
     let pg_duckdb = pg_ext duckdb $pgrx $tags $context
-
     let pg_vector = pg_ext vector $pgrx $tags $context
-
-    # let pg_search = pg_ext search $pgrx $tags $context
+    let pg_search = pg_ext search $pgrx $tags $context
 
     {
         from: 'postgres'
@@ -99,7 +96,7 @@ export def main [context: record = {}] {
             PARADEDB_TELEMETRY: 'false'
         }
 
-        for ext in [$pg_vector $pg_duckdb] {
+        for ext in [$pg_vector $pg_duckdb $pg_search] {
             with-mount {|new, old|
                 let ctr = { from: $'($context.image):($ext)' } | build --no-commit {|| }
                 cd ($ctr.BUILDAH_WORKING_MOUNTPOINT)
@@ -113,36 +110,5 @@ export def main [context: record = {}] {
         }
 
         conf entrypoint [nu /usr/local/bin/entrypoint-hook.nu]
-
-        # pkg with [
-        #     git
-        #     cmake
-        #     binutils
-        #     m4
-        #     pkg-config
-        #     lsb-release
-        #     libcurl4-openssl-dev
-        #     libicu-dev
-        #     uuid-dev
-        #     build-essential
-        #     libpq-dev
-        #     python3-dev
-        #     libkrb5-dev
-        #     postgresql-server-dev-($ctx.pg_version_major)
-        # ] {
-        # }
-
-        # run [
-        #     r#'mkdir /tmp/paradedb'#
-        #     r#'cd /tmp/paradedb'#
-        #     r#'code_name=$(cat /etc/os-release | grep '^VERSION_CODENAME' | cut -d '=' -f 2)'#
-        #     r#'version=$(curl --retry 3 -fsSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/paradedb/paradedb/releases | jq -r '.[0].tag_name' | cut -c 2-)'#
-        #     r#'curl --retry 3 -fsSL https://github.com/paradedb/paradedb/releases/download/v${version}/postgresql-${PG_VERSION_MAJOR}-pg-search_${version}-1PARADEDB-${code_name}_amd64.deb -o pg-search.deb'#
-        #     r#'dpkg -i pg-search.deb'#
-        #     r#'cd /tmp'#
-        #     r#'rm -rf paradedb'#
-        # ]
-
-
     }
 }

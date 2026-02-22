@@ -18,7 +18,10 @@ export def main [tags context] {
             [
                 sudo
                 ca-certificates
+                lsb-release
                 build-essential
+                binutils
+                m4
                 gnupg
                 curl
                 jq
@@ -32,10 +35,15 @@ export def main [tags context] {
                 libssl-dev
                 libcurl4-openssl-dev
                 liblz4-dev
-                pkg-config
+                libpq-dev
                 postgresql-server-dev-($ctx.pg_version_major)
                 tree
                 rustup
+
+                pkg-config
+                uuid-dev
+                python3-dev
+                libkrb5-dev
 
                 libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev
                 libssl-dev libxml2-utils xsltproc
