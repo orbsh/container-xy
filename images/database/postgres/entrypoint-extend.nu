@@ -32,7 +32,7 @@ def pg-setup-conf [] {
             if ($p | is-empty) {
                 $acc
             } else {
-                let p = p | first
+                let p = $p | first
                 let k = $p.k | str downcase | str replace --all "__" "."
                 let v = match $p.t {
                     CONF => {
@@ -58,6 +58,14 @@ def pg-setup-conf [] {
         "pg_stat_statements.max = 10000"
         "pg_stat_statements.track = all"
     ]
+
+    let seccomp = cat /proc/self/status | grep Seccomp | from yaml | get Seccomp
+    if ($seccomp == 0) {
+        $conf_lines ++= ['io_method = io_uring']
+    } else {
+        print "  -> Launch the container using `--security-opt seccomp=unconfined` to enable io_uring"
+        $conf_lines ++= ['io_method = worker']
+    }
 
     # Save to usr.conf (overwriting old settings)
     $conf_lines | str join "\n" | save --force $conf_path
