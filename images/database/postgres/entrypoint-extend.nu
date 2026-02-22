@@ -29,7 +29,7 @@ def pg-setup-conf [] {
         | transpose key value
         | where {|it| $it.key | str starts-with "PGCONF_"}
         | each {|it|
-            let k = $it.key | str replace "PGCONF_" "" | str lowercase | str replace --all "__" "."
+            let k = $it.key | str replace "PGCONF_" "" | str downcase | str replace --all "__" "."
             $"($k) = ($it.value)"
         }
 
@@ -84,7 +84,7 @@ def start-readyset [] {
     }
 }
 
-def main [...args] {
+def main [] {
     initialize-password
 
     if ($"($env.PGDATA)/postgresql.conf" | path exists) {
@@ -92,10 +92,4 @@ def main [...args] {
     }
 
     start-readyset
-
-    if ($args | is-empty) {
-        ^docker-entrypoint.sh "postgres"
-    } else {
-        ^docker-entrypoint.sh ...$args
-    }
 }

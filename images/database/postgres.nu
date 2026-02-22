@@ -108,9 +108,11 @@ export def main [context: record = {}] {
             }
         }
 
-        copy images/database/postgres/extend-entrypoint.nu /entrypoint/extend-entrypoint.nu
+        for f in [extend hook] {
+            copy images/database/postgres/entrypoint-($f).nu /usr/local/bin/entrypoint-($f).nu
+        }
 
-        conf entrypoint [nu /entrypoint/extend-entrypoint.nu]
+        conf entrypoint [nu /usr/local/bin/entrypoint-hook.nu]
 
         # pkg with [
         #     git
