@@ -4,12 +4,12 @@ def main [...args] {
     open /usr/local/bin/docker-entrypoint.sh
     | lines
     | each {|x|
-        if ('exec "$@"' in $x) {
+        if ($x | str contains 'exec "$@"') {
             [
                 'nu /usr/local/bin/entrypoint-extend.nu'
                 $x
             ]
-        } else if ('docker_temp_server_stop' in $x) {
+        } else if ($x | str contains 'docker_temp_server_stop') {
             [
                 $x
                 r#'echo "include_if_exists = 'usr.conf'">> $PGDATA/postgresql.conf'#

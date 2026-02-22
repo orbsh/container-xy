@@ -94,14 +94,14 @@ export def main [context: record = {}] {
             PGCONF_MAX_REPLICATION_SLOTS: 10
 
             # ,citus,timescaledb
-            PGCONF_SHARED_PRELOAD_LIBRARIES: "'pg_stat_statements,pg_net,pg_cron,pg_duckdb'"
+            PGQONF_SHARED_PRELOAD_LIBRARIES: 'pg_stat_statements,pg_duckdb,pg_vector'
             PGCONF_LOG_MIN_DURATION_STATEMENT: 1000
             PARADEDB_TELEMETRY: 'false'
         }
 
         for ext in [$pg_vector $pg_duckdb] {
             with-mount {|new, old|
-                let ctr = { from: $'($context.image):($pg_vector)' } | build --no-commit {|| }
+                let ctr = { from: $'($context.image):($ext)' } | build --no-commit {|| }
                 cd ($ctr.BUILDAH_WORKING_MOUNTPOINT)
                 cp -r * ($new | path join usr)
                 buildah unmount $ctr.BUILDAH_WORKING_CONTAINER

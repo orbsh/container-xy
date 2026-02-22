@@ -27,10 +27,23 @@ def pg-setup-conf [] {
     # e.g., PGCONF_LOG__MIN_DURATION -> log.min_duration (using __ as .)
     mut conf_lines = $env
         | transpose key value
-        | where {|it| $it.key | str starts-with "PGCONF_"}
-        | each {|it|
-            let k = $it.key | str replace "PGCONF_" "" | str downcase | str replace --all "__" "."
-            $"($k) = ($it.value)"
+        | reduce -f [] {|it, acc|
+            let p = $it.key | parse -r "PG(?<t>.+?)_(?<k>.+)"
+            if ($p | is-empty) {
+                $acc
+            } else {
+                let p = p | first
+                let k = $p.k | str downcase | str replace --all "__" "."
+                let v = match $p.t {
+                    CONF => {
+                        $"($k) = ($it.value)"
+                    }
+                    QONF => {
+                        $"($k) = '($it.value)'"
+                    }
+                }
+                $acc | append $v
+            }
         }
 
 
