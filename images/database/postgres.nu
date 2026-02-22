@@ -3,6 +3,9 @@ use ./pg_ext
 
 
 export def main [context: record = {}] {
+    let context = $context | merge {
+        pg_version_major: '18'
+    }
 
     let repo = $context.image
     | split row '/'
@@ -17,10 +20,9 @@ export def main [context: record = {}] {
 
     let pg_vector = pg_ext vector $pgrx $tags $context
 
-    let pg_search = pg_ext search $pgrx $tags $context
+    # let pg_search = pg_ext search $pgrx $tags $context
 
     {
-        pg_version_major: '18'
         from: 'postgres'
         timezone: Asia/Shanghai
         workdir: /home/master
@@ -97,7 +99,16 @@ export def main [context: record = {}] {
             PARADEDB_TELEMETRY: 'false'
         }
 
-        copy postgres/extend-entrypoint.nu /entrypoint/extend-entrypoint.nu
+        for ext in [$pg_vector $pg_duckdb] {
+            with-mount {|new, old|
+                let ctr = { from: $'($context.image):($pg_vector)' } | build --no-commit {|| }
+                cd ($ctr.BUILDAH_WORKING_MOUNTPOINT)
+                cp -r * ($new | path join usr)
+                buildah unmount $ctr.BUILDAH_WORKING_CONTAINER
+            }
+        }
+
+        copy images/database/postgres/extend-entrypoint.nu /entrypoint/extend-entrypoint.nu
 
         conf entrypoint [nu /entrypoint/extend-entrypoint.nu]
 

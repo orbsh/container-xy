@@ -7,7 +7,6 @@ export def main [tags context] {
         version: ['substr 1']
     } $tags {|cx|
         {
-            pg_version_major: '18'
             pgrx_version: $cx.version
             from: 'postgres'
             timezone: Asia/Shanghai

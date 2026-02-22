@@ -33,6 +33,5 @@ export def main [pgrx tags context] {
 
             buildah unmount $dst.BUILDAH_WORKING_CONTAINER
         }
-
     }
 }
