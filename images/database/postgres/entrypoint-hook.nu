@@ -9,7 +9,7 @@ def main [...args] {
                 'nu /usr/local/bin/entrypoint-extend.nu'
                 $x
             ]
-        } else if ($x | str contains 'docker_temp_server_stop') {
+        } else if ($x | str contains 'unset PGPASSWORD') {
             [
                 $x
                 r#'echo "include_if_exists = 'usr.conf'">> $PGDATA/postgresql.conf'#
