@@ -70,12 +70,11 @@ export module conf {
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
     }
 
-    export def workdir [...vec] {
+    export def workdir [path] {
         trace inc-level
-        $vec
+        $path
         | trace f config workdir
-        | each {|x| [--workingdir $x] }
-        | flatten
+        | do {|x| [--workingdir $x] } $in
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
     }
 

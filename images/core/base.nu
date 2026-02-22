@@ -27,6 +27,7 @@ export def main [context: record = {}] {
             openssh rsync dropbear s3fs
             strace tcpdump socat websocat
             ripgrep dust
+            tree
             pueue # entrypoint
         ]
         setup timezone $ctx.timezone
