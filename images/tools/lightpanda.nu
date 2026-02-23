@@ -24,7 +24,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             let lv = $env.LOG_LEVEL? | default info | str downcase
             let proxy = if ($env.HTTP_PROXY? | is-not-empty) {

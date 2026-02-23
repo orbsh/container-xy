@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-use init.nu [tasks]
+use libs/tasks.nu
 
 # s3fs if s3_id=mount,user,endpoint,region,bucket,accesskey,secretkey,opts...
 # opts: nonempty,use_path_request_style,use_xattr,a=1,b=2

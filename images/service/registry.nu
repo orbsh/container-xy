@@ -35,7 +35,7 @@ export def main [context: record = {}] {
 
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             def run-zot [] {
                 let s3 = if ($env.S3_BACKEND? | is-empty) {

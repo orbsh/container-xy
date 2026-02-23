@@ -23,7 +23,7 @@ export def main [context: record = {}] {
         with-mount {
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             let cmd = [
                 /usr/local/bin/surreal

@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-use init.nu [tasks]
+use libs/tasks.nu
 
 $env
 | transpose k v

@@ -167,9 +167,8 @@ export module image {
                     let img = ($cfg.repo)/($j.k):($t)
                     trace o pull $img
                     ^$env.CNTRCTL pull $img
-                    use entrypoint/init.nu now
                     let short = ($j.k):($t)
-                    notify-send $"(now)($short)"
+                    notify-send $short
                     $images ++= [$short]
                     trace o move $short
                     ^$env.CNTRCTL tag $img $short
@@ -260,6 +259,8 @@ export module test {
             --name $name
             --device /dev/fuse --privileged
             -v ($CWD)/entrypoint/init.nu:/entrypoint/init.nu
+            -v ($CWD)/entrypoint/libs:/entrypoint/libs
+            # -v ($CWD)/entrypoint:/entrypoint
             --entrypoint /entrypoint/init.nu
             -e CHECK_INTERVAL=($check)
         ]

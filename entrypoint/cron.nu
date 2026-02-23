@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-use init.nu [tasks]
+use libs/tasks.nu
 
 if ($env.CRONFILE? | is-not-empty) {
     if ($env.CRONFILE | path exists) {

@@ -24,7 +24,7 @@ export def main [context: record = {}] {
         with-mount {
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             export def wg-ip [interface] {
                 ip addr show $interface
@@ -63,7 +63,7 @@ export def main [context: record = {}] {
 
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             if ($env.COREFILE? | is-not-empty) {
                 let p = $env.COREFILE

@@ -39,7 +39,7 @@ export def main [context: record = {}] {
 
             let tmpl = r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             for i in {files} {{
                 ln -fs /opt/($i) /data

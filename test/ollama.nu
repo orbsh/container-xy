@@ -18,7 +18,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             def run-ollama [model?] {
                 let act = if $env.ENTRYPOINT_ARGS?.0? == 'srv' {

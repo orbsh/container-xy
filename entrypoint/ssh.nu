@@ -1,5 +1,6 @@
 #!/usr/bin/env nu
-use init.nu [tasks info]
+use init.nu info
+use libs/tasks.nu
 
 # user:uid:gid:comment
 def set_user [user_info: string, pubkey: string] {

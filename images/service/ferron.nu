@@ -27,7 +27,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [tasks]
+            use libs/tasks.nu
 
             def run-ferron [config?] {
                 mut cmd = ["/usr/local/bin/ferron"]
