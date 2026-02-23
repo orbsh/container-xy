@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-use init.nu [pueue-extend pueue-spawn now]
+use init.nu [tasks]
 
 def cert-file []: path -> path {
     $in
@@ -31,5 +31,9 @@ if ($keyfile | path exists) {
 
     zellij web --create-token
 
-    'zellij web' | pueue-spawn zellij-web
+    tasks spawn {
+        tag: zellij-web
+        msg: 'Starting zellij-web'
+        cmd: 'zellij web'
+    }
 }

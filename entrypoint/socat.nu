@@ -1,16 +1,5 @@
 #!/usr/bin/env nu
-use init.nu [pueue-extend pueue-spawn now]
-
-def run_socat [job] {
-    if ($job | is-empty) { return }
-    let g = 'default'
-    pueue-extend $g ($job | length)
-    for j in $job {
-        $"sudo socat ($j.proto)-listen:($j.port),reuseaddr,fork ($j.proto):($j.target)"
-        | pueue-spawn --unsafe $"socat_($j.proto)_($j.port)"
-        print $"(now)($j.proto):($j.port) --> ($j.target)"
-    }
-}
+use init.nu [tasks]
 
 $env
 | transpose k v
@@ -32,4 +21,11 @@ $env
         }
     }
 }
-| run_socat $in
+| each {|j|
+    {
+        tag: $"socat_($j.proto)_($j.port)"
+        msg: $"($j.proto):($j.port) --> ($j.target)"
+        cmd: $"sudo socat ($j.proto)-listen:($j.port),reuseaddr,fork ($j.proto):($j.target)"
+    }
+}
+| tasks spawn ...$in

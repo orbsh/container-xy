@@ -23,15 +23,20 @@ export def main [context: record = {}] {
         with-mount {
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
-            [
+            let cmd = [
                 /usr/local/bin/surreal
                 start -A
                 ($env.SURREAL_STORE? | default rocksdb):///var/lib/surrealdb
             ]
             | str join " "
-            | pueue-spawn surreal
+
+            tasks spawn {
+                tag: surreal
+                msg: 'Starting SurrealDB.'
+                cmd: $cmd
+            }
             '#
             | str trim
             | str replace -rma '^ {12}' ''

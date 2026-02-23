@@ -39,13 +39,16 @@ export def main [context: record = {}] {
 
             let tmpl = r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             for i in {files} {{
                 ln -fs /opt/($i) /data
             }}
 
-            'mihomo -d /data -ext-ctl 0.0.0.0:9090' | pueue-spawn mihomo
+            tasks spawn {
+                tag: mihomo
+                cmd: 'mihomo -d /data -ext-ctl 0.0.0.0:9090'
+            }
             '#
             | str trim
             | str replace -rma '^ {12}' ''

@@ -27,7 +27,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             def run-ferron [config?] {
                 mut cmd = ["/usr/local/bin/ferron"]
@@ -36,9 +36,14 @@ export def main [context: record = {}] {
                 } else {
                     [--config $config]
                 }
-                print $"(now)($config | str join ' ')"
                 $cmd ++= $config
-                $cmd | str join " " | pueue-spawn ferron
+                let cmd = $cmd | str join " "
+
+                tasks spawn {
+                    tag: ferron
+                    msg: ($config | str join ' ')
+                    cmd: $cmd
+                }
             }
 
             run-ferron $env.CONFIGFILE?

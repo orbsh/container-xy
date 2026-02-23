@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-use init.nu [pueue-spawn now]
+use init.nu [tasks info]
 
 # user:uid:gid:comment
 def set_user [user_info: string, pubkey: string] {
@@ -19,7 +19,7 @@ def set_user [user_info: string, pubkey: string] {
     ] | where { |it| $it | path exists } | first
 
     if not $root {
-        print $"(now)setup user: ($name)"
+        info $"setup user: ($name)"
 
         if (sudo getent group $name | is-empty) {
             sudo groupadd -g $gid $name
@@ -54,20 +54,27 @@ def init_ssh [config] {
 }
 
 def run_ssh [] {
-    let timeout_args = if ($env.SSH_TIMEOUT? != null) {
-        print $"(now)Starting dropbear with a timeout of ($env.SSH_TIMEOUT) seconds"
-        ["-K" $env.SSH_TIMEOUT "-I" $env.SSH_TIMEOUT]
+    mut timeout_args  = []
+    mut msg = ''
+
+    if ($env.SSH_TIMEOUT? != null) {
+        $msg = $"Starting dropbear with a timeout of ($env.SSH_TIMEOUT) seconds"
+        $timeout_args ++= ["-K" $env.SSH_TIMEOUT "-I" $env.SSH_TIMEOUT]
     } else {
-        print $"(now)Starting dropbear"
-        []
+        $msg = $"Starting dropbear"
     }
 
-    [
+    let cmd = [
         "sudo" "dropbear" "-REFems" "-p" "22"
         ...$timeout_args
     ]
     | str join " "
-    | pueue-spawn sshd
+
+    tasks spawn {
+        tag: sshd
+        msg: $msg
+        cmd: $cmd
+    }
 }
 
 let ssh_config = $env

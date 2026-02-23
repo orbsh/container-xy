@@ -32,19 +32,20 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
-            def run-marimo [] {
-                [
-                    marimo edit --no-token
-                    -p $env.PORT
-                    --host $env.HOST
-                ]
-                | str join " "
-                | pueue-spawn marimo
+            let cmd = [
+                marimo edit --no-token
+                -p $env.PORT
+                --host $env.HOST
+            ]
+            | str join " "
+
+            tasks spawn {
+                tag: marimo
+                msg: "Starting marimo."
+                cmd: $cmd
             }
-
-            run-marimo
             '#
             | str trim
             | str replace -rma $'^ {12}' ''

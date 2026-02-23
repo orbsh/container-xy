@@ -24,7 +24,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             let lv = $env.LOG_LEVEL? | default info | str downcase
             let proxy = if ($env.HTTP_PROXY? | is-not-empty) {
@@ -32,7 +32,7 @@ export def main [context: record = {}] {
             } else {
                 []
             }
-            [
+            let cmd = [
                 /usr/local/bin/lightpanda
                 serve
                 --host 0.0.0.0
@@ -41,7 +41,11 @@ export def main [context: record = {}] {
                 --log_level info
             ]
             | str join " "
-            | pueue-spawn ollama
+
+            tasks spawn {
+                tag: ollama
+                cmd: $cmd
+            }
             '#
             | str trim
             | str replace -rma $'^ {12}' ''

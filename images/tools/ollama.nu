@@ -30,7 +30,7 @@ export def main [context: record = {}] {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             def run-ollama [model?] {
                 let act = if $env.ENTRYPOINT_ARGS?.0? == 'srv' {
@@ -38,9 +38,13 @@ export def main [context: record = {}] {
                 } else {
                     $env.ENTRYPOINT_ARGS
                 }
-                ["/bin/ollama" ...$act]
+                let cmd = ["/bin/ollama" ...$act]
                 | str join " "
-                | pueue-spawn ollama
+
+                tasks spawn {
+                    tag: ollama
+                    cmd: $cmd
+                }
             }
 
             run-ollama $env.MODEL_PATH?

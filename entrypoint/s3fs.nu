@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-use init.nu [pueue-extend, pueue-spawn]
+use init.nu [tasks]
 
 # s3fs if s3_id=mount,user,endpoint,region,bucket,accesskey,secretkey,opts...
 # opts: nonempty,use_path_request_style,use_xattr,a=1,b=2
@@ -52,7 +52,7 @@ def run_s3 [s3_id: string, s3_args: string] {
         ["-o" $"endpoint=($o.region)"]
     }
 
-    [
+    let cmd = [
         "sudo" "-u" $o.user "s3fs" "-f"
         ...$opt_args
         "-o" $"bucket=($o.bucket)"
@@ -62,18 +62,21 @@ def run_s3 [s3_id: string, s3_args: string] {
         $o.mount_point
     ]
     | str join " "
-    | pueue-spawn --unsafe $"s3fs_($s3_id)"
 
-    print $"Starting s3fs ($s3_id) for ($o.mount_point)"
+    {
+        tag: $"s3fs_($s3_id)"
+        msg: $"Starting s3fs ($s3_id) for ($o.mount_point)"
+        cmd: $cmd
+    }
 }
 
 let s3_configs = $env | transpose k v | where k starts-with "s3_"
 
 if ($s3_configs | is-not-empty) {
-    pueue-extend default ($s3_configs | length)
-    for r in $s3_configs {
+    $s3_configs
+    | each {|r|
         let s3_id = ($r.k | str replace "s3_" "")
-        print $"Configuring S3FS: ($s3_id)"
         run_s3 $s3_id $r.v
     }
+    | tasks spawn ...$in
 }

@@ -24,7 +24,7 @@ export def main [context: record = {}] {
         with-mount {
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             export def wg-ip [interface] {
                 ip addr show $interface
@@ -46,9 +46,13 @@ export def main [context: record = {}] {
                     print $"==> wg entrypoint: ($i)"
                 }
 
-                # for i in $its {
-                #     [wg-quick up $i] | str join ' ' | pueue-spawn wireguard_($i)
+                # $its | each {|i|
+                #     {
+                #         tag: $"wireguard_($i)"
+                #         cmd: ([wg-quick up $i] | str join ' ')
+                #     }
                 # }
+                # | tasks spawn ...$in
             }
 
             run-wireguard
@@ -59,7 +63,7 @@ export def main [context: record = {}] {
 
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             if ($env.COREFILE? | is-not-empty) {
                 let p = $env.COREFILE
@@ -104,11 +108,10 @@ export def main [context: record = {}] {
                 | str replace -rma $'^ {4}' ''
                 | save -f ($p | path join self)
 
-                def run-coredns [] {
-                    'coredns -conf $env.COREFILE' | pueue-spawn coredns
+                tasks spawn {
+                    tag: coredns
+                    cmd: 'coredns -conf $env.COREFILE'
                 }
-
-                run-coredns
             }
             '#
             | str trim

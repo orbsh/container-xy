@@ -35,7 +35,7 @@ export def main [context: record = {}] {
 
             r#'
             #!/usr/bin/env nu
-            use init.nu [pueue-spawn now]
+            use init.nu [tasks]
 
             def run-zot [] {
                 let s3 = if ($env.S3_BACKEND? | is-empty) {
@@ -136,9 +136,14 @@ export def main [context: record = {}] {
                 }
                 | to json
                 | save -f /etc/zot/config.json
-                [/usr/local/bin/zot serve /etc/zot/config.json]
+
+                let cmd = [/usr/local/bin/zot serve /etc/zot/config.json]
                 | str join " "
-                | pueue-spawn zot
+
+                tasks spawn {
+                    tag: zot
+                    cmd: $cmd
+                }
             }
 
             run-zot
