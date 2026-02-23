@@ -258,10 +258,9 @@ export module test {
             -it
             --name $name
             --device /dev/fuse --privileged
-            -v ($CWD)/entrypoint/init.nu:/entrypoint/init.nu
             -v ($CWD)/entrypoint/libs:/entrypoint/libs
             # -v ($CWD)/entrypoint:/entrypoint
-            --entrypoint /entrypoint/init.nu
+            --entrypoint /entrypoint/libs/init.nu
             -e CHECK_INTERVAL=($check)
         ]
         if $user {

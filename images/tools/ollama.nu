@@ -24,7 +24,7 @@ export def main [context: record = {}] {
 
         conf volume [/root/.ollama]
         copy entrypoint /entrypoint
-        conf entrypoint ["/entrypoint/init.nu"]
+        conf entrypoint ["/entrypoint/libs/init.nu"]
 
         with-mount {
             cd entrypoint

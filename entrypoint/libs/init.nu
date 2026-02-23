@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-use libs/tasks.nu
+use tasks.nu
 
 def init [args] {
     if ($env.DEBUG? == 'true') { $env.config.show_errors = true }
@@ -10,7 +10,7 @@ def init [args] {
         nu -c $"source ($env.PREBOOT)"
     }
 
-    const basedir = path self .
+    const basedir = path self ..
     const this = path self
     let files = ls ($basedir | path join "*.nu" | into glob)
     | where name != $this and type == file

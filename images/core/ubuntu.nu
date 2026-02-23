@@ -52,6 +52,6 @@ export def main [context: record = {}] {
         conf workdir $ctx.workdir
         conf cmd []
         copy entrypoint /entrypoint
-        conf entrypoint ["/entrypoint/init.nu"]
+        conf entrypoint ["/entrypoint/libs/init.nu"]
     }
 }
