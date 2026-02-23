@@ -5,7 +5,7 @@ def extend [group, num = 1] {
 }
 
 export def log [id] {
-
+    pueue log $id --json | from json
 }
 
 export def init [] {
