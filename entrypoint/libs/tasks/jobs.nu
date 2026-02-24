@@ -36,9 +36,10 @@ def run [
     for t in $tasks {
         if ($t.msg? | is-not-empty) { info $t.msg }
         let group = $t.grp
-        let task_id = if false {
+        let task_id = if true {
+            let cmd = $t.cmd | split row -r '\s+'
             job spawn -t $t.tag {
-                nu -c $'($t.cmd) out+err>| tee { save -f /proc/1/fd/1 }'
+                run-external ($cmd.0) ...($cmd | slice 1..) out+err>| tee { save -f /proc/1/fd/1 }
             }
         } else {
             job spawn -t $t.tag {
