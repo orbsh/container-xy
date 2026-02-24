@@ -8,7 +8,11 @@ export def --env init [
     $env.TASKSEQ = mktemp -t tasks.XXXXXX
     touch $env.TASKSEQ
     job spawn {
-        tail -f $env.TASKSEQ | lines | each {|x| $x | from json | run $in }
+        tail -f $env.TASKSEQ
+        | lines
+        | each {|x|
+            $x | from json | run $in
+        }
     }
 }
 
@@ -17,7 +21,11 @@ export def spawn [
     --group(-g): string = 'default'
 ] {
     for t in $tasks {
-        $t | upsert group $group | to json -r | $"($in)(char newline)" | save -a $env.TASKSEQ
+        $t
+        | merge {grp: $group, cts: (date now | format date '%FT%T%.3f')}
+        | to json -r
+        | $"($in)(char newline)"
+        | save -a $env.TASKSEQ
     }
 }
 
@@ -27,7 +35,7 @@ def run [
     if ($tasks | is-empty) { return }
     for t in $tasks {
         if ($t.msg? | is-not-empty) { info $t.msg }
-        let group = $t.group
+        let group = $t.grp
         let task_id = if false {
             job spawn -t $t.tag {
                 nu -c $'($t.cmd) out+err>| tee { save -f /proc/1/fd/1 }'
