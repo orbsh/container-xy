@@ -27,7 +27,7 @@ def run [
 ] {
     if ($tasks | is-empty) { return }
     for t in $tasks {
-        if ($t.msg | is-not-empty) { info $t.msg }
+        if ($t.msg? | is-not-empty) { info $t.msg }
         let group = $t.group
         let task_id = if false {
             job spawn -t $t.tag {
