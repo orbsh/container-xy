@@ -80,5 +80,5 @@ export def wait [
     print pids:($pids)
 
     tail -f /dev/null ...$pids
-    print 123
+    print '...'
 }
