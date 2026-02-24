@@ -10,6 +10,7 @@ $env
                 proto: 'tcp'
                 port: $port
                 target: $r.v
+                options: [reuseaddr fork]
             }
         }
         ['udp' $port] => {
@@ -17,6 +18,7 @@ $env
                 proto: 'udp'
                 port: $port
                 target: $r.v
+                options: [pf=ip4 reuseaddr fork]
             }
         }
     }
@@ -25,7 +27,7 @@ $env
     {
         tag: $"socat_($j.proto)_($j.port)"
         msg: $"($j.proto):($j.port) --> ($j.target)"
-        cmd: $"sudo socat ($j.proto)-listen:($j.port),reuseaddr,fork ($j.proto):($j.target)"
+        cmd: $"sudo socat ($j.proto)-listen:($j.port),($j.options | str join ',') ($j.proto):($j.target)"
     }
 }
 | tasks spawn ...$in

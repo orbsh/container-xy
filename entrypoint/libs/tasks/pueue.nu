@@ -1,3 +1,5 @@
+use ../info.nu
+
 def extend [group, num = 1] {
     let status = pueue status -g $group -j | from json
     let running = $status | get tasks | columns | length

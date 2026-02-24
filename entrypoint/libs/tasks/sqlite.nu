@@ -1,3 +1,5 @@
+use ../info.nu
+
 const DB = '/var/lib/tasks.db'
 
 export def log [id] {

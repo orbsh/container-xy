@@ -4,7 +4,7 @@
 # $env.UPTERM_WEBHOOK
 # $env.UPTERM_LABELS
 
-use libs/init.nu [info]
+use libs/info.nu
 use libs/tasks.nu
 
 if ($env.UPTERM_WEBHOOK? | is-not-empty) {

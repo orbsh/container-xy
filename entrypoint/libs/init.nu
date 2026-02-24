@@ -1,6 +1,7 @@
 #!/usr/bin/env nu
 
 use tasks.nu
+use info.nu
 
 def init [args] {
     if ($env.DEBUG? == 'true') { $env.config.show_errors = true }
@@ -11,14 +12,14 @@ def init [args] {
     }
 
     const basedir = path self ..
-    const this = path self
+    const info = path self info.nu
     let files = ls ($basedir | path join "*.nu" | into glob)
-    | where name != $this and type == file
+    | where type == file
     | get name
 
     if true {
         mut script = [
-            $"use ($this) info"
+            $"use ($info)"
             $'cd ($basedir)'
             $'$env.ENTRYPOINT_ARGS = ($args | to nuon)'
         ]
@@ -62,8 +63,4 @@ export def main [...args] {
         let rest = ($args | drop nth 0)
         run-external $cmd ...$rest
     }
-}
-
-export def info [...msg] {
-    print $"(date now | format date '%FT%T%.3f')│($msg | str join ' ')"
 }

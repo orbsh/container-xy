@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-use libs/init.nu info
+use libs/info.nu
 use libs/tasks.nu
 
 # user:uid:gid:comment
