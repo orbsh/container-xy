@@ -1,6 +1,6 @@
 use ../info.nu
 
-const SEQ = '/var/run/tasks'
+const SEQ = '/tmp/tasks'
 
 export def log [id] {
 }

@@ -222,9 +222,8 @@ export module test {
         mut flag = [
             -it
             --name $name
-            -v ($CWD)/entrypoint/init.nu:/entrypoint/init.nu
-            -v ($CWD)/entrypoint/ssh.nu:/entrypoint/ssh.nu
             -v ($CWD)/images/service/ferron:/srv/ferron
+            -v ($CWD)/entrypoint/libs:/entrypoint/libs
             -e CONFIGFILE=/srv/ferron/($config).kdl
             -p 9900:8080
         ]

@@ -41,7 +41,7 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
-        hub install [pueue websocat dropbear]
+        hub install [websocat dropbear]
 
         conf env {
             DEBUGE: ''

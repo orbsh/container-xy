@@ -244,7 +244,6 @@ export def run-script [
         export def exec [cmd: list] {
             trace inc-level
             $cmd
-            # | prepend 'set -eux'
             | str join (char newline)
             | trace f run-with-nu
             | buildah run $env.BUILDAH_WORKING_CONTAINER nu -c $in

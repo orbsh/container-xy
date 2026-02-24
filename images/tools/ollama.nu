@@ -9,7 +9,6 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         pkg install [curl zstd git sudo]
-        hub install [pueue]
         conf cmd [srv]
 
         setup git $ctx.author

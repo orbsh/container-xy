@@ -36,8 +36,6 @@ packages:
             ''
             '$env.config.show_banner = "short"'
             '$env.NU_POWER_CONFIG.theme.color.normal = "xterm_olive"'
-            'export alias pst = pueue status'
-            'export alias pf = pueue follow'
         ]
         | str join (char newline)
         | save -a ($ctx.mount| path join tmp config.nu)

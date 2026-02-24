@@ -12,7 +12,6 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        hub install [pueue]
         conf cmd [srv]
         with-mount {
             cd entrypoint

@@ -28,7 +28,6 @@ export def main [context: record = {}] {
             strace tcpdump socat websocat
             ripgrep dust
             tree
-            pueue # entrypoint
         ]
         setup timezone $ctx.timezone
         setup sudo

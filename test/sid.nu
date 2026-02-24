@@ -25,7 +25,7 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
-        hub install -c $ctx.cache [websocat pueue]
+        hub install -c $ctx.cache [websocat]
 
         conf workdir $ctx.workdir
         conf cmd []
