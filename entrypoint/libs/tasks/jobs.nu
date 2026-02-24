@@ -1,15 +1,14 @@
 use ../info.nu
 
-const SEQ = '/tmp/tasks'
-
 export def log [id] {
 }
 
-export def init [
+export def --env init [
 ] {
-    touch $SEQ
+    $env.TASKSEQ = mktemp -t tasks.XXXXXX
+    touch $env.TASKSEQ
     job spawn {
-        tail -f $SEQ | lines | each {|x| $x | from json | run $in }
+        tail -f $env.TASKSEQ | lines | each {|x| $x | from json | run $in }
     }
 }
 
@@ -18,7 +17,7 @@ export def spawn [
     --group(-g): string = 'default'
 ] {
     for t in $tasks {
-        $t | upsert group $group | to json -r | $"($in)(char newline)" | save -a $SEQ
+        $t | upsert group $group | to json -r | $"($in)(char newline)" | save -a $env.TASKSEQ
     }
 }
 
@@ -52,7 +51,7 @@ export def wait [
         job kill $sid
     }
 
-    let total = open -r $SEQ | lines | length
+    let total = open -r $env.TASKSEQ | lines | length
     loop {
         let jl = job list
         if ($jl | length) != $total {
