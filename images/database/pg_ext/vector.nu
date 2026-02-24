@@ -22,7 +22,7 @@ export def main [pgrx tags context] {
             | build --no-commit {|ctx1|
                 let pg_ver = $context.pg_version_major
                 run [
-                    $'curl --retry 3 -fsSL https://github.com/pgvector/pgvector/archive/refs/tags/v($version).tar.gz | tar zxf - -C . --strip-components=1'
+                    $'curl --retry 3 -fsSL https://github.com/pgvector/pgvector/archive/refs/tags/v($version).tar.gz | tar -zxf - -C . --strip-components=1'
                     'make clean -j'
                     'make USE_PGXS=1 OPTFLAGS="" -j'
                     $'mkdir -p /out/lib/postgresql/($pg_ver)/lib'

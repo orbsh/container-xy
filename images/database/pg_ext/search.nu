@@ -2,8 +2,8 @@ use ./libs.nu *
 use ../../../libs *
 
 export def main [pgrx tags context] {
-    sync pg_search {
-        repo: 'paradedb/paradedb'
+    sync pg_textsearch {
+        repo: 'timescale/pg_textsearch'
         version: ['substr 1']
     } $tags {|cx|
         {
@@ -19,18 +19,14 @@ export def main [pgrx tags context] {
             | build --no-commit {|ctx1|
                 let pg_ver = $context.pg_version_major
                 run [
-                    'git clone --depth=1 https://github.com/paradedb/paradedb.git /tmp/paradedb'
-                    'cd /tmp/paradedb/pg_search'
-                    $'cargo pgrx package --features icu --pg-config "/usr/lib/postgresql/($pg_ver)/bin/pg_config"'
-                    $'mkdir -p /out/pg_search/lib/postgresql/($pg_ver)/lib'
-                    $'cp ../target/release/pg_search-pg($pg_ver)/usr/lib/postgresql/($pg_ver)/lib/* /out/pg_search/lib/postgresql/($pg_ver)/lib'
-                    $'mkdir -p /out/pg_search/share/postgresql/($pg_ver)/extension'
-                    $'cp ../target/release/pg_search-pg($pg_ver)/usr/share/postgresql/($pg_ver)/extension/* /out/pg_search/share/postgresql/($pg_ver)/extension'
+                    $'curl -sSL https://github.com/timescale/pg_textsearch/releases/download/v($cx.version)/pg_textsearch-($cx.version).tar.gz | tar -zxf - -C . --strip-component=1'
+                    'make -j$(nproc)'
+                    'DESTDIR=/out make install'
                 ]
             }
 
             with-mount {|new, old|
-                cd ($dst.BUILDAH_WORKING_MOUNTPOINT | path join out/pg_search)
+                cd ($dst.BUILDAH_WORKING_MOUNTPOINT | path join out/usr)
                 cp -r * $new
             }
 

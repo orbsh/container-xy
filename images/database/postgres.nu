@@ -17,7 +17,7 @@ export def main [context: record = {}] {
     let pgrx = pg_ext pgrx $tags $context
     let pg_duckdb = pg_ext duckdb $pgrx $tags $context
     let pg_vector = pg_ext vector $pgrx $tags $context
-    # let pg_search = pg_ext search $pgrx $tags $context
+    let pg_search = pg_ext search $pgrx $tags $context
 
     {
         from: 'postgres'
@@ -96,7 +96,7 @@ export def main [context: record = {}] {
             PARADEDB_TELEMETRY: 'false'
         }
 
-        for ext in [$pg_vector $pg_duckdb] {
+        for ext in [$pg_vector $pg_duckdb $pg_search] {
             with-mount {|new, old|
                 let ctr = { from: $'($context.image):($ext)' } | build --no-commit {|| }
                 cd ($ctr.BUILDAH_WORKING_MOUNTPOINT)

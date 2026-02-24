@@ -8,9 +8,16 @@ export module hub {
         | columns
     }
 
-    export def version [hub:string@cmpl-version] {
+    export def version [
+        hub?:string@cmpl-version
+        --repo(-r):string
+    ] {
         use libs/hub.nu
-        hub get-version (open hub.yaml | get packages | get $hub)
+        if ($repo | is-not-empty) {
+            hub get-version { repo: $repo }
+        } else {
+            hub get-version (open hub.yaml | get packages | get $hub)
+        }
     }
 }
 
