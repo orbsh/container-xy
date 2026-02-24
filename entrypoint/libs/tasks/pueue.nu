@@ -23,7 +23,7 @@ export def spawn [
     extend $group ($tasks | length)
     for t in $tasks {
         if ($t.msg | is-not-empty) { info $t.msg }
-        if false {
+        if ($env.SPAWN_VIA_NU? | is-not-empty) {
             pueue add --group $group -l $t.tag -- $"nu -c '($t.cmd) out+err>| tee { save -f /proc/1/fd/1 }'"
         } else {
             pueue add --group $group -l $t.tag -- $"bash -c '($t.cmd) |& tee /proc/1/fd/1'"

@@ -33,9 +33,14 @@ export def spawn [
     if ($tasks | is-empty) { return }
     for t in $tasks {
         if ($t.msg | is-not-empty) { info $t.msg }
-        let task_id = if false {
+        let task_id = if ($env.SPAWN_VIA_BASH? | is-empty) {
             job spawn -t $t.tag {
-                nu -c $'($t.cmd) out+err>| tee { save -f /proc/1/fd/1 }'
+                let cmd = $t.cmd | split row -r '\s+'
+                let bin = $cmd.0
+                let args = $cmd | skip 1
+                job spawn -t $t.tag {
+                    run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
+                }
             }
         } else {
             job spawn -t $t.tag {

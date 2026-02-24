@@ -18,6 +18,7 @@ def init [args] {
     | get name
 
     if true {
+        # Batch Mode
         mut script = [
             $"use ($info)"
             $'cd ($basedir)'
@@ -31,8 +32,9 @@ def init [args] {
         | str join (char newline)
         | nu -c $in
     } else {
+        # Sequential Mode
         for file in $files {
-            info $"source ($file)"
+            info $"load ($file)"
             nu $file
         }
     }

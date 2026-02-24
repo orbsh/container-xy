@@ -243,13 +243,14 @@ export module test {
     }
 
     export def run [
-    --user(-u)
-    --socat
-    --s3
-    --ssh
-    --image(-i): string = 'xy:rust'
-    --check: duration = 1sec
-    ...args
+        --user(-u)
+        --socat
+        --s3
+        --ssh
+        --bash
+        --image(-i): string = 'xy:rust'
+        --check: duration = 1sec
+        ...args
     ] {
         let name = 'test-xy'
         ^$env.CNTRCTL rm -f $name
@@ -262,6 +263,9 @@ export module test {
             --entrypoint /entrypoint/libs/init.nu
             -e CHECK_INTERVAL=($check)
         ]
+        if $bash {
+            $flag ++= [-e SPAWN_VIA_BASH=1]
+        }
         if $user {
             $flag ++= [--user 1000]
         }

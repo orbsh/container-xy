@@ -36,10 +36,12 @@ def run [
     for t in $tasks {
         if ($t.msg? | is-not-empty) { info $t.msg }
         let group = $t.grp
-        let task_id = if true {
+        let task_id = if ($env.SPAWN_VIA_BASH? | is-empty) {
             let cmd = $t.cmd | split row -r '\s+'
+            let bin = $cmd.0
+            let args = $cmd | skip 1
             job spawn -t $t.tag {
-                run-external ($cmd.0) ...($cmd | slice 1..) out+err>| tee { save -f /proc/1/fd/1 }
+                run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
             }
         } else {
             job spawn -t $t.tag {
