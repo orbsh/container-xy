@@ -2,7 +2,7 @@ use ./libs.nu *
 use ../../../libs *
 
 export def main [pgrx tags context] {
-    sync pg_zhparser {
+    sync $context.pg_version_major pg_zhparser {
         repo: 'amutu/zhparser'
         version: ['substr 1']
     } $tags {|cx|

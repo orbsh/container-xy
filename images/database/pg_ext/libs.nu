@@ -1,6 +1,6 @@
-export def sync [prefix cfg tags act] {
+export def sync [pgver prefix cfg tags act] {
     let version = hub get-version $cfg
-    let tag = ($prefix)_($version)
+    let tag = ($prefix)_($pgver)_($version)
     if ($tag not-in $tags) {
         do $act { version: $version, tag: $tag }
     } else {

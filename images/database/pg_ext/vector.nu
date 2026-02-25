@@ -7,7 +7,7 @@ export def main [pgrx tags context] {
     | first
     | get name
     | str substring 1..
-    let tag = $"pg_vector_($version)"
+    let tag = $"pg_vector_($context.pg_version_major)_($version)"
     if ($tag not-in $tags) {
         {
             timezone: Asia/Shanghai

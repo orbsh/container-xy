@@ -2,7 +2,8 @@ use ./libs.nu *
 use ../../../libs *
 
 export def main [tags context] {
-    sync pgrx {
+    let pg_ver = $context.pg_version_major
+    sync $pg_ver pgrx {
         repo: 'pgcentralfoundation/pgrx'
         version: ['substr 1']
     } $tags {|cx|
@@ -36,7 +37,7 @@ export def main [tags context] {
                 libcurl4-openssl-dev
                 liblz4-dev
                 libpq-dev
-                postgresql-server-dev-($ctx.pg_version_major)
+                postgresql-server-dev-($pg_ver)
                 tree
                 rustup
 
@@ -66,7 +67,7 @@ export def main [tags context] {
             run [
                 'cargo install cargo-get'
                 $'cargo install --locked cargo-pgrx --version ($ctx.pgrx_version)'
-                $'cargo pgrx init --pg($ctx.pg_version_major)=/usr/lib/postgresql/($ctx.pg_version_major)/bin/pg_config'
+                $'cargo pgrx init --pg($pg_ver)=/usr/lib/postgresql/($pg_ver)/bin/pg_config'
             ]
         }
     }

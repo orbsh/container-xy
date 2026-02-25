@@ -2,7 +2,7 @@ use ./libs.nu *
 use ../../../libs *
 
 export def main [pgrx tags context] {
-    sync pg_textsearch {
+    sync $context.pg_version_major pg_textsearch {
         repo: 'timescale/pg_textsearch'
         version: ['substr 1']
     } $tags {|cx|

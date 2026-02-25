@@ -2,7 +2,7 @@ use ./libs.nu *
 use ../../../libs *
 
 export def main [pgrx tags context] {
-    sync pg_duckdb {
+    sync $context.pg_version_major pg_duckdb {
         repo: 'duckdb/pg_duckdb'
         version: ['substr 1']
     } $tags {|cx|
