@@ -164,10 +164,19 @@ export module action {
 }
 
 export module image {
-    export def pull [--archive] {
+    def cmpl-tags [] {
+        open $CFG | get assets.image.manifest | columns
+    }
+
+    export def pull [
+        ...tags:string@cmpl-tags
+        --archive
+    ] {
         use libs/trace.nu
         let cfg = open $CFG | get assets.image
-        for i in ($cfg.manifest | transpose k v) {
+        let s = $cfg.manifest | transpose k v
+        let s = if ($tags | is-empty) { $s } else { $s | where {|i| $i.k in $tags } }
+        for i in $s {
             mut images = []
             for j in ($i.v | transpose k v) {
                 for t in $j.v {
