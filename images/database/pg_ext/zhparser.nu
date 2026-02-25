@@ -19,14 +19,19 @@ export def main [pgrx tags context] {
             | build --no-commit {|ctx1|
                 let pg_ver = $context.pg_version_major
                 run [
+                    'opwd=$(pwd)'
                     'curl -sSL http://www.xunsearch.com/scws/down/scws-1.2.3.tar.bz2 | tar -jxf -'
                     'cd scws-1.2.3'
                     './configure'
-                    'make install'
-                    'cd ..'
+                    'DESTDIR=/scws make install'
+                    'cd /scws/usr/local'
+                    'tar -cvf /scws.tar *'
+                    'cd $opwd'
+                    'tar -xf /scws.tar -C /usr/local'
                     $'curl -sSL https://github.com/amutu/zhparser/archive/refs/tags/v($cx.version).tar.gz | tar -zxf - -C . --strip-component=1'
                     'make -j$(nproc)'
                     'DESTDIR=/out make install'
+                    'tar -xf /scws.tar -C /out/usr'
                 ]
             }
 
