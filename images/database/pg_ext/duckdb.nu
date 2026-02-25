@@ -1,7 +1,10 @@
 use ./libs.nu *
 use ../../../libs *
 
-export def main [pgrx tags context] {
+export def main [xctx] {
+    let pgrx  = $xctx.pgrx
+    let tags  = $xctx.tags
+    let context = $xctx.context
     sync $context.pg_version_major pg_duckdb {
         repo: 'duckdb/pg_duckdb'
         version: ['substr 1']

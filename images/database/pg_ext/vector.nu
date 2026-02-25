@@ -1,7 +1,10 @@
 use ./libs.nu *
 use ../../../libs *
 
-export def main [pgrx tags context] {
+export def main [xctx] {
+    let pgrx  = $xctx.pgrx
+    let tags  = $xctx.tags
+    let context = $xctx.context
     let version = curl --retry 3 -fsSL https://api.github.com/repos/pgvector/pgvector/tags
     | from json
     | first

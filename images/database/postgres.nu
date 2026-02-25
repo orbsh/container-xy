@@ -14,12 +14,6 @@ export def main [context: record = {}] {
 
     let tags = ghcr tags $repo
 
-    let pgrx = pg_ext pgrx $tags $context
-    let pg_duckdb = pg_ext duckdb $pgrx $tags $context
-    let pg_vector = pg_ext vector $pgrx $tags $context
-    let pg_search = pg_ext search $pgrx $tags $context
-    let pg_zhparser = pg_ext zhparser $pgrx $tags $context
-
     {
         from: 'postgres'
         timezone: Asia/Shanghai
@@ -97,7 +91,15 @@ export def main [context: record = {}] {
             PARADEDB_TELEMETRY: 'false'
         }
 
-        for ext in [$pg_vector $pg_duckdb $pg_search $pg_zhparser] {
+        let xctx = { tags: $tags, context: $context }
+        | insert pgrx {|x| pg_ext pgrx $x }
+
+        for ext in [
+            (pg_ext duckdb $xctx)
+            (pg_ext vector $xctx)
+            (pg_ext search $xctx)
+            (pg_ext zhparser $xctx)
+        ] {
             with-mount {|new, old|
                 let ctr = { from: $'($context.image):($ext)' } | build --no-commit {|| }
                 cd ($ctr.BUILDAH_WORKING_MOUNTPOINT)

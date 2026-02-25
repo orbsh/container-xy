@@ -1,7 +1,9 @@
 use ./libs.nu *
 use ../../../libs *
 
-export def main [tags context] {
+export def main [xctx] {
+    let tags  = $xctx.tags
+    let context = $xctx.context
     let pg_ver = $context.pg_version_major
     sync $pg_ver pgrx {
         repo: 'pgcentralfoundation/pgrx'
