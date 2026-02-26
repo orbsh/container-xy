@@ -165,7 +165,7 @@ export module action {
 
 export module image {
     def cmpl-tags [] {
-        open $CFG | get assets.image.manifest | columns
+        open $CFG | get assets.image.manifest | columns | { completions: $in, options: { sort: false } }
     }
 
     export def pull [

@@ -16,6 +16,25 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use libs/tasks.nu
 
+            if ($env.ZEROCLAW_API_KEY? | is-empty) and ($env.API_KEY? | is-empty) {
+                print 'Please set ZEROCLAW_API_KEY or API_KEY environment variable'
+                return
+            }
+
+            let conf = $env.HOME | path join .zeroclaw/config.toml
+
+            if not ($conf | path exists) {
+                zeroclaw onboard
+            }
+
+            mut cfg = open $conf
+
+            $cfg.default_provider = $env.DEFAULT_PROVIDER? | default 'custom:https://dashscope.aliyuncs.com/compatible-mode/v1'
+            $cfg.default_model = $env.DEFAULT_MODEL? | default 'qwen3.5-122b-a10b'
+
+            $cfg | to toml | save -f $conf
+
+
             tasks spawn {
                 tag: zeroclaw
                 cmd: 'zeroclaw gateway'
@@ -26,8 +45,7 @@ export def main [context: record = {}] {
             | save entrypoint/zeroclaw.nu
         }
 
-        conf expose [7890 7891 9090]
+        conf expose [42617]
         conf cmd ['srv']
-        conf workdir /data
     }
 }
