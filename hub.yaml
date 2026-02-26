@@ -444,3 +444,10 @@ packages:
       - mv lightpanda-{arch}-linux lightpanda
       - chmodx lightpanda
       - wrap bin
+  zeroclaw:
+    repo: zeroclaw-labs/zeroclaw
+    uri: download/{version}/zeroclaw-{arch}-unknown-linux-gnu.tar.gz
+    version: []
+    unpack:
+      - chmodx zeroclaw
+      - wrap bin
