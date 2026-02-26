@@ -32,6 +32,9 @@ export def main [context: record = {}] {
             $cfg.default_provider = $env.DEFAULT_PROVIDER? | default 'custom:https://dashscope.aliyuncs.com/compatible-mode/v1'
             $cfg.default_model = $env.DEFAULT_MODEL? | default 'qwen3.5-122b-a10b'
 
+            $cfg.gateway.host = '0.0.0.0'
+            $cfg.gateway.port = $env.GATEWAY_PORT? | default '42617' | into int
+
             $cfg.browser = {
                 enable: true
                 allowed_domains: ["*"]
