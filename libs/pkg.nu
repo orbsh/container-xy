@@ -1,4 +1,5 @@
 use b.nu
+use hub.nu
 
 export def install [pkgs] {
     let pkgs = $pkgs | str join ' '
@@ -106,8 +107,6 @@ export def 'bun install' [
 }
 
 export def 'setup js' [pkgs] {
-    install [
-        bun
-    ]
+    hub install [bun]
     bun install $pkgs
 }
