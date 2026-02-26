@@ -9,7 +9,7 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: zeroclaw }
     | build {|ctx|
-        hub install -c $ctx.cache? [zeroclaw]
+        hub install -c $ctx.cache? [zeroclaw lightpanda]
         with-mount {
 
             let tmpl = r#'
@@ -31,6 +31,14 @@ export def main [context: record = {}] {
 
             $cfg.default_provider = $env.DEFAULT_PROVIDER? | default 'custom:https://dashscope.aliyuncs.com/compatible-mode/v1'
             $cfg.default_model = $env.DEFAULT_MODEL? | default 'qwen3.5-122b-a10b'
+
+            $cfg.browser = {
+                enable: true
+                allowed_domains: ["*"]
+                backend: "agent_browser"
+                native_headless: true
+                native_webdriver_url: "http://127.0.0.1:9222"
+            }
 
             $cfg | to toml | save -f $conf
 
