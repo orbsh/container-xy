@@ -44,6 +44,20 @@ export def main [context: record = {}] {
                 native_webdriver_url: "http://127.0.0.1:9222"
             }
 
+            if ($env.MATTERMOST_URL? | is-not-empty) {
+                $cfg.channels_config.mattermost = {
+                    url: $env.MATTERMOST_URL
+                    bot_token: $env.MATTERMOST_BOT_TOKEN
+                    channel_id: $env.MATTERMOST_CHANNEL_ID
+                    allowed_users: ["*"]
+                    mention_only: false
+                    group_reply: {
+                        mode: "all_messages" # optional: all_messages | mention_only
+                        allowed_sender_ids: []
+                    }
+                }
+            }
+
             $cfg | to toml | save -f $conf
 
 
