@@ -252,10 +252,7 @@ export module test {
                 -p 2311:2311
             ]
         }
-        ^$env.CNTRCTL run ...[
-            ...$flag
-            $image
-        ]
+        ^$env.CNTRCTL run ...$flag $image
     }
 
     export def run [
@@ -312,11 +309,22 @@ export module test {
                 -e udp_456=uuu:456
             ]
         }
-        ^$env.CNTRCTL run ...[
-            ...$flag
-            $image
-            ...$args
+        ^$env.CNTRCTL run ...$flag $image ...$args
+    }
+
+    export def zeroclaw [
+        ...args
+
+    ] {
+        let image = 'ghcr.io/fj0r/xy:zeroclaw'
+        mut flag = [
+            -p 42617:42617
+            -e API_KEY=(asn --all | get api_key)
         ]
+        $flag ++= [-v ($env.PWD)/images/tools/entrypoint/zeroclaw.nu:/entrypoint/zeroclaw.nu]
+        $flag ++= (open ~/.config/mattermost_bot.yaml | items {|k, v| [-e ($k)=($v)]} | flatten)
+
+        ^$env.CNTRCTL run ...$flag $image ...$args
     }
 
 }

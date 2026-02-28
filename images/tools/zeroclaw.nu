@@ -14,7 +14,7 @@ export def main [context: record = {}] {
         # with-mount {|new, old|
         #     cp -f ($old | path join images/tools/entrypoint/zeroclaw.nu) ($new | path join entrypoint/zeroclaw.nu)
         # }
-        copy images/tools/entrypoint/zeroclaw.nu entrypoint/zeroclaw.nu
+        copy images/tools/entrypoint/zeroclaw.nu /entrypoint/zeroclaw.nu
 
         conf expose [42617]
         conf cmd ['srv']
