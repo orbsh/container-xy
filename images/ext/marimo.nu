@@ -15,7 +15,7 @@ export def main [context: record = {}] {
         }
         pkg with [ base-devel ] {
             pkg pip install [
-                psycopg[binary] lancedb duckdb
+                psycopg[binary] boto3 lancedb duckdb
                 numpy scikit-learn polars[all]
                 # httpx aiofile aiostream fastapi uvicorn
                 # debugpy pytest pydantic pydantic-graph PyParsing
