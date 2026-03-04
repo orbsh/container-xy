@@ -20,6 +20,10 @@ export def main [context: record = {}] {
             xdg_config: $xdg_config
             plugins: [query]
         }
+        with-mount {|new, old|
+            cd ($new)/root
+            cp ($new)/home/($ctx.user)/.config/nushell/scripts/llm/integration/ollama.nu .
+        }
 
         conf volume [/root/.ollama]
         copy entrypoint /entrypoint
