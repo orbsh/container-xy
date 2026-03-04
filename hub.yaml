@@ -1,9 +1,3 @@
-settings:
-  nushell:
-    git: https://github.com/fj0r/nushell.git
-    clone:
-      depth: 3
-
 packages:
   nushell:
     repo: nushell/nushell
@@ -44,6 +38,10 @@ packages:
         ]
         b exec $cmd
     options:
+      config:
+        git: https://github.com/fj0r/nushell.git
+        clone:
+          depth: 3
       plugins:
         - query
   helix:

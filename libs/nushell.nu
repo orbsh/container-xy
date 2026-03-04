@@ -25,7 +25,7 @@ export def setup [
     ]
 
     b with-mount {
-        let cfg = (open $CFG).settings.nushell
+        let cfg = (open $CFG).packages.nushell.options.config
         let xdg_config = relative-path $config.xdg_config
         | path expand
         | path join nushell
