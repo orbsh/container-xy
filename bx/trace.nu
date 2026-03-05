@@ -30,7 +30,7 @@ export def o [
 
     mut r = [$"(ansi grey)($lv)│($msg.time)"]
     if ($prefix | is-not-empty) {
-        $r ++= [$"<($prefix)>"]
+        $r ++= [$"($prefix)"]
     }
     if ($msg.tag? | is-not-empty) {
         let tag = $msg.tag | items {|k, v| $"($k)=($v)"} | str join ' '

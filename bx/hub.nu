@@ -228,7 +228,7 @@ def install-inner [
 
     cd $origin
     for d in ($dst | uniq) {
-        trace o -p 'clean temp dir' $d
+        trace o -p 'clean-temp-dir' $d
         rm -rf $d
     }
 }

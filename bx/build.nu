@@ -48,7 +48,7 @@ export def --env main [
     buildah unmount $working_container
 
     let image = ($ctx.image):($ctx.tag? | default 'latest')
-    trace o commit $image
+    trace o -p commit $image
     if $squash {
         buildah commit --squash $working_container $image
     } else {
