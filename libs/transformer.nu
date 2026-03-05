@@ -10,6 +10,15 @@ export def run [acts?: list]: any -> any {
 
 def dispatch [input act args?] {
     match $act {
+        first => {
+            $input | first
+        }
+        nth => {
+            $input | get ($args.0 - 1)
+        }
+        select => {
+            $input | where {|i| $i | parse -r $args.0 | is-not-empty }
+        }
         from-json => {
             $input | from json
         }

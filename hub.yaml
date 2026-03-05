@@ -376,7 +376,10 @@ packages:
         - fts
   surrealdb:
     repo: surrealdb/surrealdb
-    with_prerelease: true
+    # list_tags: true
+    # version:
+    #   - select ^v3
+    #   - first
     uri: download/{version}/surreal-{version}.linux-{arch2}.tgz
     unpack:
       - wrap bin

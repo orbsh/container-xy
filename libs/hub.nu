@@ -11,9 +11,9 @@ export def get-version [cfg]: nothing -> string {
         ''
     } else if ($cfg.repo | str starts-with 'http') {
         curl --retry 3 -fsSL $cfg.repo
-    } else if ($cfg.with_prerelease? | default false) {
+    } else if ($cfg.list_tags? | default false) {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases"
-        curl --retry 3 -fsSL $url | from json | first | get tag_name
+        curl --retry 3 -fsSL $url | from json | get tag_name
     } else {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases/latest"
         curl --retry 3 -fsSL $url | from json | get tag_name
