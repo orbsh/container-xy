@@ -158,11 +158,14 @@ def install-inner [
                 ($cache)/($f) | path expand
             }
             if ($cache | is-empty) {
+                trace o -p 'fetch' { uri: $uri, file: $f }
                 curl --retry 3 -fsSL $uri -o $f
             } else {
                 if not ($cache | path exists) {
+                    trace o -p 'fetch' { uri: $uri, cache: $cache }
                     curl --retry 3 -fsSL $uri -o $cache
                 }
+                trace o -p 'use-cache' { uri: $uri, file: $f, cache: $cache }
                 cp $cache $f
             }
 
