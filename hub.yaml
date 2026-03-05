@@ -449,6 +449,7 @@ packages:
     repo: zeroclaw-labs/zeroclaw
     uri: download/{version}/zeroclaw-{arch}-unknown-linux-gnu.tar.gz
     version: []
+    exclude_vessel: true
     unpack:
       - chmodx zeroclaw
       - wrap bin
