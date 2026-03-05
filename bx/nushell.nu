@@ -1,7 +1,6 @@
 use b.nu
 use trace.nu
 use hub.nu
-const CFG = path self ../hub.yaml
 
 export def setup [
     dir
@@ -25,7 +24,7 @@ export def setup [
     ]
 
     b with-mount {
-        let cfg = (open $CFG).packages.nushell.options.config
+        let cfg = open ($env.BX_WORKDIR | path join hub.yaml) | get packages.nushell.options.config
         let xdg_config = relative-path $config.xdg_config
         | path expand
         | path join nushell

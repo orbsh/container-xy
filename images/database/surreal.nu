@@ -1,4 +1,4 @@
-use ../../libs *
+use ../../bx *
 
 export def main [context: record = {}] {
     {

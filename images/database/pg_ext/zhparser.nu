@@ -1,5 +1,5 @@
 use ./libs.nu *
-use ../../../libs *
+use ../../../bx *
 
 export def main [xctx] {
     let pgrx  = $xctx.pgrx

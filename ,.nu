@@ -1,5 +1,6 @@
 const CWD = path self .
 const CFG = path self ,.toml
+const NU_LIB_DIRS = ['($CWD)']
 
 export module hub {
     def cmpl-version [] {
@@ -12,7 +13,7 @@ export module hub {
         hub?:string@cmpl-version
         --repo(-r):string
     ] {
-        use libs/hub.nu
+        use bx/hub.nu
         if ($repo | is-not-empty) {
             hub get-version { repo: $repo }
         } else {
@@ -172,7 +173,7 @@ export module image {
         ...tags:string@cmpl-tags
         --archive
     ] {
-        use libs/trace.nu
+        use bx/trace.nu
         let cfg = open $CFG | get assets.image
         let s = $cfg.manifest | transpose k v
         let s = if ($tags | is-empty) { $s } else { $s | where {|i| $i.k in $tags } }
@@ -209,6 +210,7 @@ def cmpl-build [] {
 
 export def build [s: string@cmpl-build] {
     buildah unshare nu -c $"
+        const NU_LIB_DIRS = ['($CWD)']
         overlay use ($s) as build
         build {
             cache: ~/Downloads

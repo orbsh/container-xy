@@ -1,4 +1,4 @@
-use ../../libs *
+use ../../bx *
 use ./pg_ext
 
 

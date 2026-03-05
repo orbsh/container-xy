@@ -7,6 +7,7 @@ export def --env main [
     --squash
 ]: record -> any {
     let ctx = $in
+    $env.BX_WORKDIR = $env.PWD
     trace o -p build $ctx
 
     let working_container = buildah from $ctx.from

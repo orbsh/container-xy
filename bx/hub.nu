@@ -3,16 +3,13 @@ use build.nu
 use transformer.nu
 use extract.nu
 use b.nu
-const CFG = path self ../hub.yaml
-
-const WD = path self ..
 
 export def get-version [cfg]: nothing -> string {
     trace inc-level
     if $cfg.type? in ['ImageVolume'] {
         return ''
     }
-    let CACHE = $WD | path join version.yaml
+    let CACHE = $env.BX_WORKDIR | path join version.yaml
     if ($CACHE | path exists) {
         let f = open $CACHE
         if $cfg.repo? in $f {
@@ -116,7 +113,7 @@ def install-inner [
     --with-python
 ] {
     trace inc-level
-    let cfg = open $CFG | get packages | get $tag
+    let cfg = open ($env.BX_WORKDIR | path join hub.yaml) | get packages | get $tag
     let arch = if ($arch | is-empty) { $nu.os-info.arch } else { $arch }
 
     let python_version = if $with_python {
