@@ -5,9 +5,15 @@ export def --env main [
     --expose
     --no-commit
     --squash
+    --workdir(-w): string
 ]: record -> any {
     let ctx = $in
-    $env.BX_WORKDIR = $env.PWD
+    $env.BX_WORKDIR = if ($workdir | is-empty) {
+        $env.PWD
+    } else {
+        $workdir
+    }
+    trace o -p bx-workdir $env.BX_WORKDIR
     trace o -p build $ctx
 
     let working_container = buildah from $ctx.from
