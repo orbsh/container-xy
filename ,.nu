@@ -201,27 +201,27 @@ export module image {
     }
 }
 
+def cmpl-build [] {
+    glob ($CWD)/test/*.nu
+    | append (glob ($CWD)/images/*/*.nu)
+    | path relative-to $CWD
+}
+
+export def build [s: string@cmpl-build] {
+    buildah unshare nu -c $"
+        overlay use ($s) as build
+        build {
+            cache: ~/Downloads
+            image: xy
+            author: orbit
+            skip_push: true
+        }
+        "
+        | str trim
+        | str replace -rma '^ {12}' ''
+}
+
 export module test {
-    def cmpl-build [] {
-        glob ($env.PWD)/test/*.nu
-        | path split
-        | each { $in | last 2 | path join }
-    }
-
-    export def build [s: string@cmpl-build] {
-        buildah unshare nu -c $"
-            overlay use ($s) as build
-            build {
-                cache: ~/Downloads
-                image: xy
-                author: orbit
-                skip_push: true
-            }
-            "
-            | str trim
-            | str replace -rma '^ {12}' ''
-    }
-
     def cmpl-ferron [] {
         glob ($CWD)/images/service/ferron/*.kdl
         | path parse
