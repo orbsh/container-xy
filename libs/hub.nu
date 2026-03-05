@@ -5,11 +5,25 @@ use extract.nu
 use b.nu
 const CFG = path self ../hub.yaml
 
+const WD = path self ..
+
 export def get-version [cfg]: nothing -> string {
     trace inc-level
-    let ver = if $cfg.type? in ['ImageVolume'] {
-        ''
-    } else if ($cfg.repo | str starts-with 'http') {
+    if $cfg.type? in ['ImageVolume'] {
+        return ''
+    }
+    let CACHE = $WD | path join version.yaml
+    if ($CACHE | path exists) {
+        let f = open $CACHE
+        if $cfg.repo? in $f {
+            let ver = $f | get $cfg.repo
+            trace o -p 'version' { repo: ($cfg.repo? | default {$cfg.type}), version: $ver, cache: true }
+            return $ver
+        }
+    } else {
+        {} | to yaml | save $CACHE
+    }
+    let ver = if ($cfg.repo | str starts-with 'http') {
         curl --retry 3 -fsSL $cfg.repo
     } else if ($cfg.list_tags? | default false) {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases"
@@ -19,7 +33,9 @@ export def get-version [cfg]: nothing -> string {
         curl --retry 3 -fsSL $url | from json | get tag_name
     }
     trace o -p 'version' { repo: ($cfg.repo? | default {$cfg.type}), version: $ver }
-    $ver | transformer run $cfg.version?
+    let v = $ver | transformer run $cfg.version?
+    open $CACHE | upsert $cfg.repo $v | to yaml | save -f $CACHE
+    $v
 }
 
 export def format-uri [cfg]: record -> string {
