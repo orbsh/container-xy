@@ -14,7 +14,7 @@ export def main [context: record = {}] {
         hub install -c $ctx.cache? [openfang] # lightpanda
         copy images/tools/entrypoint/openfang.nu /entrypoint/openfang.nu
 
-        conf expose [42617]
+        conf expose [4200]
         conf cmd ['srv']
     }
 }

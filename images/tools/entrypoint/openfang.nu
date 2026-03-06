@@ -1,69 +1,44 @@
 #!/usr/bin/env nu
 use libs/tasks.nu
 
-if ($env.OPENFANG_API_KEY? | is-empty) and ($env.API_KEY? | is-empty) {
-    print 'Please set OPENFANG_API_KEY or API_KEY environment variable'
-    return
+
+let d = $env.HOME | path join .openfang
+mkdir $d
+let conf = $d | path join config.toml
+
+mut cfg = if ($conf | path exists) {
+    open $conf
+} else {
+    {}
 }
 
-let conf = $env.HOME | path join .openfang/config.toml
+$cfg.api_listen = "0.0.0.0:4200"
 
-if not ($conf | path exists) {
-    openfang onboard
-}
-
-mut cfg = open $conf
-
-$cfg.default_provider = $env.DEFAULT_PROVIDER? | default 'custom:https://dashscope.aliyuncs.com/compatible-mode/v1'
-$cfg.default_model = $env.DEFAULT_MODEL? | default 'qwen3.5-122b-a10b'
-
-$cfg.gateway.allow_public_bind = true
-$cfg.gateway.host = '0.0.0.0'
-$cfg.gateway.port = $env.GATEWAY_PORT? | default '42617' | into int
-
-$cfg.browser = {
-    enable: true
-    allowed_domains: ["*"]
-    backend: "agent_browser"
-    native_headless: true
-    native_webdriver_url: "http://127.0.0.1:9222"
-}
-
-if ($env.NOSTR_KEY? | is-not-empty) {
-    mut c = {
-        private_key: $env.NOSTR_KEY
-    }
-    if ($env.NOSTR_RELAY? | is-not-empty) {
-        $c.relays = $env.NOSTR_RELAY | split row ','
-    }
-    if ($env.ALLOWED_PUBKEYS? | is-not-empty) {
-        $c.allowed_pubkeys = $env.ALLOWED_PUBKEYS | split row ','
-    }
-    $cfg.channels_config.nostr = $c
-}
-
-if ($env.MATTERMOST_URL? | is-not-empty) {
-    $cfg.channels_config.mattermost = {
-        url: $env.MATTERMOST_URL
-        bot_token: $env.MATTERMOST_BOT_TOKEN
-        channel_id: $env.MATTERMOST_CHANNEL_ID
-        allowed_users: ["*"]
-        mention_only: false
-        group_reply: {
-            mode: "all_messages" # optional: all_messages | mention_only
-            allowed_sender_ids: []
-        }
+if ($env.MATTERMOST_TOKEN? | is-not-empty) {
+    $cfg.channels.mattermost = {
+        server_url: $env.MATTERMOST_SERVER_URL
+        token_env: 'MATTERMOST_TOKEN'
     }
 }
 
-if ($env.DINGTALK_CLIENT_ID? | is-not-empty) {
-    $cfg.channels_config.dingtalk = {
-        client_id: $env.DINGTALK_CLIENT_ID
-        client_secret: $env.DINGTALK_CLIENT_SECRET
-        allowed_users: ($env.DINGTALK_ALLOWED_USERS? | split row ',' | default ["*"])
+if ($env.QWEN_API_KEY? | is-not-empty) {
+    $cfg.default_model = {
+        provider: 'qwen'
+        model: 'qwen-max'
+        api_key_env: 'QWEN_API_KEY'
+    }
+    $cfg.routing = {
+        simple_model: 'qwen-turbo'
+        medium_model: 'qwen-plus'
+        complex_model: 'qwen-max'
+        simple_threshold: 100
+        complex_threshold: 500
     }
 }
 
+$cfg.memory = {
+    decay_rate: 0.05
+}
 
 
 $cfg | to toml | save -f $conf
@@ -71,5 +46,5 @@ $cfg | to toml | save -f $conf
 
 tasks spawn {
     tag: openfang
-    cmd: 'openfang gateway'
+    cmd: 'openfang start'
 }
