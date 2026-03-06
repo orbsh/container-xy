@@ -9,8 +9,6 @@ on:
   workflow_run:
     workflows: ["ext"]
     branches: [ main, release ]
-    types:
-      - completed
 
 env:
   REGISTRY: ghcr.io
