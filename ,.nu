@@ -14,6 +14,7 @@ export module hub {
         --repo(-r):string
     ] {
         use bx/hub.nu
+        $env.BX_WORKDIR = $CWD
         if ($repo | is-not-empty) {
             hub get-version { repo: $repo }
         } else {

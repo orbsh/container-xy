@@ -445,6 +445,13 @@ packages:
       - mv lightpanda-{arch}-linux lightpanda
       - chmodx lightpanda
       - wrap bin
+  openfang:
+    repo: RightNow-AI/openfang
+    exclude_vessel: true
+    uri: download/{version}/openfang-{arch}-unknown-linux-gnu.tar.gz
+    unpack:
+      - chmodx openfang
+      - wrap bin
   zeroclaw:
     repo: zeroclaw-labs/zeroclaw
     uri: download/{version}/zeroclaw-{arch}-unknown-linux-gnu.tar.gz
