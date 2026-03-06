@@ -85,6 +85,7 @@ export def 'pip install' [
         $cmd ++= [--index-url $index_url]
     }
     $cmd ++= $pkgs
+
     b run [ ($cmd | str join ' ') ]
 }
 
@@ -92,6 +93,9 @@ export def 'setup python' [pkgs] {
     let bin = match $env.OS_RELEASE_ID {
         debian => [ python3 python3-pip ],
         _ => [ python python-pip ],
+    }
+    b conf env {
+        PYTHONUNBUFFERED: x
     }
     install $bin
     pip install $pkgs

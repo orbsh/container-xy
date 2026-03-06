@@ -16,7 +16,6 @@ export def main [context: record = {}] {
             LC_ALL: C.UTF-8
             TIMEZONE: $ctx.timezone
             MASTER: $ctx.user
-            PYTHONUNBUFFERED: x
         }
         pkg update
         pkg install [

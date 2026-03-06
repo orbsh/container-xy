@@ -15,7 +15,6 @@ export def main [context: record = {}] {
             LC_ALL: C.UTF-8
             TIMEZONE: $ctx.timezone
             MASTER: $ctx.user
-            PYTHONUNBUFFERED: x
         }
         let xdg_config = $"/home/($ctx.user)/.config"
         setup master $ctx.user $ctx.workdir $xdg_config

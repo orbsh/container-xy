@@ -28,7 +28,6 @@ export def main [context: record = {}] {
             LANG: C.UTF-8
             LC_ALL: C.UTF-8
             TIMEZONE: $ctx.timezone
-            PYTHONUNBUFFERED: x
         }
 
         pkg update
