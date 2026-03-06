@@ -330,4 +330,17 @@ export module test {
         ^$env.CNTRCTL run ...$flag $image ...$args
     }
 
+    export def openfang [
+        --image(-i): string = 'ghcr.io/fj0r/xy:openfang'
+    ] {
+        mut flag = [
+            -p 4200:4200
+            -v ($env.HOME)/.openfang:/root/.openfang
+        ]
+        for i in (open ~/.config/openfang.yaml | transpose k v) {
+            $flag ++= [-e $"($i.k)=($i.v)"]
+        }
+        ^$env.CNTRCTL run ...$flag $image
+     }
+
 }
