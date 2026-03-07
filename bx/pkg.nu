@@ -1,5 +1,6 @@
 use b.nu
 use hub.nu
+use rust.nu
 
 export def install [pkgs] {
     let pkgs = $pkgs | str join ' '
@@ -38,7 +39,15 @@ export def with [pkgs act] {
         }
     }
 
+    if 'rustup' in $pkgs {
+        rust up root stable
+    }
+
     let r = do $act
+
+    if 'rustup' in $pkgs {
+        b run ['rustup self uninstall -y']
+    }
 
     match $env.OS_RELEASE_ID {
         arch => {

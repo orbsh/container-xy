@@ -14,7 +14,6 @@ export def main [context: record = {}] {
             rustup
             build-essential
         ] {
-            rust up root stable
             pkg pip install [pip setuptools wheel 'spacy[transformers]']
         }
         run ['python -m spacy download zh_core_web_trf']
