@@ -3,7 +3,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):latest'
+        from: $'($context.image):playwright'
         user: master
         workdir: /home/master
     }
