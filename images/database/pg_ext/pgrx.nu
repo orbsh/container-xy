@@ -17,7 +17,7 @@ export def main [xctx] {
         | merge $context
         | merge { tag: $cx.tag }
         | build {|ctx|
-            pkg update
+            pkg refresh
             [
                 sudo
                 ca-certificates

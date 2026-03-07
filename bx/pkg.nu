@@ -67,7 +67,7 @@ export def with [pkgs act] {
     $r
 }
 
-export def update [] {
+export def refresh [] {
     match $env.OS_RELEASE_ID {
         arch => {
             b run ["pacman -Syu --noconfirm"]

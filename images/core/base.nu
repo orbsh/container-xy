@@ -17,7 +17,7 @@ export def main [context: record = {}] {
             TIMEZONE: $ctx.timezone
             MASTER: $ctx.user
         }
-        pkg update
+        pkg refresh
         pkg install [
             sudo cronie tzdata
             # base-devel

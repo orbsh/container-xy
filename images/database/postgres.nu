@@ -30,7 +30,7 @@ export def main [context: record = {}] {
             TIMEZONE: $ctx.timezone
         }
 
-        pkg update
+        pkg refresh
         let pg_pkgs = [
             pgxnclient
             postgresql-plpython3-{version}
