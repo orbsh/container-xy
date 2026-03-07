@@ -86,6 +86,17 @@ jobs:
             tag: surreal
           }
 
+      - name: build playwright
+        shell: buildah unshare nu {0}
+        run: |-
+          overlay use ${{ github.workspace }}/images/tools/playwright.nu as build
+          build {
+            author: ${{ env.USERNAME }}
+            password: ${{ secrets.GHCR_TOKEN }}
+            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+            tag: playwright
+          }
+
       - name: Build ollama
         shell: buildah unshare nu {0}
         run: |
