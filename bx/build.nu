@@ -61,7 +61,7 @@ export def --env main [
     }
 }
 
-export def os-id []: path -> string {
+def os-id []: path -> string {
     let file = $in
     # ImageVolume
     if not ($file | path exists) {

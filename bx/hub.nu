@@ -3,6 +3,7 @@ use build.nu
 use transformer.nu
 use extract.nu
 use b.nu
+use utils.nu *
 
 export def get-version [cfg]: nothing -> string {
     trace inc-level
@@ -179,7 +180,7 @@ def install-inner [
     cd ($dst | last)
     trace o -p 'files-ready' $env.PWD
     b with-mount {|new, old|
-        let target = b relative-path $target
+        let target = relative-path $target
         let new_target = $new | path join $target
         mkdir $new_target
         let d = $new_target | path parse | get parent

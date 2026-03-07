@@ -1,6 +1,7 @@
 use b.nu
 use trace.nu
 use hub.nu
+use utils.nu *
 
 export def setup [
     dir
