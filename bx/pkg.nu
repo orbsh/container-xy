@@ -46,7 +46,13 @@ export def with [pkgs act] {
     let r = do $act
 
     if 'rustup' in $pkgs {
-        b run ['rustup self uninstall -y']
+        b run [
+            'rustup toolchain uninstall $(rustup toolchain list)'
+            'rm -rf ~/.rustup/toolchains/*'
+            'rm -rf ~/.rustup/downloads/*'
+            'rm -rf ~/.cargo/registry/*'
+            'rm -rf ~/.cargo/git/*'
+        ]
     }
 
     match $env.OS_RELEASE_ID {

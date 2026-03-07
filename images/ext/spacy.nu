@@ -10,6 +10,10 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: spacy }
     | build {|ctx|
+        conf env {
+            PYTHONUNBUFFERED: x
+        }
+
         pkg with [
             rustup
             build-essential
