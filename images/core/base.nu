@@ -52,7 +52,7 @@ export def main [context: record = {}] {
             typer pydantic-settings pyyaml
             boltons decorator
         ]
-        pkg setup js [
+        pkg setup js --runtime node [
             @typespec/compiler @typespec/json-schema
             vscode-langservers-extracted
             yaml-language-server

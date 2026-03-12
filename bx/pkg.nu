@@ -125,7 +125,30 @@ export def 'bun install' [
     b run [ ($cmd | str join ' ') ]
 }
 
-export def 'setup js' [pkgs] {
-    hub install [bun]
-    bun install $pkgs
+export def 'npm install' [
+    pkgs
+] {
+    mut cmd = [npm install --global -no-cache]
+    $cmd ++= $pkgs
+    b run [ ($cmd | str join ' ') ]
+}
+
+export def 'setup js' [
+    pkgs
+    --runtime: string = 'bun'
+] {
+    match $runtime {
+        node => {
+            let bin = match $env.OS_RELEASE_ID {
+                debian => [ nodejs npm ],
+                _ => [ nodejs npm ],
+            }
+            install $bin
+            npm install $pkgs
+        }
+        bun => {
+            hub install [bun]
+            bun install $pkgs
+        }
+    }
 }
