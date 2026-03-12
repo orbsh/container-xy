@@ -117,25 +117,21 @@ export def 'setup python' [pkgs] {
 }
 
 
-export def 'bun install' [
-    pkgs
-] {
-    mut cmd = [bun install --global --no-cache]
-    $cmd ++= $pkgs
-    b run [ ($cmd | str join ' ') ]
-}
-
 export def 'npm install' [
     pkgs
+    --runtime: string = 'node'
 ] {
-    mut cmd = [npm install --global -no-cache]
+    mut cmd = match $runtime {
+        node => [npm install --global -no-cache]
+        bun => [bun install --global -no-cache]
+    }
     $cmd ++= $pkgs
     b run [ ($cmd | str join ' ') ]
 }
 
 export def 'setup js' [
     pkgs
-    --runtime: string = 'bun'
+    --runtime: string = 'node'
 ] {
     match $runtime {
         node => {
@@ -144,11 +140,10 @@ export def 'setup js' [
                 _ => [ nodejs npm ],
             }
             install $bin
-            npm install $pkgs
         }
         bun => {
             hub install [bun]
-            bun install $pkgs
         }
     }
+    npm install --runtime $runtime $pkgs
 }
