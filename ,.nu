@@ -330,10 +330,27 @@ export module test {
         ^$env.CNTRCTL run ...$flag $image ...$args
     }
 
+    export def openclaw [
+        --image(-i): string = 'xy:openclawx'
+        --init
+    ] {
+        let cfgf = if $init { [] } else {
+            [-v ($CWD)/assets/.openclaw:/root/.openclaw]
+        }
+        mut flag = [
+            --name test-openclaw
+            -p 18789:18789
+            -e OPENAI_API_KEY=(asn --all | get api_key)
+            ...$cfgf
+        ]
+        ^$env.CNTRCTL run ...$flag $image
+    }
+
     export def openfang [
         --image(-i): string = 'ghcr.io/fj0r/xy:openfang'
     ] {
         mut flag = [
+            --name test-openfang
             -p 4200:4200
             -v ($env.HOME)/.openfang:/root/.openfang
         ]
