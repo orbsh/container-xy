@@ -49,7 +49,7 @@ if not ($conf | path exists) {
               alias: "qwen3.5"
             }
           },
-          workspace: "/root/.openclaw/workspace",
+          workspace: $d,
           compaction: {
             mode: safeguard
           }
@@ -95,27 +95,32 @@ if not ($conf | path exists) {
     $cfg | to json | save -f $conf
 }
 
-r#'
+let bin = $d | path join node_modules .bin openclaw
 
-def cmpl-reqid [] {
-    openclaw devices list --json
+let tmpl = r#'
+
+def cmpl-reqid [] {{
+    {bin} devices list --json
     | from json
     | get pending
-    | each {|x|
-        {
+    | each {{|x|
+        {{
             value: $x.requestId
             descriptioin: $"($x.deviceId | str substring ..6)|($x.clientId)|($x.clientMode)"
-        }
-    }
-}
+        }}
+    }}
+}}
 
-export def openclaw-devices-approve [req_id: string@cmpl-reqid] {
-    openclaw devices approve $req_id
-}
+export def openclaw-devices-approve [req_id: string@cmpl-reqid] {{
+    {bin} devices approve $req_id
+}}
 '#
+
+{bin: $bin}
+| format pattern $tmpl
 | save -a ($env.HOME | path join .config/nushell/config.nu)
 
 tasks spawn {
     tag: openclaw
-    cmd: 'openclaw gateway'
+    cmd: $'($bin) gateway'
 }
