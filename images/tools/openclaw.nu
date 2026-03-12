@@ -10,9 +10,17 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: openclaw }
     | build {|ctx|
-        # pkg install [sudo cronie]
+        conf user master
+        conf env {
+            OPENCLAW_CONFIG_PATH: /home/master/openclaw/openclaw.json
+        }
 
-        pkg npm install [openclaw]
+        run [
+            'mkdir openclaw'
+            'cd openclaw'
+            'npm install --no-cache openclaw'
+        ]
+
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
 
         conf expose [18789]

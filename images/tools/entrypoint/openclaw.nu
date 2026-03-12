@@ -2,7 +2,7 @@
 use libs/tasks.nu
 
 
-let d = $env.HOME | path join .openclaw
+let d = $env.HOME | path join openclaw
 mkdir $d
 let conf = $d | path join openclaw.json
 
@@ -95,6 +95,25 @@ if not ($conf | path exists) {
     $cfg | to json | save -f $conf
 }
 
+r#'
+
+def cmpl-reqid [] {
+    openclaw devices list --json
+    | from json
+    | get pending
+    | each {|x|
+        {
+            value: $x.requestId
+            descriptioin: $"($x.deviceId | str substring ..6)|($x.clientId)|($x.clientMode)"
+        }
+    }
+}
+
+export def openclaw-devices-approve [req_id: string@cmpl-reqid] {
+    openclaw devices approve $req_id
+}
+'#
+| save -a ($env.HOME | path join .config/nushell/config.nu)
 
 tasks spawn {
     tag: openclaw

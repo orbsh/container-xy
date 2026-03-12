@@ -331,6 +331,7 @@ export module test {
     }
 
     export def openclaw [
+        ...$args
         --image(-i): string = 'xy:openclawx'
         --init
     ] {
@@ -343,7 +344,7 @@ export module test {
             -e OPENAI_API_KEY=(asn --all | get api_key)
             ...$cfgf
         ]
-        ^$env.CNTRCTL run ...$flag $image
+        ^$env.CNTRCTL run ...$flag $image ...$args
     }
 
     export def openfang [
