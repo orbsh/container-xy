@@ -2,13 +2,10 @@
 use libs/tasks.nu
 use libs/info.nu
 
+def init [file home] {
+    mkdir $home
 
-mkdir $env.OPENCLAW_HOME
-
-
-if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
     let token = random binary 24 | encode hex | str downcase
-    info $"gateway_token ($token)"
 
     mut cfg = {
       models: {
@@ -17,7 +14,7 @@ if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
       },
       agents: {
         defaults: {
-          workspace: $env.OPENCLAW_HOME,
+          workspace: $home,
           compaction: {
             mode: safeguard
           }
@@ -98,7 +95,8 @@ if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
         }
     }
 
-    $cfg | to json | save -f $env.OPENCLAW_CONFIG_PATH
+    $cfg | to json | save -f $file
+    $token
 }
 
 let bin = $env.OPENCLAW_HOME | path join node_modules .bin openclaw
@@ -122,9 +120,22 @@ export def openclaw-devices-approve [req_id: string@cmpl-reqid] {{
 }}
 '#
 
-{bin: $bin} | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
+{ bin: $bin } | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
 
-tasks spawn {
-    tag: openclaw
-    cmd: $'($bin) gateway'
+if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
+    if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
+        let token = init $env.OPENCLAW_CONFIG_PATH $env.OPENCLAW_HOME
+        info $"gateway_token ($token)"
+    }
+
+    tasks spawn {
+        tag: openclaw
+        cmd: $'($bin) gateway'
+    }
+} else {
+    let port = $env.OPENCLAW_GATEWAY_PORT? | default '18789'
+    tasks spawn {
+        tag: openclaw-node
+        cmd: $"($bin) node run --host $($env.OPENCLAW_GATEWAY_HOST) --port ($port)"
+    }
 }

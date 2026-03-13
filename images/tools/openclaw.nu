@@ -13,6 +13,7 @@ export def main [context: record = {}] {
         conf user master
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
+            OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: '1'
             OPENCLAW_HOME: $ctx.workdir
             OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
         }
