@@ -2,9 +2,9 @@
 use libs/tasks.nu
 
 
-let d = $env.HOME | path join openclaw
-mkdir $d
-let conf = $d | path join openclaw.json
+mkdir $env.OPENCLAW_HOME
+let conf = $env.OPENCLAW_HOME | path join openclaw.json
+let token = random binary 24 | encode hex | str downcase
 
 if not ($conf | path exists) {
     mut cfg = {
@@ -49,7 +49,7 @@ if not ($conf | path exists) {
               alias: "qwen3.5"
             }
           },
-          workspace: $d,
+          workspace: $env.OPENCLAW_HOME,
           compaction: {
             mode: safeguard
           }
@@ -81,7 +81,7 @@ if not ($conf | path exists) {
         },
         auth: {
           mode: token,
-          token: "e0023b75d072ef959389c654406f908634b2c883577cd625"
+          token: $token
         },
         tailscale: {
           mode: off,
@@ -95,7 +95,7 @@ if not ($conf | path exists) {
     $cfg | to json | save -f $conf
 }
 
-let bin = $d | path join node_modules .bin openclaw
+let bin = $env.OPENCLAW_HOME | path join node_modules .bin openclaw
 
 let tmpl = r#'
 
@@ -116,9 +116,7 @@ export def openclaw-devices-approve [req_id: string@cmpl-reqid] {{
 }}
 '#
 
-{bin: $bin}
-| format pattern $tmpl
-| save -a ($env.HOME | path join .config/nushell/config.nu)
+{bin: $bin} | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
 
 tasks spawn {
     tag: openclaw

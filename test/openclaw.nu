@@ -9,6 +9,10 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: openclawx }
     | build {|ctx|
+        run ['rm -rf openclaw/node_modules/@node-llama-cpp']
+        conf env {
+            OPENCLAW_HOME: /home/master/openclaw
+        }
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
     }
 }
