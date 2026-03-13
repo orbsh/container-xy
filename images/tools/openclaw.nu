@@ -11,7 +11,6 @@ export def main [context: record = {}] {
     | merge { tag: openclaw }
     | build {|ctx|
         conf user master
-        conf workdir $ctx.workdir
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
             OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: '1'
@@ -19,8 +18,8 @@ export def main [context: record = {}] {
             OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
         }
 
+        conf workdir $ctx.workdir
         run [
-            $'mkdir ($ctx.workdir)'
             $'cd ($ctx.workdir)'
             # 'npm install --no-cache --omit=optional openclaw'
             'npm install --no-cache openclaw'
