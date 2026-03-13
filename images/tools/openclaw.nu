@@ -14,6 +14,7 @@ export def main [context: record = {}] {
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
             OPENCLAW_HOME: $ctx.workdir
+            OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
         }
 
         run [

@@ -3,10 +3,9 @@ use libs/tasks.nu
 
 
 mkdir $env.OPENCLAW_HOME
-let conf = $env.OPENCLAW_HOME | path join openclaw.json
 let token = random binary 24 | encode hex | str downcase
 
-if not ($conf | path exists) {
+if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
     mut cfg = {
       models: {
         mode: merge,
@@ -95,7 +94,7 @@ if not ($conf | path exists) {
         }
     }
 
-    $cfg | to json | save -f $conf
+    $cfg | to json | save -f $env.OPENCLAW_CONFIG_PATH
 }
 
 let bin = $env.OPENCLAW_HOME | path join node_modules .bin openclaw
