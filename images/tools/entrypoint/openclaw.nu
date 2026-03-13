@@ -143,5 +143,6 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     tasks spawn {
         tag: openclaw-node
         cmd: $"($bin) node run ($args | str join ' ')"
+        polling_interval: 1sec
     }
 }

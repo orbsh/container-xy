@@ -40,13 +40,15 @@ def run [
             let cmd = $t.cmd | split row -r '\s+'
             let bin = $cmd.0
             let args = $cmd | skip 1
-            job spawn -t $t.tag {
-                if ($env.TASK_POLLING_INTERVAL? | is-empty) {
+            if ($t.polling_interval? | is-empty) {
+                job spawn -t $t.tag {
                     run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
-                } else {
+                }
+            } else {
+                job spawn -t $t.tag {
                     loop {
                         run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
-                        sleep ($env.TASK_POLLING_INTERVAL | into duration)
+                        sleep $t.polling_interval
                     }
                 }
             }
