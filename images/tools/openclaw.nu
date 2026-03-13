@@ -11,6 +11,7 @@ export def main [context: record = {}] {
     | merge { tag: openclaw }
     | build {|ctx|
         conf user master
+        conf workdir $ctx.workdir
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
             OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: '1'

@@ -41,7 +41,14 @@ def run [
             let bin = $cmd.0
             let args = $cmd | skip 1
             job spawn -t $t.tag {
-                run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
+                if ($env.TASK_POLLING_INTERVAL? | is-empty) {
+                    run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
+                } else {
+                    loop {
+                        run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
+                        sleep ($env.TASK_POLLING_INTERVAL | into duration)
+                    }
+                }
             }
         } else {
             job spawn -t $t.tag {

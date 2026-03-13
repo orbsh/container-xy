@@ -134,8 +134,14 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     }
 } else {
     let port = $env.OPENCLAW_GATEWAY_PORT? | default '18789'
+    mut args = [
+        --host $env.OPENCLAW_GATEWAY_HOST --port $port
+    ]
+    if ($env.OPENCLAW_NODE_ID? | is-not-empty) {
+        $args ++= [--node-id $env.OPENCLAW_NODE_ID]
+    }
     tasks spawn {
         tag: openclaw-node
-        cmd: $"($bin) node run --host $($env.OPENCLAW_GATEWAY_HOST) --port ($port)"
+        cmd: $"($bin) node run ($args | str join ' ')"
     }
 }

@@ -9,9 +9,6 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: openclawx }
     | build {|ctx|
-        conf env {
-            OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
-        }
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
     }
 }
