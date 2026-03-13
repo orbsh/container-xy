@@ -19,8 +19,7 @@ export def main [context: record = {}] {
         run [
             $'mkdir ($ctx.workdir)'
             $'cd ($ctx.workdir)'
-            'npm install --no-cache openclaw'
-            'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
+            'npm install --no-cache --omit=optional openclaw'
         ]
 
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
