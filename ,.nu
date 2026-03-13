@@ -335,13 +335,15 @@ export module test {
         --image(-i): string = 'xy:openclawx'
         --init
     ] {
+        let cnm = 'test-openclaw'
+        do -i { dcr $cnm }
         let cfgf = if $init { [] } else {
             [-v ($CWD)/assets/.openclaw:/root/.openclaw]
         }
         mut flag = [
-            --name test-openclaw
+            --name $cnm
             -p 18789:18789
-            -e OPENAI_API_KEY=(asn --all | get api_key)
+            -e QWEN_API_KEY=(asn --all | get api_key)
             ...$cfgf
         ]
         ^$env.CNTRCTL run ...$flag $image ...$args

@@ -10,45 +10,10 @@ if not ($conf | path exists) {
     mut cfg = {
       models: {
         mode: merge,
-        providers: {
-          custom-dashscope-aliyuncs-com: {
-            baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-            apiKey: {
-              source: env,
-              provider: default,
-              id: OPENAI_API_KEY
-            },
-            api: openai-completions,
-            models: [
-              [ id, name, reasoning, input, cost, contextWindow, maxTokens ];
-              [
-                "qwen3.5-122b-a10b",
-                "qwen3.5-122b-a10b (Custom Provider)",
-                false,
-                [ text ],
-                {
-                  input: 0,
-                  output: 0,
-                  cacheRead: 0,
-                  cacheWrite: 0
-                },
-                16000,
-                4096
-              ]
-            ]
-          }
-        }
+        providers: {}
       },
       agents: {
         defaults: {
-          model: {
-            primary: "custom-dashscope-aliyuncs-com/qwen3.5-122b-a10b"
-          },
-          models: {
-            "custom-dashscope-aliyuncs-com/qwen3.5-122b-a10b": {
-              alias: "qwen3.5"
-            }
-          },
           workspace: $env.OPENCLAW_HOME,
           compaction: {
             mode: safeguard
@@ -92,6 +57,44 @@ if not ($conf | path exists) {
         }
       }
     }
+
+    if ($env.QWEN_API_KEY? | is-not-empty) {
+        let model = $env.QWEN_MODEL? | default 'qwen3.5-122b-a10b'
+        $cfg.models.providers.custom-dashscope-aliyuncs-com = {
+          baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+          apiKey: {
+            source: env,
+            provider: default,
+            id: QWEN_API_KEY
+          },
+          api: openai-completions,
+          models: [
+            {
+                id: $model
+                name: $"($model) \(Custom Provider\)"
+                reasoning:false
+                input: [text]
+                cost:{
+                  input: 0
+                  output: 0
+                  cacheRead: 0
+                  cacheWrite: 0
+                }
+                contextWindow: 16000
+                maxTokens: 4096
+            }
+          ]
+        }
+        $cfg.agents.defaults.model = {
+          primary: $"custom-dashscope-aliyuncs-com/($model)"
+        }
+        $cfg.agents.defaults.models = {
+          $"custom-dashscope-aliyuncs-com/($model)": {
+            alias: "qwen3.5"
+          }
+        }
+    }
+
     $cfg | to json | save -f $conf
 }
 
