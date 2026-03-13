@@ -1,11 +1,15 @@
 #!/usr/bin/env nu
 use libs/tasks.nu
+use libs/info.nu
 
 
 mkdir $env.OPENCLAW_HOME
-let token = random binary 24 | encode hex | str downcase
+
 
 if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
+    let token = random binary 24 | encode hex | str downcase
+    info $"gateway_token ($token)"
+
     mut cfg = {
       models: {
         mode: merge,
