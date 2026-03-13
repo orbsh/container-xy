@@ -47,7 +47,9 @@ def run [
             } else {
                 job spawn -t $t.tag {
                     loop {
-                        run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
+                        do -i {
+                            run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
+                        }
                         sleep $t.polling_interval
                     }
                 }
