@@ -338,7 +338,7 @@ export module test {
         let cnm = 'test-openclaw'
         do -i { dcr $cnm }
         let cfgf = if $init { [] } else {
-            [-v ($CWD)/assets/.openclaw:/root/.openclaw]
+            [-v ($CWD)/assets/openclaw:/app/data]
         }
         mut flag = [
             --name $cnm
