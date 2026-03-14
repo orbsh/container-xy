@@ -10,7 +10,6 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: openclaw }
     | build {|ctx|
-        conf user master
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
             OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: '1'
@@ -27,6 +26,7 @@ export def main [context: record = {}] {
             'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
         ]
 
+        conf user master
         conf workdir $ctx.workdir
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
 
