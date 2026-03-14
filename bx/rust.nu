@@ -89,6 +89,10 @@ export def up [
                 release: { debug: 0 }
               }
             } | to toml | save config.toml
+            print '#################################'
+            pwd | print $in
+            ls | print $in
+            cat config.toml
         }
     }
 
