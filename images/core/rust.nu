@@ -11,7 +11,6 @@ export def main [context: record = {}] {
         env: {
             RUSTUP_HOME: '/opt/rustup'
             CARGO_HOME: '/opt/cargo'
-            RUSTC_WRAPPER: '/usr/bin/sccache'
         }
     }
     | merge $context

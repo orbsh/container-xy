@@ -15,6 +15,11 @@ export def up [
         $"rustup default ($channel)"
         $"rustup toolchain install ($channel)"
     ]
+
+    b conf env {
+        RUSTC_WRAPPER: '/usr/bin/sccache'
+    }
+
     if ($component | is-not-empty) {
         b run [
             $"rustup component add ($component | str join ' ')"
@@ -48,11 +53,43 @@ export def up [
         ]
     }
 
+    let cargo_home = $env.CARGO_HOME? | default $cargo_home
     if ($cargo_home | is-not-empty) {
         b run [
             $'rm -rf ($cargo_home)/registry/src/*'
             $'chown ($owner):($owner) -R ($cargo_home)'
         ]
+        b with-mount {||
+            cd (relative-path $cargo_home)
+            {
+              target: {
+                "x86_64-unknown-linux-gnu": {
+                  # linker: /usr/bin/clang,
+                  # rustflags: [
+                  #   -C, "link-arg=--ld-path=/opt/mold/bin/mold",
+                  #   -C, "codegen-units=16"
+                  # ]
+                }
+              },
+              build: {
+                incremental: true,
+                # rustflags: [ -C, "codegen-units=16" ],
+                rustc-wrapper: sccache,
+                target-dir: /tmp/target/cargo
+              },
+              profile: {
+                dev: {
+                  opt-level: 0,
+                  debug: line-tables-only,
+                  ...(if $channel == 'nightly' {{codegen-backend: cranelift}} else {{}}),
+                  package: {
+                    *: { opt-level: 3, debug: false }
+                  }
+                },
+                release: { debug: 0 }
+              }
+            } | to toml | save config.toml
+        }
     }
 
 }
