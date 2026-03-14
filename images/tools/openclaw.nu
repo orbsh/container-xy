@@ -17,13 +17,22 @@ export def main [context: record = {}] {
             OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
         }
 
+        let skills = [
+            self-improving
+            duckduckgo-websearch
+        ]
+        | each {|x|
+            $'./node_modules/.bin/clawdhub install ($x)'
+        }
         run [
             'mkdir -p /app/data'
             'cd /app'
             'chown -R master:master data'
             # 'npm install --no-cache --omit=optional openclaw'
-            'npm install --no-cache openclaw'
+            'npm install --no-cache openclaw clawhub'
             'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
+            # 'clawhub config set registry https://clawhub-mirror.aliyuncs.com'
+            ...$skills
         ]
 
         conf user master

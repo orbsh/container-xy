@@ -2,7 +2,94 @@
 use libs/tasks.nu
 use libs/info.nu
 
-def init [file home] {
+const BIN = '/app' | path join node_modules .bin openclaw
+
+def setup-models [] {
+    mut cfg = {
+        models: {
+            providers: {}
+        }
+        agents: {
+            defaults: {
+                models: {}
+            }
+        }
+    }
+    let e = $env
+    | transpose k v
+    | reduce -f [] {|i, a|
+        let r = $i.k | parse -r '^(?<m>.+)_API_KEY$'
+        if ($r | is-not-empty) {
+            let name = $r.0.m | str downcase
+            $a | append {
+                name: $name
+                key: $i.k
+                value: $i.v
+            }
+        } else {
+            $a
+        }
+    }
+    for i in $e {
+        let models = $env
+        | get -o ($i.name)_MODEL
+        | default (match $i.name {
+            qwen => 'qwen3.5-122b-a10b'
+            glm => 'glm-4.7'
+        })
+        | split row ','
+        | each {|x|
+            {
+                id: $x
+                name: $"($x) \(Custom Provider\)"
+                reasoning: false
+                input: [text]
+                cost:{
+                  input: 0
+                  output: 0
+                  cacheRead: 0
+                  cacheWrite: 0
+                }
+                contextWindow: 16000
+                maxTokens: 4096
+            }
+        }
+
+        let baseUrl = match $i.name {
+            qwen => "https://dashscope.aliyuncs.com/compatible-mode/v1"
+            glm => "https://open.bigmodel.cn/api/paas/v4"
+        }
+
+        $cfg.models.providers = $cfg.models.providers
+        | insert $i.name {
+            baseUrl: $baseUrl
+            apiKey: {
+                source: env
+                provider: default
+                id: $i.key
+            }
+            api: openai-completions
+            models: $models
+        }
+
+        if ($cfg.agents.defaults.model? | is-empty) {
+            $cfg.agents.defaults.model = {
+                primary: $"($i.name)/($models.0.id)"
+            }
+        }
+
+        for x in $models {
+            $cfg.agents.defaults.models = $cfg.agents.defaults.models
+            | insert $"($i.name)/($x.id)" {
+                alias: $"($i.name)/($x.id)"
+            }
+        }
+
+    }
+    return $cfg
+}
+
+def gen-config [file home] {
     mkdir $home
 
     let token = random binary 24 | encode hex | str downcase
@@ -21,12 +108,7 @@ def init [file home] {
         }
       },
       tools: {
-        profile: coding,
-        web: {
-          search: {
-            provider: kimi
-          }
-        }
+        profile: coding
       },
       commands: {
         native: auto,
@@ -58,79 +140,47 @@ def init [file home] {
       }
     }
 
-    if ($env.QWEN_API_KEY? | is-not-empty) {
-        let model = $env.QWEN_MODEL? | default 'qwen3.5-122b-a10b'
-        $cfg.models.providers.custom-dashscope-aliyuncs-com = {
-          baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-          apiKey: {
-            source: env,
-            provider: default,
-            id: QWEN_API_KEY
-          },
-          api: openai-completions,
-          models: [
-            {
-                id: $model
-                name: $"($model) \(Custom Provider\)"
-                reasoning:false
-                input: [text]
-                cost:{
-                  input: 0
-                  output: 0
-                  cacheRead: 0
-                  cacheWrite: 0
-                }
-                contextWindow: 16000
-                maxTokens: 4096
-            }
-          ]
-        }
-        $cfg.agents.defaults.model = {
-          primary: $"custom-dashscope-aliyuncs-com/($model)"
-        }
-        $cfg.agents.defaults.models = {
-          $"custom-dashscope-aliyuncs-com/($model)": {
-            alias: "qwen3.5"
-          }
-        }
-    }
-
-    $cfg | to json | save -f $file
+    $cfg
+    | merge deep --strategy=append (setup-models)
+    | to json
+    | save -f $file
     $token
 }
 
-let bin = '/app' | path join node_modules .bin openclaw
 
-let tmpl = r#'
+def update-nu-config [] {
+    let tmpl = r#'
 
-def cmpl-reqid [] {{
-    {bin} devices list --json
-    | from json
-    | get pending
-    | each {{|x|
-        {{
-            value: $x.requestId
-            descriptioin: $"($x.deviceId | str substring ..6)|($x.clientId)|($x.clientMode)"
+    def cmpl-reqid [] {{
+        {bin} devices list --json
+        | from json
+        | get pending
+        | each {{|x|
+            {{
+                value: $x.requestId
+                descriptioin: $"($x.deviceId | str substring ..6)|($x.clientId)|($x.clientMode)"
+            }}
         }}
     }}
-}}
 
-export def openclaw-devices-approve [req_id: string@cmpl-reqid] {{
-    {bin} devices approve $req_id
-}}
-'#
+    export def openclaw-devices-approve [req_id: string@cmpl-reqid] {{
+        {bin} devices approve $req_id
+    }}
+    '#
 
-{ bin: $bin } | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
+    { bin: $BIN } | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
+}
 
 if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
-        let token = init $env.OPENCLAW_CONFIG_PATH $env.OPENCLAW_HOME
+        update-nu-config
+        let token = gen-config $env.OPENCLAW_CONFIG_PATH $env.OPENCLAW_HOME
         info $"gateway_token ($token)"
     }
 
     tasks spawn {
         tag: openclaw
-        cmd: $'($bin) gateway'
+        cmd: $'($BIN) gateway'
     }
 } else {
     let port = $env.OPENCLAW_GATEWAY_PORT? | default '18789'
@@ -142,7 +192,7 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     }
     tasks spawn {
         tag: openclaw-node
-        cmd: $"($bin) node run ($args | str join ' ')"
+        cmd: $"($BIN) node run ($args | str join ' ')"
         polling_interval: 5sec
     }
 }
