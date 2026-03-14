@@ -99,7 +99,7 @@ def init [file home] {
     $token
 }
 
-let bin = $env.OPENCLAW_HOME | path join node_modules .bin openclaw
+let bin = '/app' | path join node_modules .bin openclaw
 
 let tmpl = r#'
 

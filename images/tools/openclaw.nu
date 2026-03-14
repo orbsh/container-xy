@@ -5,7 +5,7 @@ export def main [context: record = {}] {
     {
         from: $'($context.image):latest'
         user: master
-        workdir: /home/master/openclaw
+        workdir: /app/data
     }
     | merge $context
     | merge { tag: openclaw }
@@ -18,14 +18,16 @@ export def main [context: record = {}] {
             OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
         }
 
-        conf workdir $ctx.workdir
         run [
-            $'cd ($ctx.workdir)'
+            'mkdir -p /app/data'
+            'cd /app'
+            'chown -R master:master data'
             # 'npm install --no-cache --omit=optional openclaw'
             'npm install --no-cache openclaw'
             'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
         ]
 
+        conf workdir $ctx.workdir
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
 
         conf expose [18789]
