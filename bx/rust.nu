@@ -18,9 +18,6 @@ export def up [
     ]
 
     hub install [mold sccache]
-    b conf env {
-        RUSTC_WRAPPER: '/usr/bin/sccache'
-    }
 
     if ($component | is-not-empty) {
         b run [
@@ -61,16 +58,17 @@ export def up [
             $'rm -rf ($cargo_home)/registry/src/*'
             $'chown ($owner):($owner) -R ($cargo_home)'
         ]
-        b with-mount {||
-            cd (relative-path $cargo_home)
+        b with-mount {
             let linker = if ('usr/bin/clang' | path exists) {{
                 linker: /usr/bin/clang
             }} else {{}}
             let ld = if ('usr/local/bin/mold' | path exists) {[
                 -C, "link-arg=--ld-path=/usr/local/bin/mold"
-                -C, "codegen-units=16"
+                # -C, "codegen-units=16"
             ]} else {[]}
             let backend = if $channel == 'nightly' {{codegen-backend: cranelift}} else {{}}
+
+            cd (relative-path $cargo_home)
             let cfg = {
               target: {
                 "x86_64-unknown-linux-gnu": {
@@ -92,7 +90,15 @@ export def up [
                     *: { opt-level: 3, debug: false }
                   }
                 },
-                release: { debug: 0 }
+                release: {
+                  debug: 0
+                  strip: true
+                  opt-level: z
+                  panic: abort
+                  lto: fat
+                  codegen-units: 1
+                  # rustflags: [-C target-cpu=native]
+                }
               }
             }
             | to toml
@@ -101,6 +107,9 @@ export def up [
         }
     }
 
+    b conf env {
+        RUSTC_WRAPPER: '/usr/local/bin/sccache'
+    }
 }
 
 export def prefetch [
