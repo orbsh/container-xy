@@ -134,6 +134,22 @@ packages:
       - strip 1
       - filter wasmtime wasmtime-min
       - wrap bin
+  sccache:
+    repo: mozilla/sccache
+    execlude_vessel: true
+    uri: download/{version}/sccache-{version}-{arch}-unknown-linux-musl.tar.gz
+    unpack:
+      - strip 1
+      - filter sccache
+      - wrap bin
+  mold:
+    repo: rui314/mold
+    exclude_vessel: true
+    uri: download/v{version}/mold-{version}-{arch}-linux.tar.gz
+    version:
+      - substr 1
+    unpack:
+      - strip 1
   zellij:
     repo: zellij-org/zellij
     uri: download/{version}/zellij-{arch}-unknown-linux-musl.tar.gz

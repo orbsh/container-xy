@@ -18,7 +18,7 @@ export def main [context: record = {}] {
         conf env $ctx.env
 
         pkg install [
-            rustup lldb sccache
+            rustup lldb
             musl
         ]
 

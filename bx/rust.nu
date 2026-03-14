@@ -1,6 +1,7 @@
 use b.nu
 use trace.nu
 use utils.nu *
+use hub.nu
 
 export def up [
     owner
@@ -16,6 +17,7 @@ export def up [
         $"rustup toolchain install ($channel)"
     ]
 
+    hub install [mold sccache]
     b conf env {
         RUSTC_WRAPPER: '/usr/bin/sccache'
     }
@@ -64,8 +66,8 @@ export def up [
             let linker = if ('usr/bin/clang' | path exists) {{
                 linker: /usr/bin/clang
             }} else {{}}
-            let ld = if ('opt/mold/bin/mold' | path exists) {[
-                -C, "link-arg=--ld-path=/opt/mold/bin/mold"
+            let ld = if ('usr/local/bin/mold' | path exists) {[
+                -C, "link-arg=--ld-path=/usr/local/bin/mold"
                 -C, "codegen-units=16"
             ]} else {[]}
             let backend = if $channel == 'nightly' {{codegen-backend: cranelift}} else {{}}
