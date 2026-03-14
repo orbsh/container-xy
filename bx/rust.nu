@@ -61,19 +61,23 @@ export def up [
         ]
         b with-mount {||
             cd (relative-path $cargo_home)
-            {
+            let linker = if ('usr/bin/clang' | path exists) {{
+                linker: /usr/bin/clang
+            }} else {{}}
+            let ld = if ('opt/mold/bin/mold' | path exists) {[
+                -C, "link-arg=--ld-path=/opt/mold/bin/mold"
+                -C, "codegen-units=16"
+            ]} else {[]}
+            let backend = if $channel == 'nightly' {{codegen-backend: cranelift}} else {{}}
+            let cfg = {
               target: {
                 "x86_64-unknown-linux-gnu": {
-                  # linker: /usr/bin/clang,
-                  # rustflags: [
-                  #   -C, "link-arg=--ld-path=/opt/mold/bin/mold",
-                  #   -C, "codegen-units=16"
-                  # ]
+                  ...$linker
+                  rustflags: [...$ld]
                 }
               },
               build: {
                 incremental: true,
-                # rustflags: [ -C, "codegen-units=16" ],
                 rustc-wrapper: sccache,
                 target-dir: /tmp/target/cargo
               },
@@ -81,18 +85,17 @@ export def up [
                 dev: {
                   opt-level: 0,
                   debug: line-tables-only,
-                  ...(if $channel == 'nightly' {{codegen-backend: cranelift}} else {{}}),
+                  ...$backend,
                   package: {
                     *: { opt-level: 3, debug: false }
                   }
                 },
                 release: { debug: 0 }
               }
-            } | to toml | save config.toml
-            print '#################################'
-            pwd | print $in
-            ls | print $in
-            cat config.toml
+            }
+            | to toml
+            trace o -p 'cargo/config.toml' $cfg
+            $cfg | save config.toml
         }
     }
 
