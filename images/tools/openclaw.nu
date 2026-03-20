@@ -32,12 +32,17 @@ export def main [context: record = {}] {
             $'./node_modules/.bin/clawhub install ($x)'
         }
 
+        let npm_pkgs = [
+            node-html-parser
+        ]
+        | str join ' '
+
         run [
             'mkdir -p /app/data'
             'cd /app'
             'chown -R master:master data'
             # 'npm install --no-cache --omit=optional openclaw'
-            'npm install --no-cache openclaw clawhub'
+            $'npm install --no-cache openclaw clawhub ($npm_pkgs)'
             'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
             # 'clawhub config set registry https://clawhub-mirror.aliyuncs.com'
             ...$skills_ins
