@@ -29,7 +29,7 @@ export def main [context: record = {}] {
 
         let skills_ins = $ctx.skills
         | each {|x|
-            $'./node_modules/.bin/clawhub install ($x)'
+            $'clawhub install ($x)'
         }
 
         let npm_pkgs = [
@@ -42,8 +42,8 @@ export def main [context: record = {}] {
             'cd /app'
             'chown -R master:master data'
             # 'npm install --no-cache --omit=optional openclaw'
-            $'npm install --no-cache openclaw clawhub ($npm_pkgs)'
-            'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
+            $'npm install -g --no-cache openclaw clawhub ($npm_pkgs)'
+            'rm -rf /usr/lib/node_modules/@node-llama-cpp node_modules/node-llama-cpp'
             # 'clawhub config set registry https://clawhub-mirror.aliyuncs.com'
             ...$skills_ins
         ]

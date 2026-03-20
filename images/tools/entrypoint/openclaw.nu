@@ -2,8 +2,6 @@
 use libs/tasks.nu
 use libs/info.nu
 
-const BIN = '/app' | path join node_modules .bin openclaw
-
 def setup-models [] {
     mut cfg = {
         models: {
@@ -175,7 +173,7 @@ def update-nu-config [] {
     let tmpl = r#'
 
     def cmpl-reqid [] {{
-        {bin} devices list --json
+        openclaw devices list --json
         | from json
         | get pending
         | each {{|x|
@@ -187,11 +185,11 @@ def update-nu-config [] {
     }}
 
     export def openclaw-devices-approve [req_id: string@cmpl-reqid] {{
-        {bin} devices approve $req_id
+        openclaw devices approve $req_id
     }}
     '#
 
-    { bin: $BIN } | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
+    { } | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
 }
 
 if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
@@ -203,7 +201,7 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
 
     tasks spawn {
         tag: openclaw
-        cmd: $'($BIN) gateway'
+        cmd: 'openclaw gateway'
     }
 } else {
     let port = $env.OPENCLAW_GATEWAY_PORT? | default '18789'
@@ -215,7 +213,7 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     }
     tasks spawn {
         tag: openclaw-node
-        cmd: $"($BIN) node run ($args | str join ' ')"
+        cmd: $"openclaw node run ($args | str join ' ')"
         polling_interval: 5sec
     }
 }
