@@ -27,6 +27,8 @@ export def main [context: record = {}] {
             OPENCLAW_SKILLS: ($ctx.skills | str join ',')
         }
 
+        hub install [oras]
+
         let skills_ins = $ctx.skills
         | each {|x|
             $'clawhub install ($x)'
