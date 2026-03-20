@@ -3,27 +3,35 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):latest'
+        from: $'($context.image):playwright'
         user: master
         workdir: /app/data
     }
     | merge $context
     | merge { tag: openclaw }
+    | upsert skills {|x|
+        $x.skills?
+        | default []
+        | append [
+            self-improving
+            duckduckgo-websearch
+        ]
+        | uniq
+    }
     | build {|ctx|
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
             OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: '1'
             OPENCLAW_HOME: $ctx.workdir
             OPENCLAW_CONFIG_PATH: ($ctx.workdir | path join openclaw.json)
+            OPENCLAW_SKILLS: ($ctx.skills | str join ',')
         }
 
-        let skills = [
-            self-improving
-            duckduckgo-websearch
-        ]
+        let skills_ins = $ctx.skills
         | each {|x|
-            $'./node_modules/.bin/clawdhub install ($x)'
+            $'./node_modules/.bin/clawhub install ($x)'
         }
+
         run [
             'mkdir -p /app/data'
             'cd /app'
@@ -32,7 +40,7 @@ export def main [context: record = {}] {
             'npm install --no-cache openclaw clawhub'
             'rm -rf node_modules/@node-llama-cpp node_modules/node-llama-cpp'
             # 'clawhub config set registry https://clawhub-mirror.aliyuncs.com'
-            ...$skills
+            ...$skills_ins
         ]
 
         conf user master

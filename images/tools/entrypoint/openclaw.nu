@@ -89,10 +89,20 @@ def setup-models [] {
     return $cfg
 }
 
+# TODO:
+def fetch-skills [] {
+}
+
 def gen-config [file home] {
     mkdir $home
 
     let token = random binary 24 | encode hex | str downcase
+
+    let skill_entries = $env.OPENCLAW_SKILLS
+    | split row ','
+    | reduce -f {} {|i, a|
+        $a | upsert $i { enabled: true }
+    }
 
     mut cfg = {
       models: {
@@ -115,6 +125,12 @@ def gen-config [file home] {
         nativeSkills: auto,
         restart: true,
         ownerDisplay: raw
+      },
+      skills: {
+        load: {
+          extraDirs: ["/app/skills"]
+        },
+        entries: $skill_entries
       },
       session: {
         dmScope: per-channel-peer
