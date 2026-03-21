@@ -192,6 +192,16 @@ def update-nu-config [] {
     { } | format pattern $tmpl | save -a ($env.HOME | path join .config/nushell/config.nu)
 }
 
+if ($env.PROXY? | is-not-empty) {
+    let proxy = $env.PROXY
+    $env.http_proxy = $proxy
+    $env.https_proxy = $proxy
+    $env.no_proxy = 'localhost,127.0.0.1'
+    if ($proxy | url parse).scheme in [socks5 socks5h] {
+        $env.all_proxy = $proxy
+    }
+}
+
 if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
         update-nu-config
