@@ -2,6 +2,8 @@
 use libs/tasks.nu
 use libs/info.nu
 
+const SKILL_DIR = '/app/skills'
+
 def setup-models [] {
     mut cfg = {
         models: {
@@ -87,8 +89,28 @@ def setup-models [] {
     return $cfg
 }
 
-# TODO:
 def fetch-skills [] {
+    mut config = {}
+    for url in ($env.SKILL_PACKAGE_URLS | split row ',') {
+        let w = mktemp -d
+        if ($env.SKILL_PACKAGE_AUTH? | is-not-empty) {
+            let up = ($env.SKILL_PACKAGE_AUTH | split row ':' | first 2)
+            http get -r --user $up.0 --password $up.1 $url
+        } else {
+            http get -r $url
+        }
+        | zstd -d
+        | tar xf - -C $w
+        cd $w
+        let cfg = open config.json
+        rm config.json
+        let name = $cfg.name
+        $config = $config | upsert $name ($cfg | reject name)
+        cd $SKILL_DIR
+        mv $w $name
+        info setup-skill {name: $name, url: $url}
+    }
+    $config
 }
 
 def gen-config [file home] {
@@ -96,7 +118,7 @@ def gen-config [file home] {
 
     let token = random binary 24 | encode hex | str downcase
 
-    let skill_entries = $env.OPENCLAW_SKILLS
+    mut skill_entries = $env.OPENCLAW_SKILLS
     | split row ','
     | reduce -f {} {|i, a|
         $a | upsert $i { enabled: true }
@@ -126,7 +148,7 @@ def gen-config [file home] {
       },
       skills: {
         load: {
-          extraDirs: ["/app/skills"]
+          extraDirs: [$SKILL_DIR]
         },
         entries: $skill_entries
       },
@@ -208,6 +230,15 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
         let token = gen-config $env.OPENCLAW_CONFIG_PATH $env.OPENCLAW_HOME
         info $"gateway_token ($token)"
     }
+
+
+    if ($env.SKILL_PACKAGE_URLS? | is-not-empty) {
+        open $env.OPENCLAW_CONFIG_PATH
+        | update skills.entries {|x|
+            $x.skills.entries | merge (fetch-skills)
+        }
+    }
+
 
     tasks spawn {
         tag: openclaw

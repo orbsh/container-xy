@@ -317,7 +317,6 @@ export module test {
 
     export def zeroclaw [
         ...args
-
     ] {
         let image = 'ghcr.io/fj0r/xy:zeroclaw'
         mut flag = [
