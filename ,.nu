@@ -334,19 +334,22 @@ export module test {
         ...$args
         --image(-i): string = 'xy:openclawx'
         --init
+        --proxy
     ] {
         let cnm = 'test-openclaw'
         do -i { dcr $cnm }
-        let cfgf = if $init { [] } else {
-            [-v ($env.HOME)/.openclaw:/app/data]
-        }
         mut flag = [
             --name $cnm
             -p 18789:18789
             -e QWEN_API_KEY=(asn --all | get api_key)
             -e QWEN_MODEL=glm-5
-            ...$cfgf
         ]
+        if not $init {
+            $flag ++= [-v ($env.HOME)/.openclaw:/app/data]
+        }
+        if $proxy {
+            $flag ++= [-e PROXY=socks5://host.docker.internal:8989]
+        }
         ^$env.CNTRCTL run ...$flag $image ...$args
     }
 
