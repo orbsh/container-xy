@@ -12,8 +12,15 @@ export def main [context: record = {}] {
         $x.skills?
         | default []
         | append [
-            self-improving
-            duckduckgo-websearch
+            self-improving #proactive-agent
+            ontology
+            summarize
+            file-search
+            multi-search-engine
+            scheduler
+            playwright
+            github
+            ahrefs
         ]
         | uniq
     }
