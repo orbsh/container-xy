@@ -4,7 +4,6 @@ use ../../bx *
 export def main [context: record = {}] {
     {
         from: $'($context.image):playwright'
-        user: master
         workdir: /app/data
     }
     | merge $context
@@ -42,7 +41,6 @@ export def main [context: record = {}] {
         run [
             'mkdir -p /app/data'
             'cd /app'
-            'chown -R master:master data'
             # 'npm install --no-cache --omit=optional openclaw'
             $'npm install -g --no-cache openclaw clawhub ($npm_pkgs)'
             'rm -rf /usr/lib/node_modules/@node-llama-cpp node_modules/node-llama-cpp'
@@ -50,7 +48,6 @@ export def main [context: record = {}] {
             ...$skills_ins
         ]
 
-        conf user master
         conf workdir $ctx.workdir
         copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
 
