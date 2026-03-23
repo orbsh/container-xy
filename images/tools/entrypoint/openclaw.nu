@@ -20,8 +20,10 @@ def setup-models [] {
     | reduce -f [] {|i, a|
         let r = $i.k | parse -r '^(?<m>.+)_API_KEY$'
         if ($r | is-not-empty) {
-            let name = $r.0.m | str downcase
+            let id =  $r.0.m
+            let name = $id | str downcase
             $a | append {
+                id: $id
                 name: $name
                 key: $i.k
                 value: $i.v
@@ -30,9 +32,10 @@ def setup-models [] {
             $a
         }
     }
+
     for i in $e {
         let models = $env
-        | get -o ($i.name)_MODEL
+        | get -o ($i.id)_MODEL
         | default (match $i.name {
             qwen => 'qwen3.5-122b-a10b'
             glm => 'glm-4.7'
@@ -55,10 +58,12 @@ def setup-models [] {
             }
         }
 
-        let baseUrl = match $i.name {
+        let baseUrl = $env
+        | get -o ($i.id)_BASE_URL
+        | default (match $i.name {
             qwen => "https://dashscope.aliyuncs.com/compatible-mode/v1"
             glm => "https://open.bigmodel.cn/api/paas/v4"
-        }
+        })
 
         $cfg.models.providers = $cfg.models.providers
         | insert $i.name {
