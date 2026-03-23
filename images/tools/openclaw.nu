@@ -24,6 +24,16 @@ export def main [context: record = {}] {
         ]
         | uniq
     }
+    | upsert plugins {|x|
+        $x.plugins?
+        | default []
+        | append [
+            mattermost
+            nostr
+            feishu
+        ]
+        | uniq
+    }
     | build {|ctx|
         conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
@@ -35,10 +45,9 @@ export def main [context: record = {}] {
 
         hub install [oras]
 
-        let skills_ins = $ctx.skills
-        | each {|x|
-            $'clawhub install ($x)'
-        }
+        let skills_ins = $ctx.skills | each {|x| $'clawhub install ($x)' }
+
+        let plugins_ins = $ctx.plugins | each {|x| $'openclaw plugins install @openclaw/($x)' }
 
         let npm_pkgs = [
             node-html-parser
@@ -52,6 +61,7 @@ export def main [context: record = {}] {
             $'npm install -g --no-cache openclaw clawhub ($npm_pkgs)'
             'rm -rf /usr/lib/node_modules/@node-llama-cpp node_modules/node-llama-cpp'
             # 'clawhub config set registry https://clawhub-mirror.aliyuncs.com'
+            ...$plugins_ins
             ...$skills_ins
         ]
 
