@@ -382,10 +382,11 @@ packages:
     options:
       extensions:
         - httpfs
-        - vortex
+        # - vortex
         - delta
         - ducklake
         - iceberg
+        - lance
         - postgres
         - mysql
         - sqlite
