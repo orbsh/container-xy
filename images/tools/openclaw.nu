@@ -28,7 +28,6 @@ export def main [context: record = {}] {
         $x.plugins?
         | default []
         | append [
-            feishu
         ]
         | uniq
     }
