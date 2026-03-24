@@ -230,11 +230,13 @@ if ($env.PROXY? | is-not-empty) {
 }
 
 if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
-    if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
+    let token = if not ($env.OPENCLAW_CONFIG_PATH | path exists) {
         update-nu-config
-        let token = gen-config $env.OPENCLAW_CONFIG_PATH $env.OPENCLAW_HOME
-        info $"gateway_token ($token)"
+        gen-config $env.OPENCLAW_CONFIG_PATH $env.OPENCLAW_HOME
+    } else {
+        open $env.OPENCLAW_CONFIG_PATH | get gateway.auth.token
     }
+    info $"gateway_token ($token)"
 
 
     if ($env.SKILL_PACKAGE_URLS? | is-not-empty) {
