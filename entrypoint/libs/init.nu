@@ -47,7 +47,7 @@ def init [args] {
     info "boot completed"
 }
 
-export def main [...args] {
+export def --wrapped main [...args] {
     tasks init
 
     init $args
