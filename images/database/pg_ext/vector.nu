@@ -1,4 +1,3 @@
-use ./libs.nu *
 use ../../../bx *
 
 export def main [xctx] {

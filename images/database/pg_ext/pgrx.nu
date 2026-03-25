@@ -1,14 +1,17 @@
-use ./libs.nu *
 use ../../../bx *
 
 export def main [xctx] {
     let tags  = $xctx.tags
     let context = $xctx.context
     let pg_ver = $context.pg_version_major
-    sync $pg_ver pgrx {
-        repo: 'pgcentralfoundation/pgrx'
-        version: ['substr 1']
-    } $tags {|cx|
+    hub sync {
+        cfg: {
+            repo: 'pgcentralfoundation/pgrx'
+            version: ['substr 1']
+        }
+        tag: $"pgrx_($pg_ver)_{version}"
+        obj: $tags
+    } {|cx|
         {
             pgrx_version: $cx.version
             from: 'postgres'

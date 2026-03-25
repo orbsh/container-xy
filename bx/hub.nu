@@ -341,3 +341,14 @@ export def gen-script [
 
     $ctx | str join "\n\n"
 }
+
+export def sync [arg action] {
+    let version = hub get-version $arg.cfg
+    let tag = {version: $version} | format pattern $arg.tag
+    if ($tag not-in $arg.obj) {
+        do $action { version: $version, tag: $tag }
+    } else {
+        trace o $tag exists
+    }
+    return $tag
+}

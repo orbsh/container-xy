@@ -1,14 +1,17 @@
-use ./libs.nu *
 use ../../../bx *
 
 export def main [xctx] {
     let pgrx  = $xctx.pgrx
     let tags  = $xctx.tags
     let context = $xctx.context
-    sync $context.pg_version_major pg_duckdb {
-        repo: 'duckdb/pg_duckdb'
-        version: ['substr 1']
-    } $tags {|cx|
+    hub sync {
+        cfg: {
+            repo: 'duckdb/pg_duckdb'
+            version: ['substr 1']
+        }
+        tag: $"pg_duckdb_($context.pg_version_major)_{version}"
+        obj: $tags
+    } {|cx|
         {
             timezone: Asia/Shanghai
         }
