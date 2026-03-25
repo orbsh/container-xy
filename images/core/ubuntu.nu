@@ -22,6 +22,7 @@ export def main [context: record = {}] {
             sudo attr procps htop cron tzdata
             # base-devel
             # nushell
+            ca-certificates
             curl openssh-client rsync s3fs
             strace tcpdump socat
             sqlite3 patch tree
