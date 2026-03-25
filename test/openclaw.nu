@@ -4,7 +4,7 @@ export def main [context: record = {}] {
     {
         from: $'($context.image):openclaw'
         user: master
-        workdir: /home/master/openclaw
+        workdir: /app/data
     }
     | merge $context
     | merge { tag: openclawx }

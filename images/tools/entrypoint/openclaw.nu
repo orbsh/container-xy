@@ -107,8 +107,8 @@ def fetch-skills [] {
         | zstd -d
         | tar xf - -C $w
         cd $w
-        let cfg = open config.json
-        rm config.json
+        let cfg = open config.yaml
+        rm config.yaml
         let name = $cfg.name
         $config = $config | upsert $name ($cfg | reject name)
         cd $SKILL_DIR
