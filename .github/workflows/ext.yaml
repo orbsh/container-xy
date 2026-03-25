@@ -53,15 +53,15 @@ jobs:
         with:
           version: 0.111.0
 
-      - name: Build marimo
+      - name: build surreal
         shell: buildah unshare nu {0}
-        run: |
-          overlay use ${{ github.workspace }}/images/ext/marimo.nu as build
+        run: |-
+          overlay use ${{ github.workspace }}/images/database/surreal.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tag: marimo
+            tag: surreal
           }
 
       - name: build postgres
@@ -75,15 +75,15 @@ jobs:
             tag: postgres
           }
 
-      - name: build surreal
+      - name: Build marimo
         shell: buildah unshare nu {0}
-        run: |-
-          overlay use ${{ github.workspace }}/images/database/surreal.nu as build
+        run: |
+          overlay use ${{ github.workspace }}/images/ext/marimo.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tag: surreal
+            tag: marimo
           }
 
       - name: build playwright
