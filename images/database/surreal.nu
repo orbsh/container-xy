@@ -25,17 +25,23 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use libs/tasks.nu
 
-            let cmd = [
-                /usr/local/bin/surreal
-                start -A
-                ($env.SURREAL_STORE? | default rocksdb):///var/lib/surrealdb
-            ]
-            | str join " "
+            export def main [...args] {
+                mut args = $args
+                if not ($args | any { $in | str starts-with '--allow-' }) {
+                    $args ++= ['--allow-all']
+                }
+                let cmd = [
+                    /usr/local/bin/surreal
+                    start ...$args
+                    ($env.SURREAL_STORE? | default rocksdb):///var/lib/surrealdb
+                ]
+                | str join " "
 
-            tasks spawn {
-                tag: surreal
-                msg: 'Starting SurrealDB.'
-                cmd: $cmd
+                tasks spawn {
+                    tag: surreal
+                    msg: 'Starting SurrealDB.'
+                    cmd: $cmd
+                }
             }
             '#
             | str trim
