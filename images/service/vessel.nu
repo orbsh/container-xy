@@ -4,7 +4,7 @@ export def main [context: record = {}] {
     {
         from: $'($context.image):ferron'
         user: master
-        workdir: /home/master
+        workdir: /srv
         tag: vessel
     }
     | merge $context
@@ -21,5 +21,6 @@ export def main [context: record = {}] {
             }
         }
         hub install $pkg -c $ctx.cache? -t /opt/vessel --bundle --with-python
+        conf workdir $ctx.workdir
     }
 }

@@ -17,7 +17,7 @@ export def main [context: record = {}] {
     {
         from: 'postgres'
         timezone: Asia/Shanghai
-        workdir: /home/master
+        workdir: /var/lib/postgresql
     }
     | merge $context
     | update from {|x| $'postgres:($x.pg_version_major)' }
@@ -112,6 +112,7 @@ export def main [context: record = {}] {
             copy images/database/postgres/entrypoint-($f).nu /usr/local/bin/entrypoint-($f).nu
         }
 
+        conf workdir $ctx.workdir
         conf entrypoint [nu /usr/local/bin/entrypoint-hook.nu]
     }
 }

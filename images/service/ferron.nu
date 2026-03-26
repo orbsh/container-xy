@@ -4,7 +4,7 @@ export def main [context: record = {}] {
     {
         from: $'($context.image):ubuntu'
         user: master
-        workdir: /home/master
+        workdir: /srv
         tag: ferron
     }
     | merge $context
@@ -65,6 +65,7 @@ export def main [context: record = {}] {
             WEBHOOK_URI: ''
         }
 
+        conf workdir $ctx.workdir
         conf cmd ['srv']
     }
 }

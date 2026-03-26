@@ -4,7 +4,7 @@ export def main [context: record = {}] {
     {
         from: $'($context.image):ubuntu'
         user: master
-        workdir: /home/master
+        workdir: /var/lib/surrealdb
         tag: surreal
     }
     | merge $context
@@ -23,6 +23,6 @@ export def main [context: record = {}] {
         copy images/database/surreal/entrypoint.nu /entrypoint/surreal.nu
 
         conf cmd ['srv']
-        conf workdir /data
+        conf workdir $ctx.workdir
     }
 }

@@ -4,7 +4,7 @@ export def main [context: record = {}] {
     {
         from: $'($context.image):ubuntu'
         user: master
-        workdir: /home/master
+        workdir: /var/lib/registry
     }
     | merge $context
     | build {|ctx|
@@ -152,5 +152,6 @@ export def main [context: record = {}] {
             | str replace -rma $'^ {12}' ''
             | save entrypoint/zot.nu
         }
+        conf workdir $ctx.workdir
     }
 }
