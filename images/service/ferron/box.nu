@@ -5,7 +5,7 @@ use $utils *
 
 export def main [] {
     match ($env.REQUEST_METHOD | str downcase) {
-        post => {
+        post | put => {
             let i = $in | upload
             if ($env.WEBHOOK_UPLOAD? | is-not-empty) {
                 webhook $env.WEBHOOK_URI $i
@@ -57,4 +57,3 @@ def webhook [url payload] {
         { status: "error", message: "Webhook failed" }
     }
 }
-
