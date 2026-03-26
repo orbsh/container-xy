@@ -99,10 +99,9 @@ def fetch-skills [] {
     for url in ($env.SKILL_PACKAGE_URLS | split row ',') {
         let w = mktemp -d
         if ($env.SKILL_PACKAGE_AUTH? | is-not-empty) {
-            let up = ($env.SKILL_PACKAGE_AUTH | split row ':' | first 2)
-            http get -r --user $up.0 --password $up.1 $url
+            curl -sSL -u $env.SKILL_PACKAGE_AUTH $url
         } else {
-            http get -r $url
+            curl -sSL $url
         }
         | zstd -d
         | tar xf - -C $w
@@ -244,6 +243,7 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
         | update skills.entries {|x|
             $x.skills.entries | merge (fetch-skills)
         }
+        | save -f $env.OPENCLAW_CONFIG_PATH
     }
 
 
