@@ -70,6 +70,7 @@ export def main [context: record = {}] {
             numpy polars httpx pyyaml
             PyParsing
             boltons decorator
+            zstandard
         ]
 
         conf env {
