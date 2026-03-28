@@ -40,7 +40,7 @@ export def main [context: record = {}] {
             OPENCLAW_SKILLS: ($ctx.skills | str join ',')
         }
 
-        hub install [oras]
+        pkg pip install [html2txt]
 
         let skills_ins = $ctx.skills | each {|x| $'clawhub install ($x)' }
 
