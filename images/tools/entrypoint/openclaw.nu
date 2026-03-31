@@ -177,13 +177,6 @@ def gen-config [file home] {
         nodes: {
           denyCommands: [ "camera.snap", "camera.clip", "screen.record", "contacts.add", "calendar.add", "reminders.add", "sms.send" ]
         }
-      },
-      plugins: {
-        entries: {
-          qwen-portal-auth: {
-            enabled: true
-          }
-        }
       }
     }
 

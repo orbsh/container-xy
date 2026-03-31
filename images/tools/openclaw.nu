@@ -57,7 +57,6 @@ export def main [context: record = {}] {
             # 'npm install --no-cache --omit=optional openclaw'
             $'npm install -g --no-cache openclaw clawhub ($npm_pkgs)'
             'rm -rf /usr/lib/node_modules/@node-llama-cpp node_modules/node-llama-cpp'
-            # 'clawhub config set registry https://clawhub-mirror.aliyuncs.com'
             ...$plugins_ins
             ...$skills_ins
         ]
