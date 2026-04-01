@@ -119,7 +119,7 @@ export def 'setup python' [pkgs] {
 
 export def 'npm install' [
     pkgs
-    --runtime: string = 'bun'
+    --runtime: string = 'node'
 ] {
     match $runtime {
         node => {
@@ -138,7 +138,7 @@ export def 'npm install' [
 
 export def 'setup js' [
     pkgs
-    --runtime: string = 'bun'
+    --runtime: string = 'node'
 ] {
     match $runtime {
         node => {
