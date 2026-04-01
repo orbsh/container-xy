@@ -15,7 +15,7 @@ export def main [context: record = {}] {
         }
         pkg with [ base-devel ] {
             pkg pip install [
-                infinity-emb[all]
+                "'transformers<4.49'" "'optimum<2.0'" "infinity-emb[all]"
             ]
         }
         let model = 'codefuse-ai/F2LLM-v2-0.6B'
