@@ -55,7 +55,7 @@ export def main [context: record = {}] {
             'mkdir -p /app/data'
             'cd /app'
             # 'npm install --no-cache --omit=optional openclaw'
-            $'npm install -g --no-cache openclaw clawhub ($npm_pkgs)'
+            $'bun install -g --no-cache openclaw clawhub ($npm_pkgs)'
             'rm -rf /usr/lib/node_modules/@node-llama-cpp node_modules/node-llama-cpp'
             ...$plugins_ins
             ...$skills_ins

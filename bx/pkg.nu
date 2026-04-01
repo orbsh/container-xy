@@ -119,19 +119,26 @@ export def 'setup python' [pkgs] {
 
 export def 'npm install' [
     pkgs
-    --runtime: string = 'node'
+    --runtime: string = 'bun'
 ] {
-    mut cmd = match $runtime {
-        node => [npm install --global -no-cache]
-        bun => [bun install --global -no-cache]
+    match $runtime {
+        node => {
+            b run [
+                $'npm install --global ($pkgs | str join " ")'
+                'npm cache clean --force'
+            ]
+        }
+        bun => {
+            b run [
+                $'bun install --global --no-cache ($pkgs | str join " ")'
+            ]
+        }
     }
-    $cmd ++= $pkgs
-    b run [ ($cmd | str join ' ') ]
 }
 
 export def 'setup js' [
     pkgs
-    --runtime: string = 'node'
+    --runtime: string = 'bun'
 ] {
     match $runtime {
         node => {

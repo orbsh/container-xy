@@ -53,7 +53,7 @@ export def main [context: record = {}] {
             boltons decorator
             zstandard
         ]
-        pkg setup js --runtime node [
+        pkg setup js [
             @typespec/compiler @typespec/json-schema
             vscode-langservers-extracted
             yaml-language-server
