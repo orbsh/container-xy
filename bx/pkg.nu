@@ -152,5 +152,8 @@ export def 'setup js' [
             hub install [bun]
         }
     }
+    b conf env {
+        BUN_INSTALL_BIN: "/usr/local/bin"
+    }
     npm install --runtime $runtime $pkgs
 }
