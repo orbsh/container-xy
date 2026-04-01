@@ -14,7 +14,6 @@ export def main [context: record = {}] {
         | append [
             self-improving #proactive-agent
             ontology
-            summarize
             file-search
             multi-search-engine
             scheduler
