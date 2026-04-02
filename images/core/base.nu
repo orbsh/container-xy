@@ -49,7 +49,8 @@ export def main [context: record = {}] {
             ty debugpy
             httpx aiofile aiostream
             fastapi uvicorn
-            pytest pydantic pydantic-graph PyParsing
+            pytest pydantic pydantic-graph
+            PyParsing jinja2
             typer pydantic-settings pyyaml
             boltons decorator
             agno openai
