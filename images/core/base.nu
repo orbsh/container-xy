@@ -51,6 +51,7 @@ export def main [context: record = {}] {
             debugpy pytest pydantic pydantic-graph PyParsing
             typer pydantic-settings pyyaml
             boltons decorator
+            agno openai
             zstandard
         ]
         pkg setup js [
