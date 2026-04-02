@@ -25,7 +25,7 @@ export def setup [
     ]
 
     b with-mount {
-        let cfg = open ($env.BX_WORKDIR | path join hub.yaml) | get packages.nushell.options.config
+        let cfg = open ($env.BX_DATADIR | path join hub.yaml) | get packages.nushell.options.config
         let xdg_config = relative-path $config.xdg_config
         | path expand
         | path join nushell

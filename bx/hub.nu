@@ -10,7 +10,7 @@ export def get-version [cfg]: nothing -> string {
     if $cfg.type? in ['ImageVolume'] {
         return ''
     }
-    let CACHE = $env.BX_WORKDIR | path join version.yaml
+    let CACHE = $env.BX_DATADIR | path join version.yaml
     if ($CACHE | path exists) {
         let f = open $CACHE
         if $cfg.repo? in $f {
@@ -114,7 +114,7 @@ def install-inner [
     --with-python
 ] {
     trace inc-level
-    let cfg = open ($env.BX_WORKDIR | path join hub.yaml) | get packages | get $tag
+    let cfg = open ($env.BX_DATADIR | path join hub.yaml) | get packages | get $tag
     let arch = if ($arch | is-empty) { $nu.os-info.arch } else { $arch }
 
     let python_version = if $with_python {

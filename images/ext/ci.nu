@@ -33,5 +33,13 @@ export def main [context: record = {}] {
         ]
         | each { $"ansible-galaxy collection install ($in)" }
         | run $in
+
+        with-mount {|new, old|
+            let tg = $new | path join root/.config/nushell/scripts
+            mkdir $tg
+            for f in [bx version.yaml] {
+                cp -r ($old | path join $f) $tg
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 use trace.nu
+const SCRIPTS_DIR = path self ..
 
 export def --env main [
     acts
@@ -6,6 +7,7 @@ export def --env main [
     --no-commit
     --squash
     --workdir(-w): string
+    --datadir(-d): string
 ]: record -> any {
     let ctx = $in
     $env.BX_WORKDIR = if ($workdir | is-empty) {
@@ -13,7 +15,12 @@ export def --env main [
     } else {
         $workdir
     }
-    trace o -p bx-workdir $env.BX_WORKDIR
+    $env.BX_DATADIR = if ($workdir | is-empty) {
+        $SCRIPTS_DIR
+    } else {
+        $datadir
+    }
+    trace o -p bx {workdir: $env.BX_WORKDIR, datadir: $env.BX_DATADIR}
     trace o -p build $ctx
 
     let working_container = buildah from $ctx.from
