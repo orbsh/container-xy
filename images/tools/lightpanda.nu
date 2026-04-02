@@ -2,7 +2,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):ubuntu'
+        from: $'($context.image):py'
         user: master
         workdir: /home/master
     }
@@ -13,12 +13,6 @@ export def main [context: record = {}] {
 
         pkg setup python [
             playwright
-            ty
-            httpx aiofile aiostream fastapi uvicorn
-            debugpy pytest pydantic pydantic-graph PyParsing
-            typer pydantic-settings pyyaml
-            boltons decorator
-            zstandard
         ]
 
         with-mount {

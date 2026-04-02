@@ -46,9 +46,10 @@ export def main [context: record = {}] {
         ]
 
         pkg setup python [
-            ty
-            httpx aiofile aiostream fastapi uvicorn
-            debugpy pytest pydantic pydantic-graph PyParsing
+            ty debugpy
+            httpx aiofile aiostream
+            fastapi uvicorn
+            pytest pydantic pydantic-graph PyParsing
             typer pydantic-settings pyyaml
             boltons decorator
             agno openai

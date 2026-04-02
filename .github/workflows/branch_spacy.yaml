@@ -46,7 +46,7 @@ jobs:
     - name: build spacy
       shell: buildah unshare nu {0}
       run: |-
-        overlay use ${{ github.workspace }}/images/ext/spacy.nu as build
+        overlay use ${{ github.workspace }}/images/data/spacy.nu as build
         build {
           author: ${{ env.USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}

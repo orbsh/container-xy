@@ -17,10 +17,6 @@ export def main [context: record = {}] {
             pkg pip install [
                 psycopg[binary] boto3 lancedb duckdb
                 numpy scikit-learn polars[all]
-                # httpx aiofile aiostream fastapi uvicorn
-                # debugpy pytest pydantic pydantic-graph PyParsing
-                # typer pydantic-settings pyyaml
-                # boltons decorator
                 marimo[recommended,lsp,sql] altair
             ]
             pkg pip install --index-url https://download.pytorch.org/whl/cpu [
