@@ -10,7 +10,7 @@ export def main [context: record = {}] {
     | build {|ctx|
         pkg setup python [
             httpx aiofile aiostream
-            fastapi uvicorn
+            fastapi uvicorn[standard]
             pytest pydantic pydantic-graph
             PyParsing jinja2
             typer pydantic-settings pyyaml
