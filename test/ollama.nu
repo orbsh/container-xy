@@ -13,6 +13,7 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         conf cmd [srv]
+        run ['ollama --version']
         with-mount {
             cd entrypoint
             r#'

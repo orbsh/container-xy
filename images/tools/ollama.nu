@@ -8,6 +8,8 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
+        run ['ollama --version']
+
         pkg install [curl zstd git sudo]
         conf cmd [srv]
 
