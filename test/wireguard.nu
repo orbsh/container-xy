@@ -35,6 +35,8 @@ export def main [context: record = {}] {
                 | get name
                 | each {|x| $x | path parse | get stem }
 
+
+                resolvconf -u
                 for i in $its {
                     wg-quick up $i
                     print $"==> wg entrypoint: ($i)"
@@ -49,7 +51,7 @@ export def main [context: record = {}] {
                 # | tasks spawn ...$in
             }
 
-            # run-wireguard
+            run-wireguard
             '#
             | str trim
             | str replace -rma $'^ {12}' ''

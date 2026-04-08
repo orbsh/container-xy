@@ -41,7 +41,9 @@ export def main [context: record = {}] {
                 | get name
                 | each {|x| $x | path parse | get stem }
 
+                resolvconf -u
                 for i in $its {
+                    # do -i { ip link delete $i }
                     wg-quick up $i
                     print $"==> wg entrypoint: ($i)"
                 }
