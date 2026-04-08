@@ -2,7 +2,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):ubuntu'
+        from: $'($context.image):deb'
         user: master
         workdir: /home/master
         tag: wireguard
@@ -10,7 +10,7 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         pkg install [
-            wireguard-tools resolvconf
+            wireguard-tools openresolv
         ]
         hub install [
             boringtun

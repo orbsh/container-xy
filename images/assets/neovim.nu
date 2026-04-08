@@ -10,7 +10,7 @@ export def main [context: record = {}] {
         tag: 'nvim'
     }
     | build {|ctx|
-        let nvim = { from: $'($context.image):ubuntu' }
+        let nvim = { from: $'($context.image):deb' }
         | build --no-commit {|ctx|
             pkg install [
                 build-essential

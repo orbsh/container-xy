@@ -12,7 +12,7 @@ export def main [context: record = {}] {
     }
 
     {
-        from: $'($context.image):ubuntu'
+        from: $'($context.image):deb'
         user: master
         workdir: /home/master
     }

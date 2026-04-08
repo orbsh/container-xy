@@ -11,7 +11,7 @@ xy = [
 ]
 
 [assets.image.manifest.py]
-xy = ["sid", "ubuntu", "py"]
+xy = ["deb", "ubuntu", "py"]
 
 [assets.image.manifest.marimo]
 xy = ["marimo"]
