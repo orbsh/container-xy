@@ -66,3 +66,7 @@ export def wait [
         sleep $interval
     }
 }
+
+export def list [] {
+
+}

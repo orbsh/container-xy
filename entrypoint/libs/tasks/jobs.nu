@@ -41,11 +41,11 @@ def run [
             let bin = $cmd.0
             let args = $cmd | skip 1
             if ($t.polling_interval? | is-empty) {
-                job spawn -t $t.tag {
+                job spawn -d $t.tag {
                     run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
                 }
             } else {
-                job spawn -t $t.tag {
+                job spawn -d $t.tag {
                     loop {
                         do -i {
                             run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
@@ -55,7 +55,7 @@ def run [
                 }
             }
         } else {
-            job spawn -t $t.tag {
+            job spawn -d $t.tag {
                 bash -c $'($t.cmd) |& tee /proc/1/fd/1'
             }
         }
@@ -85,4 +85,8 @@ export def wait [
         }
         sleep $interval
     }
+}
+
+export def list [] {
+    job list
 }

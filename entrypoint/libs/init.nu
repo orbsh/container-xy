@@ -54,6 +54,7 @@ export def --wrapped main [...args] {
 
     if ($args | is-empty) {
         info "entering interactive mode..."
+        # tasks list | to yaml | print $in
         exec nu
     } else if ($args.0 == "srv") {
         info "entering service mode, monitoring process status."
