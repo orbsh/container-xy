@@ -65,7 +65,7 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
-        pkg setup python [
+        pkg setup py [
             'psycopg[binary]'
             numpy polars httpx pyyaml
             PyParsing

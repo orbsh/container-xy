@@ -14,12 +14,12 @@ export def main [context: record = {}] {
             PORT: '8080'
         }
         pkg with [ base-devel ] {
-            pkg pip install [
+            pkg py install [
                 psycopg[binary] boto3 lancedb duckdb
                 numpy scikit-learn polars[all]
                 marimo[recommended,lsp,sql] altair
             ]
-            pkg pip install --index-url https://download.pytorch.org/whl/cpu [
+            pkg py install --index-url https://download.pytorch.org/whl/cpu [
                 torch torchvision torchaudio
             ]
         }

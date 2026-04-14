@@ -14,7 +14,7 @@ export def main [context: record = {}] {
             PORT: '8080'
         }
         pkg with [ base-devel ] {
-            pkg pip install [
+            pkg py install [
                 "'transformers<4.49'" "'optimum<2.0'" "infinity-emb[all]"
             ]
         }

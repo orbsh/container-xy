@@ -8,7 +8,7 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        pkg setup python [
+        pkg setup py [
             httpx aiofile aiostream
             fastapi uvicorn[standard]
             pytest pydantic pydantic-graph

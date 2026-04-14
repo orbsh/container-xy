@@ -11,7 +11,7 @@ export def main [context: record = {}] {
         hub install [lightpanda]
         conf expose [9222]
 
-        pkg setup python [
+        pkg setup py [
             playwright
         ]
 

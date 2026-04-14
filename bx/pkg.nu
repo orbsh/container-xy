@@ -87,7 +87,7 @@ export def refresh [] {
     }
 }
 
-export def 'pip install' [
+export def 'py install' [
     pkgs
     --index-url: string
 ] {
@@ -104,7 +104,7 @@ export def 'pip install' [
     b run [ ($cmd | str join ' ') ]
 }
 
-export def 'setup python' [pkgs] {
+export def 'setup py' [pkgs] {
     let bin = match $env.OS_RELEASE_ID {
         debian => [ python3 python3-pip ],
         _ => [ python python-pip ],
@@ -113,13 +113,13 @@ export def 'setup python' [pkgs] {
         PYTHONUNBUFFERED: x
     }
     install $bin
-    pip install $pkgs
+    py install $pkgs
 }
 
 
-export def 'npm install' [
+export def 'js install' [
     pkgs
-    --runtime: string = 'node'
+    --runtime: string = 'bun'
 ] {
     match $runtime {
         node => {
@@ -138,7 +138,7 @@ export def 'npm install' [
 
 export def 'setup js' [
     pkgs
-    --runtime: string = 'node'
+    --runtime: string = 'bun'
 ] {
     match $runtime {
         node => {
@@ -155,5 +155,5 @@ export def 'setup js' [
     b conf env {
         BUN_INSTALL_BIN: "/usr/local/bin"
     }
-    npm install --runtime $runtime $pkgs
+    js install --runtime $runtime $pkgs
 }

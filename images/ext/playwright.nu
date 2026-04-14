@@ -10,7 +10,7 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: playwright }
     | build {|ctx|
-        pkg pip install [playwright]
+        pkg py install [playwright]
         run ['playwright install chromium']
     }
 }

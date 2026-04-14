@@ -45,7 +45,7 @@ export def main [context: record = {}] {
             duckdb
         ]
 
-        pkg setup python [
+        pkg setup py [
             ty debugpy
             httpx aiofile aiostream
             fastapi uvicorn

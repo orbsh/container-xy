@@ -15,7 +15,7 @@ export def main [context: record = {}] {
         ]
         hub install [kubectl helm]
 
-        pkg pip install [
+        pkg py install [
             furl markdown
             ansible kubernetes
             psycopg[binary] kafka-python
