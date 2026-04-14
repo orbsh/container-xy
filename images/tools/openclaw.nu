@@ -41,10 +41,6 @@ export def main [context: record = {}] {
 
         pkg py install [html2txt]
 
-        let skills_ins = $ctx.skills | each {|x| $'clawhub install ($x)' }
-
-        let plugins_ins = $ctx.plugins | each {|x| $'openclaw plugins install @openclaw/($x)' }
-
         let npm_pkgs = [
             node-html-parser
         ]
@@ -54,6 +50,10 @@ export def main [context: record = {}] {
             clawhub
             ...$npm_pkgs
         ]
+
+        let skills_ins = $ctx.skills | each {|x| $'clawhub install ($x)' }
+
+        let plugins_ins = $ctx.plugins | each {|x| $'openclaw plugins install @openclaw/($x)' }
 
         run [
             'mkdir -p /app/data'
