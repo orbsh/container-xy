@@ -3,7 +3,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):playwright'
+        from: $'($context.image):browser'
         workdir: /app/data
     }
     | merge $context
