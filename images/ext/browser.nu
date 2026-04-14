@@ -8,7 +8,6 @@ export def main [context: record = {}] {
         workdir: /home/master
     }
     | merge $context
-    | merge { tag: playwright }
     | build {|ctx|
         pkg install [chromium]
     }
