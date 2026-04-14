@@ -150,10 +150,15 @@ export def 'setup js' [
         }
         bun => {
             hub install [bun]
+            b run [
+                'cd /usr/local/bin'
+                'ln -s bun node'
+            ]
+            b conf env {
+                BUN_INSTALL_BIN: "/usr/local/bin"
+                BUN_NODE_ALIASES: "1"
+            }
         }
-    }
-    b conf env {
-        BUN_INSTALL_BIN: "/usr/local/bin"
     }
     js install --runtime $runtime $pkgs
 }
