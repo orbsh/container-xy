@@ -48,7 +48,6 @@ export def main [context: record = {}] {
         let npm_pkgs = [
             node-html-parser
         ]
-        | str join ' '
 
         pkg js install [
             openclaw
