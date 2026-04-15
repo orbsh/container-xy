@@ -29,24 +29,18 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use libs/tasks.nu
 
-            def run-ferron [config?] {
-                mut cmd = ["/usr/local/bin/ferron"]
-                let config = if ($config | is-empty) {
-                    [--config /etc/ferron.kdl]
-                } else {
-                    [--config $config]
-                }
-                $cmd ++= $config
-                let cmd = $cmd | str join " "
+            let cmd = [
+                /usr/local/bin/ferron
+                --config
+                ($env.CONFIGFILE? | default /etc/ferron.kdl)
+            ]
+            | str join " "
 
-                tasks spawn {
-                    tag: ferron
-                    msg: ($config | str join ' ')
-                    cmd: $cmd
-                }
+            tasks spawn {
+                tag: ferron
+                msg: $cmd
+                cmd: $cmd
             }
-
-            run-ferron $env.CONFIGFILE?
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
