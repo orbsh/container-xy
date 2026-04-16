@@ -30,7 +30,7 @@ export def --env init [
 ] {
     $env.TASKSEQ = mktemp -t tasks.XXXXXX
     touch $env.TASKSEQ
-    job spawn {
+    job spawn -d "taskseq_listener" {
         tail -f $env.TASKSEQ
         | lines
         | each {|x|
@@ -122,7 +122,8 @@ export def wait [
 
     let total = open -r $env.TASKSEQ | lines | length
     loop {
-        let jl = job list
+        # Only count user tasks, exclude taskseq_listener
+        let jl = job list | where {|x| $x.description? != "taskseq_listener" }
         if ($jl | length) != $total {
             for j in $jl {
                 info $"kill ($j.description?)"
