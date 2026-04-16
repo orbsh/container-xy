@@ -9,7 +9,7 @@ use ../info.nu
 # Invariants:
 #   [I1] TASKSEQ line count = total tasks to run
 #   [I2] Any task exits → active jobs < total → kill all
-#   [I3] $t.tag? | default "" → job spawn -d receives empty string
+#   [I3] $t.tag? | default "" → job.description receives empty string
 #
 # Preconditions (guaranteed by caller/external):
 #   [P1] init called only once
@@ -59,9 +59,10 @@ export def spawn [
 
 # -----------------------------------------------------------------------------
 # run: Execute tasks (called by listener)
-# Data Flow: $tasks(from JSON) → job spawn -d $tag
+# Data Flow: $tasks(from JSON) → job spawn -d $job_desc
 # Invariants: $t.tag? | default "" [I3], $t.cmd exists
 # Preconditions: JSON format valid [P3]
+# Note: $t.tag (from TASKSEQ) is mapped to job.description (via job spawn -d)
 # Reserved: let group, let task_id (future extension)
 # -----------------------------------------------------------------------------
 def run [
@@ -71,17 +72,18 @@ def run [
     for t in $tasks {
         if ($t.msg? | is-not-empty) { info $t.msg }
         let group = $t.grp
-        let tag = $t.tag? | default ""
+        # Task config 'tag' is mapped to job's 'description' field
+        let job_desc = $t.tag? | default ""
         let task_id = if ($env.SPAWN_VIA_BASH? | is-empty) {
             let cmd = $t.cmd | split row -r '\s+'
             let bin = $cmd.0
             let args = $cmd | skip 1
             if ($t.polling_interval? | is-empty) {
-                job spawn -d $tag {
+                job spawn -d $job_desc {
                     run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
                 }
             } else {
-                job spawn -d $tag {
+                job spawn -d $job_desc {
                     loop {
                         do -i {
                             run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
@@ -91,7 +93,7 @@ def run [
                 }
             }
         } else {
-            job spawn -d $tag {
+            job spawn -d $job_desc {
                 bash -c $'($t.cmd) |& tee /proc/1/fd/1'
             }
         }
@@ -112,8 +114,9 @@ export def wait [
     let interval = $env.CHECK_INTERVAL? | default '5sec' | into duration
     sleep $interval
 
-    let sid = job list | where {|x| $x.tag? | is-empty} | get -o 0.id
+    let sid = job list | where {|x| $x.description? | is-empty } | get -o 0.id
     if ($sid | is-not-empty) {
+        info $"kill untagged job ($sid)"
         job kill $sid
     }
 
@@ -122,7 +125,7 @@ export def wait [
         let jl = job list
         if ($jl | length) != $total {
             for j in $jl {
-                info $"kill ($j.tag?)"
+                info $"kill ($j.description?)"
                 job kill $j.id
             }
             break
