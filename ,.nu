@@ -315,6 +315,17 @@ export module test {
         ^$env.CNTRCTL run ...$flag $image ...$args
     }
 
+    export def hermes [
+        ...args
+    ] {
+        let image = 'ghcr.io/fj0r/xy:hermes'
+        mut flag = [
+            -e DASHSCOPE_API_KEY=(asn --all | get api_key)
+            -v ($env.PWD)/images/tools/entrypoint/hermes.nu:/entrypoint/hermes.nu
+        ]
+        ^$env.CNTRCTL run ...$flag $image ...$args
+    }
+
     export def zeroclaw [
         ...args
     ] {

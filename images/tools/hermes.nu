@@ -44,6 +44,9 @@ export def main [context: record = {}] {
         }
         | values
         conf expose $ports
+
+        copy images/tools/entrypoint/hermes.nu /entrypoint/hermes.nu
+
         conf cmd ['srv']
     }
 }
