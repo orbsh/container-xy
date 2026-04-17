@@ -1,7 +1,8 @@
 #!/usr/bin/env nu
 use libs/tasks.nu
 
-mut args = $env.SURREAL_ARGV? | default '' | split row ','
+mut args = $env.ENTRYPOINT_ARGS? | default []
+if $args.0? == 'srv' { $args = $args | skip 1 } else { exit 0 }
 
 if not ($args | any { $in | str starts-with '--allow-' }) {
     $args ++= ['--allow-all']
