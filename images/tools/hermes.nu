@@ -27,13 +27,13 @@ export def main [context: record = {}] {
         conf workdir /opt/hermes-agent
 
         with-mount {|new, old|
-            mkdir opt/hermes-agent
+            cd opt
             git clone --depth=1 https://github.com/NousResearch/hermes-agent.git
         }
 
         run [
             'cd /opt/hermes-agent'
-            'pip install -e .'
+            'pip install --break-system-packages -e .'
         ]
 
 
