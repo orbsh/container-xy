@@ -2,6 +2,24 @@ use b.nu
 use hub.nu
 use rust.nu
 
+def resolve-collect [col bundle pkgs] {
+    let sets = open ($env.BX_DATADIR | path join hub.yaml) | get $col
+    if ($bundle | is-not-empty) {
+        $sets
+        | columns
+        | do {
+            let c = $in
+            if 'all' in $bundle { $c } else { $c | where {|x| $x in $bundle } }
+        }
+        | each {|n| $sets | get $n}
+        | flatten
+    } else {
+        []
+    }
+    | append $pkgs
+    | uniq
+}
+
 export def install [pkgs] {
     let pkgs = $pkgs | str join ' '
     match $env.OS_RELEASE_ID {
@@ -88,9 +106,13 @@ export def refresh [] {
 }
 
 export def 'py install' [
-    pkgs
+    ...pkgs
     --index-url: string
+    --bundle(-b): list<string> = []
 ] {
+    let pkgs = resolve-collect 'collects.python' $bundle $pkgs
+    if ($pkgs | is-empty) { return }
+
     let pip = match $env.OS_RELEASE_ID {
         debian => "pip3"
         _ => "pip",
@@ -100,7 +122,6 @@ export def 'py install' [
         $cmd ++= [--index-url $index_url]
     }
     $cmd ++= $pkgs
-
     b run [ ($cmd | str join ' ') ]
 }
 
@@ -118,9 +139,13 @@ export def 'setup py' [pkgs] {
 
 
 export def 'js install' [
-    pkgs
+    ...pkgs
     --runtime: string = 'bun'
+    --bundle(-b): list<string> = []
 ] {
+    let pkgs = resolve-collect 'collects.js' $bundle $pkgs
+    if ($pkgs | is-empty) { return }
+
     match $runtime {
         node => {
             b run [

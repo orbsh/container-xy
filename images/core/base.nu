@@ -53,8 +53,6 @@ export def main [context: record = {}] {
             PyParsing jinja2
             typer pydantic-settings pyyaml
             boltons decorator
-            agno openai
-            zstandard
         ]
         pkg setup js [
             @typespec/compiler @typespec/json-schema

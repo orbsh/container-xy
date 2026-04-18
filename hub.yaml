@@ -491,3 +491,35 @@ packages:
     unpack:
       - chmodx zeroclaw
       - wrap bin
+
+collects:
+  python:
+    web:
+      - fastapi
+      - uvicorn
+      - httpx
+    dev:
+      - ty
+      - debugpy
+      - pytest
+    io:
+      - aiofile
+      - aiostream
+    cli:
+      - typer
+    utils:
+      - pydantic
+      - pydantic-graph
+      - pydantic-settings
+      - pyparsing
+      - jinja2
+      - pyyaml
+      - boltons
+      - decorator
+  js:
+    dev:
+      - vscode-langservers-extracted
+      - yaml-language-server
+    utils:
+      - "@typespec/compiler"
+      - "@typespec/json-schema"
