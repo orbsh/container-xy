@@ -242,7 +242,7 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
 
     tasks spawn {
         tag: openclaw
-        cmd: 'openclaw gateway'
+        cmd: [openclaw gateway]
     }
 } else {
     let port = $env.OPENCLAW_GATEWAY_PORT? | default '18789'
@@ -254,7 +254,7 @@ if ($env.OPENCLAW_GATEWAY_TOKEN? | is-empty) {
     }
     tasks spawn {
         tag: openclaw-node
-        cmd: $"openclaw node run ($args | str join ' ')"
+        cmd: [openclaw node run ...$args]
         polling_interval: 5sec
     }
 }

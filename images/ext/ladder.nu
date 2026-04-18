@@ -47,7 +47,7 @@ export def main [context: record = {}] {
 
             tasks spawn {{
                 tag: mihomo
-                cmd: 'mihomo -d /data -ext-ctl 0.0.0.0:9090'
+                cmd: [mihomo -d /data -ext-ctl 0.0.0.0:9090]
             }}
             '#
             | str trim

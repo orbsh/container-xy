@@ -27,19 +27,16 @@ export def main [context: record = {}] {
             } else {
                 []
             }
-            let cmd = [
-                /usr/local/bin/lightpanda
-                serve
-                --host 0.0.0.0
-                --port 9222
-                ...$proxy
-                --log_level info
-            ]
-            | str join " "
-
             tasks spawn {
                 tag: ollama
-                cmd: $cmd
+                cmd: [
+                    /usr/local/bin/lightpanda
+                    serve
+                    --host 0.0.0.0
+                    --port 9222
+                    ...$proxy
+                    --log_level info
+                ]
             }
             '#
             | str trim

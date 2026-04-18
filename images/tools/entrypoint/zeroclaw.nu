@@ -71,5 +71,5 @@ $cfg | to toml | save -f $conf
 
 tasks spawn {
     tag: zeroclaw
-    cmd: 'zeroclaw gateway'
+    cmd: [zeroclaw gateway]
 }

@@ -29,17 +29,15 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use libs/tasks.nu
 
-            let cmd = [
-                marimo edit --no-token
-                -p $env.PORT
-                --host $env.HOST
-            ]
-            | str join " "
-
             tasks spawn {
                 tag: marimo
                 msg: "Starting marimo."
-                cmd: $cmd
+                cmd: [
+                    marimo
+                    edit --no-token
+                    -p $env.PORT
+                    --host $env.HOST
+                ]
             }
             '#
             | str trim

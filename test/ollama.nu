@@ -26,10 +26,9 @@ export def main [context: record = {}] {
                 } else {
                     $env.ENTRYPOINT_ARGS
                 }
-                let cmd = ["/bin/ollama" ...$act] | str join " "
                 tasks spawn {
                     tag: ollama
-                    cmd: $cmd
+                    cmd: [/bin/ollama ...$act]
                 }
             }
 

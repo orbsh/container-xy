@@ -32,8 +32,7 @@ def main [] {
 
     let upterm_args = [host ...$server_arg --skip-host-key-check --accept --force-command nu -- /usr/bin/env nu]
 
-    let cmd_str = (["upterm" ...$upterm_args] | str join " ")
-    let add_result = tasks spawn { cmd: $cmd_str, tag: "upterm_host"}  | complete
+    let add_result = tasks spawn { cmd: [upterm ...$upterm_args], tag: upterm_host}  | complete
 
     if $add_result.exit_code != 0 {
         info $"Error: Failed to add task: ($add_result.stderr)"

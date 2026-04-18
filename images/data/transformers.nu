@@ -28,15 +28,13 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use libs/tasks.nu
 
-            let cmd = [
-                infinity_emb v2 --model-id ($model) --port 8080 --device cpu
-            ]
-            | str join " "
-
             tasks spawn {
                 tag: f2llm
                 msg: "Starting f2llm."
-                cmd: $cmd
+                cmd: [
+                    infinity_emb
+                    v2 --model-id ($model) --port 8080 --device cpu
+                ]
             }
             '#
             | str trim

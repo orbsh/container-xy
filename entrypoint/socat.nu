@@ -27,7 +27,11 @@ $env
     {
         tag: $"socat_($j.proto)_($j.port)"
         msg: $"($j.proto):($j.port) --> ($j.target)"
-        cmd: $"sudo socat ($j.proto)-listen:($j.port),($j.options | str join ',') ($j.proto):($j.target)"
+        cmd: [
+            sudo socat
+            ($j.proto)-listen:($j.port),($j.options | str join ',')
+            ($j.proto):($j.target)
+        ]
     }
 }
 | tasks spawn ...$in

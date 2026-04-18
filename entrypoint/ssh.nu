@@ -69,7 +69,6 @@ def run_ssh [] {
         "sudo" "dropbear" "-REFems" "-p" "22"
         ...$timeout_args
     ]
-    | str join " "
 
     tasks spawn {
         tag: sshd

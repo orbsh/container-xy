@@ -7,7 +7,7 @@ if ($env.CRONFILE? | is-not-empty) {
         tasks spawn {
             tag: cron
             msg: $"load crontab : ($env.CRONFILE)"
-            cmd: "sudo cron -f"
+            cmd: [sudo cron -f]
         }
     } else {
         print $"[Error] CRONFILE: ($env.CRONFILE) not found."

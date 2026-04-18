@@ -34,6 +34,6 @@ if ($keyfile | path exists) {
     tasks spawn {
         tag: zellij-web
         msg: 'Starting zellij-web'
-        cmd: 'zellij web'
+        cmd: [zellij web]
     }
 }

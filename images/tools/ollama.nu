@@ -29,7 +29,7 @@ export def main [context: record = {}] {
 
         conf volume [/root/.ollama]
         copy entrypoint /entrypoint
-        conf entrypoint ["/entrypoint/libs/init.nu"]
+        conf entrypoint [/entrypoint/libs/init.nu]
 
         with-mount {
             cd entrypoint
@@ -43,12 +43,9 @@ export def main [context: record = {}] {
                 } else {
                     $env.ENTRYPOINT_ARGS
                 }
-                let cmd = ["/bin/ollama" ...$act]
-                | str join " "
-
                 tasks spawn {
                     tag: ollama
-                    cmd: $cmd
+                    cmd: [/bin/ollama ...$act]
                 }
             }
 

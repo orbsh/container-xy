@@ -34,11 +34,10 @@ export def main [context: record = {}] {
                 --config
                 ($env.CONFIGFILE? | default /etc/ferron.kdl)
             ]
-            | str join " "
 
             tasks spawn {
                 tag: ferron
-                msg: $cmd
+                msg: ($cmd | str join " ")
                 cmd: $cmd
             }
             '#

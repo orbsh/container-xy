@@ -112,7 +112,7 @@ export def main [context: record = {}] {
 
                 tasks spawn {
                     tag: coredns
-                    cmd: 'coredns -conf $env.COREFILE'
+                    cmd: [coredns -conf $env.COREFILE]
                 }
             }
             '#

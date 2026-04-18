@@ -61,7 +61,6 @@ def run_s3 [s3_id: string, s3_args: string] {
         ...$region_opts
         $o.mount_point
     ]
-    | str join " "
 
     {
         tag: $"s3fs_($s3_id)"

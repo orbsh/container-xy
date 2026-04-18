@@ -39,6 +39,6 @@ if ($env.PROXY? | is-not-empty) {
 
 tasks spawn {
     tag: hermes
-    cmd: $"hermes gateway"
+    cmd: [hermes gateway]
     polling_interval: 5sec
 }

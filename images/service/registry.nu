@@ -137,12 +137,9 @@ export def main [context: record = {}] {
                 | to json
                 | save -f /etc/zot/config.json
 
-                let cmd = [/usr/local/bin/zot serve /etc/zot/config.json]
-                | str join " "
-
                 tasks spawn {
                     tag: zot
-                    cmd: $cmd
+                    cmd: [/usr/local/bin/zot serve /etc/zot/config.json]
                 }
             }
 

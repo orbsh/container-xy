@@ -43,5 +43,5 @@ if not ($conf | path exists) {
 
 tasks spawn {
     tag: openfang
-    cmd: 'openfang start'
+    cmd: [openfang start]
 }
