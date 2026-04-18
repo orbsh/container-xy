@@ -37,6 +37,9 @@ xy = [
 [assets.image.manifest.llm]
 xy = ["ollama"]
 
+[assets.image.manifest.agents]
+xy = ["hermes"]
+
 #[assets.image.manifest.php]
 #0x = [
 #    "php7",
