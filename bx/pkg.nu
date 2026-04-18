@@ -2,14 +2,14 @@ use b.nu
 use hub.nu
 use rust.nu
 
-def resolve-collect [col bundle pkgs] {
-    let sets = open ($env.BX_DATADIR | path join hub.yaml) | get $col
-    if ($bundle | is-not-empty) {
+def resolve-stack [col stack pkgs] {
+    let sets = open ($env.BX_DATADIR | path join hub.yaml) | get ($col | into cell-path)
+    if ($stack | is-not-empty) {
         $sets
         | columns
         | do {
             let c = $in
-            if 'all' in $bundle { $c } else { $c | where {|x| $x in $bundle } }
+            if 'all' in $stack { $c } else { $c | where {|x| $x in $stack } }
         }
         | each {|n| $sets | get $n}
         | flatten
@@ -106,11 +106,11 @@ export def refresh [] {
 }
 
 export def 'py install' [
-    ...pkgs
+    pkgs: list<string> = []
     --index-url: string
-    --bundle(-b): list<string> = []
+    --stack(-s): list<string> = []
 ] {
-    let pkgs = resolve-collect 'collects.python' $bundle $pkgs
+    let pkgs = resolve-stack [stacks python] $stack $pkgs
     if ($pkgs | is-empty) { return }
 
     let pip = match $env.OS_RELEASE_ID {
@@ -125,7 +125,10 @@ export def 'py install' [
     b run [ ($cmd | str join ' ') ]
 }
 
-export def 'setup py' [pkgs] {
+export def 'setup py' [
+    pkgs: list<string> = []
+    --stack(-s): list<string> = []
+] {
     let bin = match $env.OS_RELEASE_ID {
         debian => [ python3 python3-pip ],
         _ => [ python python-pip ],
@@ -134,16 +137,16 @@ export def 'setup py' [pkgs] {
         PYTHONUNBUFFERED: x
     }
     install $bin
-    py install $pkgs
+    py install --stack $stack $pkgs
 }
 
 
 export def 'js install' [
-    ...pkgs
+    pkgs: list<string> = []
     --runtime: string = 'bun'
-    --bundle(-b): list<string> = []
+    --stack(-s): list<string> = []
 ] {
-    let pkgs = resolve-collect 'collects.js' $bundle $pkgs
+    let pkgs = resolve-stack [stacks js] $stack $pkgs
     if ($pkgs | is-empty) { return }
 
     match $runtime {
@@ -162,8 +165,9 @@ export def 'js install' [
 }
 
 export def 'setup js' [
-    pkgs
+    pkgs: list<string> = []
     --runtime: string = 'bun'
+    --stack(-s): list<string> = []
 ] {
     match $runtime {
         node => {
@@ -185,5 +189,5 @@ export def 'setup js' [
             }
         }
     }
-    js install --runtime $runtime $pkgs
+    js install --runtime $runtime --stack $stack $pkgs
 }

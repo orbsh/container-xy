@@ -8,13 +8,9 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        pkg setup py [
-            httpx aiofile aiostream
-            fastapi uvicorn[standard]
-            pytest pydantic pydantic-graph
-            PyParsing jinja2
-            typer pydantic-settings pyyaml
-            boltons decorator
+        pkg setup py --stack [
+            web dev io cli utils
+        ] [
             agno openai
             zstandard
         ]

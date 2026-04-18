@@ -492,11 +492,11 @@ packages:
       - chmodx zeroclaw
       - wrap bin
 
-collects:
+stacks:
   python:
     web:
       - fastapi
-      - uvicorn
+      - uvicorn[all]
       - httpx
     dev:
       - ty

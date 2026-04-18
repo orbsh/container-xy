@@ -45,19 +45,11 @@ export def main [context: record = {}] {
             duckdb
         ]
 
-        pkg setup py [
-            ty debugpy
-            httpx aiofile aiostream
-            fastapi uvicorn
-            pytest pydantic pydantic-graph
-            PyParsing jinja2
-            typer pydantic-settings pyyaml
-            boltons decorator
+        pkg setup py --stack [
+            web dev io cli utils
         ]
-        pkg setup js [
-            @typespec/compiler @typespec/json-schema
-            vscode-langservers-extracted
-            yaml-language-server
+        pkg setup js --stack [
+            dev utils
         ]
 
         # conf volume [$ctx.workdir]
