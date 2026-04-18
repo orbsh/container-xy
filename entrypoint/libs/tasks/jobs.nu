@@ -14,11 +14,31 @@ use ../info.nu
 # Preconditions (guaranteed by caller/external):
 #   [P1] init called only once
 #   [P2] spawn called with non-empty $tasks
-#   [P3] run receives valid JSON format
-#   [P4] tasks start within wait's sleep interval
+#   [P3] cmd is a list of strings, e.g. ["socat", "TCP-LISTEN:80,...", "TCP:target:80"]
+#        - first element is the binary, remaining elements are arguments
+#        - caller does NOT join into a string; run splits bin/args directly
+#        - when shell: true, elements are joined with spaces and passed to nu -c
+#        - example (socat):
+#            {tag: "socat_tcp_80", cmd: ["sudo", "socat", "TCP-LISTEN:80,reuseaddr,fork", "TCP:target:80"]}
+#        - example (surreal):
+#            {tag: "surreal", cmd: ["/usr/local/bin/surreal", "start", "--allow-all", "rocksdb:///var/lib/surrealdb"]}
+#   [P4] spawn is called serially within each nu file; each nu file calls spawn at most once
+#   [P5] nu files are scanned and executed serially by the outer loop
+#
+# Notes:
+#   - job spawn returns immediately and the job is visible in job list right away;
+#     there is no startup race between spawn and wait
+#   - this system is intentionally simple: it is a container entrypoint, not a
+#     general-purpose job scheduler; lifecycle is managed by the container runtime
+#   - alternatives considered:
+#       pueue: mature but adds an external dependency
+#       sqlite-backed: more observable but unnecessary for this use case
+#     current implementation uses only nushell built-in job management
 # ============================================================================
 
 export def log [id] {
+    # Intentionally empty — placeholder for structured logging.
+    # Do not remove; callers may reference this export.
 }
 
 # -----------------------------------------------------------------------------
@@ -26,8 +46,7 @@ export def log [id] {
 # Data Flow: mktemp → $env.TASKSEQ → job spawn(tail -f → lines → from json → run)
 # Preconditions: called once [P1]
 # -----------------------------------------------------------------------------
-export def --env init [
-] {
+export def --env init [] {
     $env.TASKSEQ = mktemp -t tasks.XXXXXX
     touch $env.TASKSEQ
     job spawn -d "taskseq_listener" {
@@ -42,28 +61,36 @@ export def --env init [
 # -----------------------------------------------------------------------------
 # spawn: Submit tasks to queue
 # Data Flow: $tasks → merge{grp, cts} → to json → save -a
-# Preconditions: init executed, $tasks non-empty [P1, P2]
+# Preconditions: init executed [P1], $tasks non-empty [P2],
+#                called at most once per nu file [P4], files scanned serially [P5]
 # -----------------------------------------------------------------------------
 export def spawn [
     ...tasks
     --group(-g): string = 'default'
+    --dry-run(-n)           # Print JSON lines to stdout instead of writing to queue
 ] {
     for t in $tasks {
-        $t
-        | merge {grp: $group, cts: (date now | format date '%FT%T%.3f')}
-        | to json -r
-        | $"($in)(char newline)"
-        | save -a $env.TASKSEQ
+        let line = $t
+            | merge {grp: $group, cts: (date now | format date '%FT%T%.3f')}
+            | to json -r
+            | $"($in)(char newline)"
+        if $dry_run {
+            print $line
+        } else {
+            $line | save -a $env.TASKSEQ
+        }
     }
 }
 
 # -----------------------------------------------------------------------------
 # run: Execute tasks (called by listener)
-# Data Flow: $tasks(from JSON) → job spawn -d $job_desc
-# Invariants: $t.tag? | default "" [I3], $t.cmd exists
-# Preconditions: JSON format valid [P3]
+# Data Flow: $tasks (from JSON) → job spawn -d $job_desc
+# Invariants: $t.tag? | default "" [I3], $t.cmd exists and is a list [P3]
+# Preconditions: JSON format valid, cmd is a list of strings [P3]
 # Note: $t.tag (from TASKSEQ) is mapped to job.description (via job spawn -d)
-# Reserved: let group, let task_id (future extension)
+#       $t.shell (optional bool) — when true, joins cmd and runs via nu -c,
+#         allowing nushell pipeline features without forking a bash process
+# Reserved: _group, _task_id (intentionally kept for future extension — do not remove)
 # -----------------------------------------------------------------------------
 def run [
     ...tasks
@@ -71,13 +98,30 @@ def run [
     if ($tasks | is-empty) { return }
     for t in $tasks {
         if ($t.msg? | is-not-empty) { info $t.msg }
-        let group = $t.grp
         # Task config 'tag' is mapped to job's 'description' field
+        let _group = $t.grp
         let job_desc = $t.tag? | default ""
-        let task_id = if ($env.SPAWN_VIA_BASH? | is-empty) {
-            let cmd = $t.cmd | split row -r '\s+'
-            let bin = $cmd.0
-            let args = $cmd | skip 1
+        let _task_id = if ($t.shell? | default false) {
+            # Use nu -c to support nushell pipeline features (e.g. pipes, redirects).
+            # Avoids forking an external shell process.
+            let script = $t.cmd | str join " "
+            if ($t.polling_interval? | is-empty) {
+                job spawn -d $job_desc {
+                    nu -c $script out+err>| tee { save -f /proc/1/fd/1 }
+                }
+            } else {
+                job spawn -d $job_desc {
+                    loop {
+                        do -i {
+                            nu -c $script out+err>| tee { save -f /proc/1/fd/1 }
+                        }
+                        sleep ($t.polling_interval | into duration)
+                    }
+                }
+            }
+        } else {
+            let bin = $t.cmd.0
+            let args = $t.cmd | skip 1
             if ($t.polling_interval? | is-empty) {
                 job spawn -d $job_desc {
                     run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
@@ -88,13 +132,9 @@ def run [
                         do -i {
                             run-external $bin ...$args out+err>| tee { save -f /proc/1/fd/1 }
                         }
-                        sleep $t.polling_interval
+                        sleep ($t.polling_interval | into duration)
                     }
                 }
-            }
-        } else {
-            job spawn -d $job_desc {
-                bash -c $'($t.cmd) |& tee /proc/1/fd/1'
             }
         }
     }
@@ -105,7 +145,7 @@ def run [
 # Data Flow: lines | length → total, job list | length → active
 #            active != total → kill all
 # Invariants: total = expected count [I1], exit kills all [I2]
-# Preconditions: tasks start within interval [P4]
+# Note: job spawn is immediate — jobs appear in job list right away, no race condition.
 # Reserved: $group parameter (future extension)
 # -----------------------------------------------------------------------------
 export def wait [
