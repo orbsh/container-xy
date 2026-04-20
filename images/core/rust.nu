@@ -34,26 +34,13 @@ export def main [context: record = {}] {
             $bins ++= [rust-script]
         }
 
-        mut experimental = [
-            rkyv # Zero-copy deserialization framework
-            dumpster # Cycle-tracking garbage collector library
-        ]
 
-        mut frontend = [
-            wasm-bindgen wasm-bindgen-futures
-            wasm-logger gloo-net
-        ]
         match $ctx.rust.frontend? {
             'leptos' => {
-                $frontend ++= [wasm-pack wee_alloc leptos]
                 $bins ++= [cargo-leptos]
             }
             'dioxus' => {
-                $frontend ++= [dioxus dioxus-web]
                 $bins ++= [dioxus-cli]
-            }
-            _ => {
-                $frontend ++= [sycamore]
             }
         }
 
@@ -74,29 +61,12 @@ export def main [context: record = {}] {
             ...$bins
         ] --cargo-home $ctx.env.CARGO_HOME
 
-        rust prefetch $ctx.user $ctx.workdir 'rust-labs' [
-            ...$experimental
-            ...$frontend
-            clap figment knuffel kdl toml tempdir
-            snafu anyhow thiserror
-            proc-macro2 syn quote macro_rules_attribute
-            linkme regex jiff bumpalo #moka
-            nom minijinja bon indoc itertools derive_more
-            refined_type dashmap indexmap maplit arc-swap bitflags num
-            url reqwest scraper markdown
-            serde serde_derive typetag serde_with serde_json_path
-            serde_json postcard serde_cbor schemars serde_yaml
-            tracing tracing-subscriber tracing-serde
-            rayon polars nalgebra linfa burn plotlars
-            crossbeam parking_lot specs
-            wasmtime wasmi
-            steel-core steel-repl koto rune
-            notify listenfd libc mimalloc
-            tokio tokio-util tokio-tungstenite smol async-compat
-            futures futures-util async-stream async-trait
-            async-fs async-graphql sqlx
-            # warp async-graphql-warp
-            axum async-graphql-axum
+        let ui = if ($ctx.rust.frontend? | is-empty) { [] } else { [frontend ui-($ctx.rust.frontend)] }
+        rust prefetch $ctx.user $ctx.workdir 'rust-labs' --stack [
+            experimental ...$ui
+            cli error meta utils parser data http serde
+            tracing ml parallel async concurrency web
+            ecs wasm script system
         ] --cargo-home $ctx.env.CARGO_HOME
     }
 }

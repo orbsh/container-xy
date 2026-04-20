@@ -613,3 +613,125 @@ stacks:
     utils:
       - "@typespec/compiler"
       - "@typespec/json-schema"
+  rust:
+    experimental:
+      - rkyv # Zero-copy deserialization framework
+      - dumpster # Cycle-tracking garbage collector library
+    cli:
+      - clap
+      - figment
+      - knuffel
+      - kdl
+      - toml
+      - tempdir
+    error:
+      - snafu
+      - anyhow
+      - thiserror
+    meta:
+      - proc-macro2
+      - syn
+      - quote
+      - macro_rules_attribute
+    utils:
+      - linkme
+      - regex
+      - jiff
+      - bumpalo
+    parser:
+      - nom
+      - minijinja
+      - bon
+      - indoc
+      - itertools
+      - derive_more
+    data:
+      - refined_type
+      - dashmap
+      - indexmap
+      - maplit
+      - arc-swap
+      - bitflags
+      - num
+    http:
+      - url
+      - reqwest
+      - scraper
+      - markdown
+    serde:
+      - serde
+      - serde_derive
+      - typetag
+      - serde_with
+      - serde_json_path
+      - serde_json
+      - postcard
+      - serde_cbor
+      - schemars
+      - serde_yaml
+    tracing:
+      - tracing
+      - tracing-subscriber
+      - tracing-serde
+    ml:
+      - polars
+      - nalgebra
+      - linfa
+      - burn
+      - plotlars
+    parallel:
+      - rayon
+    async:
+      - tokio
+      - tokio-util
+      - tokio-tungstenite
+      - smol
+      - async-compat
+      - futures
+      - futures-util
+      - async-stream
+      - async-trait
+      - async-fs
+    concurrency:
+      - crossbeam
+      - parking_lot
+    web:
+      - axum
+      - async-graphql
+      - async-graphql-axum
+      - sqlx
+    ecs:
+      - specs
+    wasm:
+      - wasmtime
+      - wasmi
+    script:
+      - steel-core
+      - steel-repl
+      - koto
+      - rune
+    system:
+      - notify
+      - listenfd
+      - libc
+      - mimalloc
+    frontend:
+      - wasm-bindgen
+      - wasm-bindgen-futures
+      - wasm-logger
+      - gloo-net
+    ui-leptos:
+      - leptos
+      - wee_alloc
+      - wasm-pack
+    ui-dioxus:
+      - dioxus
+      - dioxus-web
+    ui-sycamore:
+      - sycamore
+  cargo:
+    ui-leptos:
+      - cargo-leptos
+    ui-dioxus:
+      - dioxus-cli
+    ui-sycamore: []

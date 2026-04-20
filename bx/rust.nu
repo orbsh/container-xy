@@ -116,7 +116,8 @@ export def prefetch [
     owner
     workdir
     proj
-    pkgs
+    pkgs: list<string> = []
+    --stack(-s): list<string> = []
     --test
     --debug: string
     --cargo-home: string
@@ -130,6 +131,8 @@ export def prefetch [
         $"cd ($proj)"
         $"pwd"
     ]
+
+    let pkgs = resolve-stack [stacks rust] $stack $pkgs
 
     let pkgs = $pkgs | reduce -f {} {|i,a|
         $a | insert $i '*'

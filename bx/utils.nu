@@ -1,3 +1,21 @@
+export def resolve-stack [col stack pkgs] {
+    let sets = open ($env.BX_DATADIR | path join hub.yaml) | get ($col | into cell-path)
+    if ($stack | is-not-empty) {
+        $sets
+        | columns
+        | do {
+            let c = $in
+            if 'all' in $stack { $c } else { $c | where {|x| $x in $stack } }
+        }
+        | each {|n| $sets | get $n}
+        | flatten
+    } else {
+        []
+    }
+    | append $pkgs
+    | uniq
+}
+
 export def relative-path [path] {
     $path | path split | where $it != '/' | path join
 }
