@@ -1,4 +1,5 @@
 use ../../bx *
+use ../../bx/utils.nu
 
 export def main [context: record = {}] {
     {
@@ -7,6 +8,7 @@ export def main [context: record = {}] {
         workdir: /home/master
         rust: {
             channel: stable
+            frontend: sycamore
         }
         env: {
             RUSTUP_HOME: '/opt/rustup'
@@ -34,15 +36,12 @@ export def main [context: record = {}] {
             $bins ++= [rust-script]
         }
 
-
-        match $ctx.rust.frontend? {
-            'leptos' => {
-                $bins ++= [cargo-leptos]
-            }
-            'dioxus' => {
-                $bins ++= [dioxus-cli]
-            }
+        mut ui_stack = []
+        if ($ctx.rust.frontend? | is-not-empty) {
+            $ui_stack ++= [frontend ui-($ctx.rust.frontend)]
         }
+
+        $bins ++= utils resolve-stack [stacks cargo] $ui_stack []
 
         rust up $ctx.user $ctx.rust.channel --component [
             rust-src clippy rustfmt
@@ -61,9 +60,8 @@ export def main [context: record = {}] {
             ...$bins
         ] --cargo-home $ctx.env.CARGO_HOME
 
-        let ui = if ($ctx.rust.frontend? | is-empty) { [] } else { [frontend ui-($ctx.rust.frontend)] }
         rust prefetch $ctx.user $ctx.workdir 'rust-labs' --stack [
-            experimental ...$ui
+            experimental ...$ui_stack
             cli error meta utils parser data http serde
             tracing ml parallel async concurrency web
             ecs wasm script system
