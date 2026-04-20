@@ -27,6 +27,7 @@ export def install [
             ]
         }
     }
+    b add-history $"install: ($pkgs | str join ' ')"
 }
 
 export def with [
@@ -115,6 +116,7 @@ export def 'py install' [
     }
     $cmd ++= $pkgs
     b run [ ($cmd | str join ' ') ]
+    b add-history $"py install: ($pkgs | str join ' ')"
 }
 
 export def 'setup py' [
@@ -154,6 +156,7 @@ export def 'js install' [
             ]
         }
     }
+    b add-history $"js install: ($pkgs | str join ' ')"
 }
 
 export def 'setup js' [

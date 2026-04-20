@@ -57,9 +57,9 @@ export def --env main [
     let image = ($ctx.image):($ctx.tag? | default 'latest')
     trace o -p commit $image
     if $squash {
-        buildah commit --squash $working_container $image
+        buildah commit --format docker --rm --squash $working_container $image
     } else {
-        buildah commit $working_container $image
+        buildah commit --format docker --rm $working_container $image
     }
 
     if not ($ctx.skip_push? | default false) {

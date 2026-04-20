@@ -1,29 +1,32 @@
 use trace.nu
 
+export def add-history [msg] {
+    buildah config --add-history --created-by $msg $env.BUILDAH_WORKING_CONTAINER
+}
+
 export def copy [src dst] {
     trace inc-level
     trace o copy $src $dst
     buildah copy $env.BUILDAH_WORKING_CONTAINER $src $dst
+    add-history $"copy: ($src) -> ($dst)"
 }
 
 export def run [cmd: list] {
     trace inc-level
-    $cmd
-    | str join ' && '
-    | trace f run
-    | buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $in
+    let cmd = $cmd | str join ' && ' | trace f run
+    buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $cmd
+    add-history $"bash -c: ($cmd)"
 }
 
 export def exec [cmd: list] {
     trace inc-level
-    $cmd
-    | str join (char newline)
-    | trace f run-with-nu
-    | buildah run $env.BUILDAH_WORKING_CONTAINER nu -c $in
+    let cmd = $cmd | str join (char newline) | trace f run-with-nu
+    buildah run $env.BUILDAH_WORKING_CONTAINER nu -c $cmd
+    add-history $"nu -c: ($cmd)"
 }
 
 export def commit [image] {
-    buildah commit $env.BUILDAH_WORKING_CONTAINER $image
+    buildah commit --format docker --rm $env.BUILDAH_WORKING_CONTAINER $image
 }
 
 export def with-mount [act] {
@@ -32,7 +35,9 @@ export def with-mount [act] {
     let old = $env.PWD
     cd $tg
     trace o -p with-mount $tg
+    add-history "mount"
     do $act $tg $old
+    add-history "unmount"
 }
 
 export module conf {

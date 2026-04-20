@@ -99,6 +99,7 @@ export def install [
             --with-python=$with_python
         )
     }
+    b add-history $"hub-install: ($pkgs | str join ' ')"
 }
 
 
