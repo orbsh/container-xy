@@ -36,18 +36,27 @@ export def with-mount [act] {
 }
 
 export module conf {
-    export def env [rec: record] {
+    export def env [d: record] {
         trace inc-level
-        $rec
+        if 'PATH' in $d { error make { msg: 'set PATH via `conf path`'} }
+        $d
         | trace f config env
         | items {|k, v| [--env ($k)=($v)] }
         | flatten
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
     }
 
-    export def expose [vec: list] {
+    export def path [v: list] {
         trace inc-level
-        $vec
+        $v
+        | append ['$PATH']
+        | str join ':'
+        | buildah config --env PATH=($in) $env.BUILDAH_WORKING_CONTAINER
+    }
+
+    export def expose [v: list] {
+        trace inc-level
+        $v
         | trace f config expose
         | each {|x|
             let x = $x | into string
@@ -61,9 +70,9 @@ export module conf {
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
     }
 
-    export def volume [vec: list] {
+    export def volume [v: list] {
         trace inc-level
-        $vec
+        $v
         | trace f config volume
         | each {|x| [--volume $x] }
         | flatten
@@ -78,23 +87,23 @@ export module conf {
         | buildah config ...$in $env.BUILDAH_WORKING_CONTAINER
     }
 
-    export def entrypoint [vec: list] {
+    export def entrypoint [v: list] {
         trace inc-level
-        $vec
+        $v
         | trace f config entrypoint
         | to json -r
         | buildah config --entrypoint $in $env.BUILDAH_WORKING_CONTAINER
     }
 
-    export def cmd [vec: list] {
+    export def cmd [v: list] {
         trace inc-level
-        $vec
+        $v
         | trace f config cmd
         | to json -r
         | buildah config --cmd $in $env.BUILDAH_WORKING_CONTAINER
     }
 
-    export def user [user] {
-        buildah config --user $user $env.BUILDAH_WORKING_CONTAINER
+    export def user [name] {
+        buildah config --user $name $env.BUILDAH_WORKING_CONTAINER
     }
 }

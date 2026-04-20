@@ -9,6 +9,15 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
+        let ghcup_root = '/opt/.ghcup'
+        conf env {
+            BOOTSTRAP_HASKELL_NONINTERACTIVE: '1'
+            GHCUP_INSTALL_BASE_PREFIX:/opt
+            GHCUP_ROOT: $ghcup_root
+            STACK_ROOT: /opt/stack
+        }
+        conf path [($ghcup_root)/bin]
+
         pkg install [
             ghc cabal-install
             stack
@@ -24,12 +33,12 @@ export def main [context: record = {}] {
             # generic persistence random scraping
         ] []
         | str join ' '
-        | inspect
-        | run [
-            'cabal update'
-            $'cabal install ($in)'
-            'cabal clean'
-        ]
+        | print $"skipped: ($in)"
+        # | run [
+        #     'stack update'
+        #     $'stack install --local-bin-path=/usr/local/bin --no-interleaved-output ($in)'
+        #     'stack clean'
+        # ]
 
         with-mount {
             r#'
