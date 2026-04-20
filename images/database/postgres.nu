@@ -66,7 +66,7 @@ export def main [context: record = {}] {
         }
 
         pkg setup py --stack [
-            data http utils
+            science http utils
         ] [
             'psycopg[binary]'
             zstandard

@@ -594,7 +594,7 @@ stacks:
     cli:
       - typer
       - ipython
-    data:
+    science:
       - polars
       - numpy
     utils:
@@ -603,9 +603,10 @@ stacks:
       - pydantic-settings
       - pyparsing
       - jinja2
-      - pyyaml
       - boltons
       - decorator
+    codec:
+      - pyyaml
   js:
     dev:
       - vscode-langservers-extracted
@@ -615,14 +616,11 @@ stacks:
       - "@typespec/json-schema"
   rust:
     experimental:
-      - rkyv # Zero-copy deserialization framework
       - dumpster # Cycle-tracking garbage collector library
     cli:
       - clap
       - figment
       - knuffel
-      - kdl
-      - toml
       - tempdir
     error:
       - snafu
@@ -635,9 +633,12 @@ stacks:
       - macro_rules_attribute
     utils:
       - linkme
-      - regex
       - jiff
       - bumpalo
+    regex:
+      - regex
+      - regex-syntax
+      - regex-automata
     parser:
       - nom
       - minijinja
@@ -645,7 +646,7 @@ stacks:
       - indoc
       - itertools
       - derive_more
-    data:
+    collections:
       - refined_type
       - dashmap
       - indexmap
@@ -658,7 +659,8 @@ stacks:
       - reqwest
       - scraper
       - markdown
-    serde:
+    codec:
+      - rkyv # Zero-copy deserialization framework
       - serde
       - serde_derive
       - typetag
@@ -669,11 +671,13 @@ stacks:
       - serde_cbor
       - schemars
       - serde_yaml
-    tracing:
+      - toml
+      - kdl
+    logging:
       - tracing
       - tracing-subscriber
       - tracing-serde
-    ml:
+    science:
       - polars
       - nalgebra
       - linfa
@@ -759,7 +763,7 @@ stacks:
       # - pretty
     prelude:
       - classy-prelude
-    containers:
+    collections:
       - containers
       - unordered-containers
       - vector
@@ -774,11 +778,12 @@ stacks:
       - process
       - unix
     data:
+      - bytestring
+      - text
+    codec:
       - aeson
       - yaml
       - binary
-      - bytestring
-      - text
     web:
       - req
       - websockets
@@ -799,7 +804,7 @@ stacks:
     effects:
       # - extensible-effects
       # - extensible-exception
-    parsing:
+    parser:
       - megaparsec
       # - Earley
       # - parsers
@@ -821,7 +826,7 @@ stacks:
       # - QuickCheck
       # - falsify
       # - hspec
-    math:
+    science:
       # - hmatrix
       # - linear
       # - statistics

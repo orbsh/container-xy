@@ -26,10 +26,10 @@ export def main [context: record = {}] {
         ]
 
         utils resolve-stack [stacks haskell] [
-            dev core containers
-            io data web lens parsing
+            dev core collections
+            io data codec web lens parser
             regex concurrency streaming
-            # prelude effects testing math cli logging
+            # prelude effects testing science cli logging
             # generic persistence random scraping
         ] []
         | str join ' '
