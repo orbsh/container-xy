@@ -18,15 +18,9 @@ export def main [context: record = {}] {
             MASTER: $ctx.user
         }
         pkg refresh
-        pkg install [
-            sudo cronie tzdata
-            # base-devel
-            # nushell
-            git
-            openssh rsync dropbear s3fs
-            strace tcpdump socat websocat
-            ripgrep fd dust
-            tree
+        pkg install --stack [
+            base dev ssh net db s3
+            diag file archive network-tools
         ]
         setup timezone $ctx.timezone
         setup sudo

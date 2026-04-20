@@ -20,8 +20,11 @@ def resolve-stack [col stack pkgs] {
     | uniq
 }
 
-export def install [pkgs] {
-    let pkgs = $pkgs | str join ' '
+export def install [
+    pkgs: list<string> = []
+    --stack(-s): list<string> = []
+] {
+    let pkgs = resolve-stack [stacks $env.OS_RELEASE_ID] $stack $pkgs | str join ' '
     match $env.OS_RELEASE_ID {
         arch => {
             b run [
@@ -41,8 +44,12 @@ export def install [pkgs] {
     }
 }
 
-export def with [pkgs act] {
-    let pkgs = $pkgs | str join ' '
+export def with [
+    pkgs: list<string>
+    act
+    --stack(-s): list<string> = []
+] {
+    let pkgs = resolve-stack [stacks $env.OS_RELEASE_ID] $stack $pkgs | str join ' '
     match $env.OS_RELEASE_ID {
         arch => {
             b run [

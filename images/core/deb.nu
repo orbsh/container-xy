@@ -18,17 +18,9 @@ export def main [context: record = {}] {
             MASTER: $ctx.user
         }
         pkg refresh
-        pkg install [
-            sudo attr procps htop cron tzdata
-            # base-devel
-            # nushell
-            ca-certificates
-            curl openssh-client rsync s3fs
-            strace tcpdump socat
-            sqlite3 patch tree
-            xz-utils zstd zip unzip
-            lsof inetutils-ping iproute2 net-tools
-            nftables iptables
+        pkg install --stack [
+            base dev ssh net db s3
+            diag file archive network-tools
         ]
         setup timezone $ctx.timezone
         setup sudo

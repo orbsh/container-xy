@@ -493,6 +493,90 @@ packages:
       - wrap bin
 
 stacks:
+  arch:
+    base:
+      - sudo
+      - cronie
+      - tzdata
+    dev:
+      - git
+    ssh:
+      - openssh
+      - dropbear
+    s3:
+      - s3fs
+    net:
+      - rsync
+      - websocat
+    diag:
+      - strace
+      - tcpdump
+      - socat
+    file:
+      - ripgrep
+      - fd
+      - dust
+      - patch
+      - tree
+    archive: []
+    network-tools: []
+    container:
+      - buildah
+      - skopeo
+      - podman
+    json:
+      - jq
+    db: []
+    vpn:
+      - wireguard-tools
+      - openresolv
+  debian:
+    base:
+      - sudo
+      - attr
+      - procps
+      - htop
+      - cron
+      - tzdata
+    dev: []
+    ssh:
+      - openssh-client
+    s3:
+      - s3fs
+    net:
+      - curl
+      - ca-certificates
+      - rsync
+    diag:
+      - strace
+      - tcpdump
+      - socat
+      - lsof
+    file:
+      - patch
+      - tree
+    archive:
+      - xz-utils
+      - zstd
+      - zip
+      - unzip
+    network-tools:
+      - inetutils-ping
+      - iproute2
+      - net-tools
+      - nftables
+      - iptables
+    container:
+      - buildah
+      - skopeo
+      - podman
+    json:
+      - jq
+    db:
+      - sqlite3
+    vpn:
+      - wireguard-tools
+      - openresolv
   python:
     web:
       - fastapi
