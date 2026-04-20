@@ -735,3 +735,117 @@ stacks:
     ui-dioxus:
       - dioxus-cli
     ui-sycamore: []
+  haskell:
+    dev:
+      - ghcid
+      # - implicit-hie
+      # - haskell-dap
+      # - ghci-dap
+      # - haskell-debug-adapter
+    core:
+      - base
+      - deepseq
+      - call-stack
+      - primitive
+      - ghc-prim
+      - template-haskell
+      # - array
+      # - hashable
+      # - fixed
+      # - mtl
+      # - fgl
+      # - clock
+      # - hpc
+      # - pretty
+    prelude:
+      - classy-prelude
+    containers:
+      - containers
+      - unordered-containers
+      - vector
+      - transformers
+      # - hashtables
+      # - dlist
+    io:
+      - time
+      - directory
+      - filepath
+      - shelly
+      - process
+      - unix
+    data:
+      - aeson
+      - yaml
+      - binary
+      - bytestring
+      - text
+    web:
+      - req
+      - websockets
+      - network
+      - servant
+      - wai
+      - warp
+      - network-uri
+      - http-conduit
+      - html
+      - taggy
+      - multipart
+    lens:
+      - lens
+      - recursion-schemes
+      - free
+      - singletons
+    effects:
+      # - extensible-effects
+      # - extensible-exception
+    parsing:
+      - megaparsec
+      # - Earley
+      # - parsers
+      # - dimension
+    concurrency:
+      - monad-par
+      - parallel
+      - async
+      - stm
+    regex:
+      - regex-base
+      - regex-posix
+      - regex-compat
+    streaming:
+      - pipes
+      - conduit
+      - machines
+    testing:
+      # - QuickCheck
+      # - falsify
+      # - hspec
+    math:
+      # - hmatrix
+      # - linear
+      # - statistics
+      # - ad
+      # - integrate
+    cli:
+      # - optparse-applicative
+    generic:
+      # - syb
+      # - uniplate
+      # - bound
+      # - unbound-generics
+      # - transformers-compat
+      # - boomerang
+    persistence:
+      # - persistent
+      # - memory
+      # - cryptonite
+    random:
+      # - mwc-random
+      # - MonadRandom
+      # - random
+    logging:
+      # - katip
+      # - monad-logger
+    scraping:
+      # - scot

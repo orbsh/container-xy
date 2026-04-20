@@ -73,7 +73,7 @@ def arch3 [a] {
 }
 
 export def install [
-    tags
+    pkgs
     --user: string
     --author(-A): string
     --target(-t): string = '/usr/local'
@@ -84,7 +84,7 @@ export def install [
     --with-python
 ] {
     trace inc-level
-    for t in $tags {
+    for t in $pkgs {
         trace o -p 'hub-install' $t
         (
             install-inner

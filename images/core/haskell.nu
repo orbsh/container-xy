@@ -1,4 +1,5 @@
 use ../../bx *
+use ../../bx/utils.nu
 
 export def main [context: record = {}] {
     {
@@ -10,51 +11,26 @@ export def main [context: record = {}] {
     | build {|ctx|
         pkg install [
             ghc cabal-install
-            # stack
+            stack
             haskell-language-server
             stylish-haskell hlint
         ]
-        [
-            ghcid # implicit-hie
-            # haskell-dap ghci-dap haskell-debug-adapter
-            deepseq call-stack primitive ghc-prim
-            template-haskell aeson yaml
-            classy-prelude base binary bytestring text
-            containers unordered-containers vector transformers
-            time directory filepath
-            shelly process unix
-            req websockets network servant wai warp network-uri
-            # extensible-effects extensible-exceptio
-            lens recursion-schemes free
-            megaparsec # Earley
-            singletons
-            monad-par parallel async stm
-            regex-base regex-posix regex-compat
-            pipes conduit machines
-            # QuickCheck falsify hspec
-            # hmatrix linear
-            # statistics ad integrati
-            # parsers dimension
-            # scot
-            http-conduit html taggy multipart
-            # optparse-applicative
-            # clock hpc pretty
-            # array hashtables dlist
-            # hashable
-            # fixed mtl fgl
-            # boomerang
-            # bound unbound-generics transformers-compat
-            # syb uniplate
-            # persistent memory cryptonite
-            # mwc-random MonadRandom random
-            # katip monad-logger
-        ]
+
+        utils resolve-stack [stacks haskell] [
+            dev core containers
+            io data web lens parsing
+            regex concurrency streaming
+            # prelude effects testing math cli logging
+            # generic persistence random scraping
+        ] []
         | str join ' '
-        # | run [
-        #     'cabal update'
-        #     $'cabal install ($in)'
-        #     'cabal clean'
-        # ]
+        | inspect
+        | run [
+            'cabal update'
+            $'cabal install ($in)'
+            'cabal clean'
+        ]
+
         with-mount {
             r#'
             :set prompt "λ: "
