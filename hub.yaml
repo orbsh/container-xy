@@ -498,6 +498,8 @@ stacks:
       - fastapi
       - uvicorn[all]
       - httpx
+    http:
+      - httpx
     dev:
       - ty
       - debugpy
@@ -507,6 +509,10 @@ stacks:
       - aiostream
     cli:
       - typer
+      - ipython
+    data:
+      - polars
+      - numpy
     utils:
       - pydantic
       - pydantic-graph

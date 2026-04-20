@@ -65,11 +65,10 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
-        pkg setup py [
+        pkg setup py --stack [
+            data http utils
+        ] [
             'psycopg[binary]'
-            numpy polars httpx pyyaml
-            PyParsing
-            boltons decorator
             zstandard
         ]
 
