@@ -18,6 +18,7 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         conf env $ctx.env
+        conf path [ ($ctx.env.CARGO_HOME)/bin ]
 
         pkg install [
             rustup lldb
