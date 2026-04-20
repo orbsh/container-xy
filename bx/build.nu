@@ -1,4 +1,5 @@
 use trace.nu
+use history.nu [init-history consume-history]
 const SCRIPTS_DIR = path self ..
 
 export def --env main [
@@ -31,6 +32,7 @@ export def --env main [
 
     let os_id = $mountpoint | path join etc/os-release | os-id
 
+    init-history
     let envs = {
         OS_RELEASE_ID: $os_id
         BUILDAH_WORKING_CONTAINER: $working_container
@@ -56,11 +58,15 @@ export def --env main [
 
     let image = ($ctx.image):($ctx.tag? | default 'latest')
     trace o -p commit $image
+
+    let msg = consume-history
+    buildah config --add-history --comment $msg $working_container
+
+    mut args = [--format docker --rm]
     if $squash {
-        buildah commit --format docker --rm --squash $working_container $image
-    } else {
-        buildah commit --format docker --rm $working_container $image
+        $args ++= [--squash]
     }
+    buildah commit ...$args $working_container $image
 
     if not ($ctx.skip_push? | default false) {
         trace o push $image

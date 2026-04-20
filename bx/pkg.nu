@@ -2,6 +2,7 @@ use b.nu
 use hub.nu
 use rust.nu
 use utils.nu *
+use history.nu [add-history]
 
 
 
@@ -10,6 +11,7 @@ export def install [
     --stack(-s): list<string> = []
 ] {
     let pkgs = resolve-stack [stacks $env.OS_RELEASE_ID] $stack $pkgs | str join ' '
+    add-history $"install: ($pkgs | str join ' ')"
     match $env.OS_RELEASE_ID {
         arch => {
             b run [
@@ -27,7 +29,6 @@ export def install [
             ]
         }
     }
-    b add-history $"install: ($pkgs | str join ' ')"
 }
 
 export def with [
@@ -105,6 +106,7 @@ export def 'py install' [
 ] {
     let pkgs = resolve-stack [stacks python] $stack $pkgs
     if ($pkgs | is-empty) { return }
+    add-history $"py install: ($pkgs | str join ' ')"
 
     let pip = match $env.OS_RELEASE_ID {
         debian => "pip3"
@@ -116,7 +118,6 @@ export def 'py install' [
     }
     $cmd ++= $pkgs
     b run [ ($cmd | str join ' ') ]
-    b add-history $"py install: ($pkgs | str join ' ')"
 }
 
 export def 'setup py' [
@@ -142,6 +143,7 @@ export def 'js install' [
 ] {
     let pkgs = resolve-stack [stacks js] $stack $pkgs
     if ($pkgs | is-empty) { return }
+    add-history $"js install: ($pkgs | str join ' ')"
 
     match $runtime {
         node => {
@@ -156,7 +158,6 @@ export def 'js install' [
             ]
         }
     }
-    b add-history $"js install: ($pkgs | str join ' ')"
 }
 
 export def 'setup js' [

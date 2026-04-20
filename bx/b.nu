@@ -1,32 +1,33 @@
 use trace.nu
-
-export def add-history [msg] {
-    buildah config --add-history --created-by $msg $env.BUILDAH_WORKING_CONTAINER
-}
+use history.nu [consume-history add-history]
 
 export def copy [src dst] {
     trace inc-level
     trace o copy $src $dst
-    buildah copy $env.BUILDAH_WORKING_CONTAINER $src $dst
     add-history $"copy: ($src) -> ($dst)"
+    buildah copy $env.BUILDAH_WORKING_CONTAINER $src $dst
 }
 
 export def run [cmd: list] {
     trace inc-level
+    add-history $"bash -c: ($cmd)"
     let cmd = $cmd | str join ' && ' | trace f run
     buildah run $env.BUILDAH_WORKING_CONTAINER bash -c $cmd
-    add-history $"bash -c: ($cmd)"
 }
 
 export def exec [cmd: list] {
     trace inc-level
+    add-history $"nu -c: ($cmd)"
     let cmd = $cmd | str join (char newline) | trace f run-with-nu
     buildah run $env.BUILDAH_WORKING_CONTAINER nu -c $cmd
-    add-history $"nu -c: ($cmd)"
 }
 
 export def commit [image] {
+    trace o -p commit $image
+    let msg = consume-history
+    buildah config --add-history --comment $msg $env.BUILDAH_WORKING_CONTAINER
     buildah commit --format docker --rm $env.BUILDAH_WORKING_CONTAINER $image
+    rm -f $env.BUILDAH_WORKING_HISTORY
 }
 
 export def with-mount [act] {

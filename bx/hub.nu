@@ -4,6 +4,7 @@ use transformer.nu
 use extract.nu
 use b.nu
 use utils.nu *
+use history.nu [add-history]
 
 export def get-version [cfg]: nothing -> string {
     trace inc-level
@@ -84,6 +85,7 @@ export def install [
     --with-python
 ] {
     trace inc-level
+    add-history $"hub-install: ($pkgs | str join ' ')"
     for t in $pkgs {
         trace o -p 'hub-install' $t
         (
@@ -99,7 +101,6 @@ export def install [
             --with-python=$with_python
         )
     }
-    b add-history $"hub-install: ($pkgs | str join ' ')"
 }
 
 
