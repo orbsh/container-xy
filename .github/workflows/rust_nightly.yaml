@@ -59,6 +59,7 @@ jobs:
             tag: r9
             rust: {
               channel: nightly
+              frontend: dioxus
             }
           }
       - name: Delete untagged ghcr
