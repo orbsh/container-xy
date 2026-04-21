@@ -605,6 +605,8 @@ stacks:
       - jinja2
       - boltons
       - decorator
+    logging:
+      - structlog
     codec:
       - pyyaml
   js:

@@ -40,7 +40,7 @@ export def main [context: record = {}] {
         ]
 
         pkg setup py --stack [
-            web dev io cli utils codec
+            web dev io cli utils logging codec
         ]
         pkg setup js --stack [
             dev utils
