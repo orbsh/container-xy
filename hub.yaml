@@ -605,6 +605,7 @@ stacks:
       - jinja2
       - boltons
       - decorator
+      - shortuuid
     logging:
       - structlog
     codec:
@@ -637,6 +638,7 @@ stacks:
       - linkme
       - jiff
       - bumpalo
+      - short-uuid
     regex:
       - regex
       - regex-syntax
