@@ -580,7 +580,7 @@ stacks:
   python:
     web:
       - fastapi
-      - uvicorn[all]
+      - uvicorn[standard]
       - httpx
     http:
       - httpx
