@@ -639,6 +639,8 @@ stacks:
       - jiff
       - bumpalo
       - short-uuid
+      - time
+      - rand
     regex:
       - regex
       - regex-syntax
@@ -681,6 +683,7 @@ stacks:
       - tracing
       - tracing-subscriber
       - tracing-serde
+      - tracing-wasm
     science:
       - polars
       - nalgebra
@@ -705,6 +708,7 @@ stacks:
       - parking_lot
     web:
       - axum
+      - axum-extra
       - async-graphql
       - async-graphql-axum
       - sqlx
@@ -728,6 +732,7 @@ stacks:
       - wasm-bindgen-futures
       - wasm-logger
       - gloo-net
+      - web-sys
     ui-leptos:
       - leptos
       - wee_alloc
