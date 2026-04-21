@@ -32,32 +32,29 @@ export def main [context: record = {}] {
 
         pkg refresh
         let pg_pkgs = [
+            wal2json
+            rational
+            cron
+            extra-window-functions
+            first-last-agg
+            ip4r
+            jsquery
+            pgaudit
+            repack
+        ]
+        | each { $"postgresql-{version}-($in)" }
+        | append [
             pgxnclient
             postgresql-plpython3-{version}
-            postgresql-{version}-repack
-            postgresql-{version}-wal2json
-            postgresql-{version}-rational
-            postgresql-{version}-cron
-            postgresql-{version}-extra-window-functions
-            postgresql-{version}-first-last-agg
-            postgresql-{version}-ip4r
-            postgresql-{version}-jsquery
-            postgresql-{version}-pgaudit
         ]
         | each {|x|
             {version: $ctx.pg_version_major} | format pattern $x
         }
-        pkg install [
-            sudo attr procps htop cron
-            curl libcurl4 ca-certificates uuid
-            openssh-client rsync s3fs
-            strace tcpdump socat
-            jq sqlite3 patch tree
-            xz-utils zstd zip unzip
-            lsof inetutils-ping iproute2 net-tools
-            nftables iptables
-            ...$pg_pkgs
+        pkg install $pg_pkgs --stack [
+            base net ssh diag network-tools
+            file archive s3 json db
         ]
+
 
         nushell setup '/usr/local' {
             user: root
