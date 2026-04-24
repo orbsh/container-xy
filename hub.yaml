@@ -582,9 +582,9 @@ stacks:
       - fastapi
       - uvicorn[standard]
       - httpx
+      - websockets
     http:
       - httpx
-      - websockets
     dev:
       - ty
       - debugpy
