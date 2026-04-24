@@ -29,7 +29,7 @@ export def main [context: record = {}] {
             dev core collections
             io data codec web lens parser
             regex concurrency streaming
-            # prelude effects testing science cli logging
+            # prelude effects testing data cli logging
             # generic persistence random scraping
         ] []
         | str join ' '

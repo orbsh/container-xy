@@ -9,10 +9,9 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         pkg setup py --stack [
-            web dev io cli utils logging codec
+            web dev io cli utils logging data codec
         ] [
             agno openai
-            zstandard
         ]
     }
 }

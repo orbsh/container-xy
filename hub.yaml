@@ -584,6 +584,7 @@ stacks:
       - httpx
     http:
       - httpx
+      - websockets
     dev:
       - ty
       - debugpy
@@ -594,9 +595,9 @@ stacks:
     cli:
       - typer
       - ipython
-    science:
+    data:
       - polars
-      - numpy
+      - zstandard
     utils:
       - pydantic
       - pydantic-graph
@@ -684,7 +685,7 @@ stacks:
       - tracing-subscriber
       - tracing-serde
       - tracing-wasm
-    science:
+    data:
       - polars
       - nalgebra
       - linfa
@@ -779,6 +780,8 @@ stacks:
       - transformers
       # - hashtables
       # - dlist
+      - bytestring
+      - text
     io:
       - time
       - directory
@@ -786,9 +789,6 @@ stacks:
       - shelly
       - process
       - unix
-    data:
-      - bytestring
-      - text
     codec:
       - aeson
       - yaml
@@ -835,7 +835,7 @@ stacks:
       # - QuickCheck
       # - falsify
       # - hspec
-    science:
+    data:
       # - hmatrix
       # - linear
       # - statistics

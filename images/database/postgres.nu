@@ -63,10 +63,9 @@ export def main [context: record = {}] {
         }
 
         pkg setup py --stack [
-            science http utils
+            data http utils
         ] [
-            'psycopg[binary]'
-            zstandard
+            'psycopg[binary]' numpy
         ]
 
         conf env {

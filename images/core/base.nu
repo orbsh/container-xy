@@ -35,12 +35,10 @@ export def main [context: record = {}] {
             plugins: [query]
         }
 
-        hub install --user $ctx.user -A $ctx.author [
-            duckdb
-        ]
+        # hub install --user $ctx.user -A $ctx.author [ duckdb ]
 
         pkg setup py --stack [
-            web dev io cli utils logging codec
+            web dev io cli utils logging data codec
         ]
         pkg setup js --stack [
             dev utils
