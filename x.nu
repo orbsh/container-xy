@@ -1,5 +1,5 @@
 const CWD = path self .
-const CFG = path self ,.toml
+const CFG = path self x.toml
 const NU_LIB_DIRS = ['($CWD)']
 
 export module hub {
