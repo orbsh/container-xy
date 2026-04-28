@@ -654,7 +654,8 @@ stacks:
       - itertools
       - derive_more
     collections:
-      - refined_type
+      # - refined_type
+      - nutype
       - dashmap
       - indexmap
       - maplit
@@ -691,8 +692,10 @@ stacks:
       - linfa
       - burn
       - plotlars
-    parallel:
+    concurrency:
       - rayon
+      - crossbeam
+      - parking_lot
     async:
       - tokio
       - tokio-util
@@ -704,9 +707,6 @@ stacks:
       - async-stream
       - async-trait
       - async-fs
-    concurrency:
-      - crossbeam
-      - parking_lot
     web:
       - axum
       - axum-extra
