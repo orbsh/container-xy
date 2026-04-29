@@ -10,7 +10,7 @@ def derive [context tag pkg] {
     | merge { tag: $tag }
     | build {|ctx|
         pkg setup py --stack [
-            web dev io cli utils logging data codec
+            web dev io cli utils logging codec
         ]  $pkg
 
     }
@@ -20,7 +20,8 @@ export def main [context: record = {}] {
     for i in [
         [py]
         [py-agno openai agno]
-        [py-hermes openai hermes-agent]
+        [py-data polars lancedb zstandard]
+        # [py-hermes openai hermes-agent]
     ] {
         derive $context $i.0 ($i | skip 1)
     }

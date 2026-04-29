@@ -597,6 +597,7 @@ stacks:
       - ipython
     data:
       - polars
+      - lancedb
       - zstandard
     utils:
       - pydantic
