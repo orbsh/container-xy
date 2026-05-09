@@ -720,6 +720,7 @@ stacks:
       - wasmtime
       - wasmi
     script:
+      - pyo3
       - steel-core
       - steel-repl
       - koto
