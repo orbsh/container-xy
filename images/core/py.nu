@@ -1,8 +1,8 @@
 use ../../bx *
 
-def derive [context tag pkg] {
+def derive [context src tag pkg] {
     {
-        from: $'($context.image):deb'
+        from: $'($context.image):($src)'
         user: master
         workdir: /home/master
     }
@@ -20,13 +20,14 @@ def derive [context tag pkg] {
 }
 
 export def main [context: record = {}] {
+    mut from = 'deb'
     for i in [
         [py]
-        [py-agno openai agno]
         [py-data polars lancedb zstandard]
-        [py-hermes openai git+https://github.com/NousResearch/hermes-agent.git]
+        [py-hermes openai agno git+https://github.com/NousResearch/hermes-agent.git]
     ] {
-        derive $context $i.0 ($i | skip 1)
+        let tag = $i.0
+        derive $context $from $tag ($i | skip 1)
+        $from = $tag
     }
-
 }
