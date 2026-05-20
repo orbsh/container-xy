@@ -58,3 +58,34 @@ hub install $pkg -c $ctx.cache? -t /opt/vessel --bundle --with-python
 
 - **`x.toml`**: Defines image manifests, repository targets, and CI mapping.
 - **`hub.yaml`**: The source of truth for all third-party package versions and download links.
+
+## Entrypoint Framework
+
+All service images share a unified **Nushell-based startup framework** (located in `entrypoint/libs/`).
+
+### Task Queue System (`libs/tasks/jobs.nu`)
+Instead of running multiple background processes with `&` and `wait`, the framework implements a lightweight **task queue** based on a temporary file (`$env.TASKSEQ`) and `tail -f`.
+
+**Architecture:**
+```
+init → TASKSEQ (tmp file) → tail -f listener → spawn append → run (job spawn)
+wait monitors job list, any exit kills all → container restart
+```
+
+**Key Design Decisions:**
+
+* **All-or-Nothing Lifecycle**: If any task exits, the `wait` function detects `active < total`, kills all remaining jobs, and exits — allowing the container runtime (K8s) to restart the pod.
+* **No External Dependencies**: Rejected `pueue` (external dependency) and `sqlite` (overkill). Uses only Nushell's built-in `job spawn`/`job list`/`job kill`.
+* **Structured Command Execution**: `cmd` is a **list of strings** (not a joined shell command). The first element is the binary, the rest are arguments. Avoids shell injection.
+* **Nushell Pipeline Support**: When `shell: true`, commands are executed via `nu -c`, allowing Nushell features (pipes, redirects) without forking bash.
+* **Unified Log Routing**: All tasks route through `tee /proc/1/fd/1` to appear in the container runtime's log stream.
+* **Polling Tasks**: Supports `polling_interval` for periodic tasks.
+
+### Script Conventions
+* **No Executable Permission Needed**: Scripts are parsed by the framework interpreter. No `chmod +x` required.
+* **No Manual Output**: The framework handles message printing and lifecycle management.
+* **Entrypoint Script Syntax**: Scripts are embedded in raw strings (`r#'...'#`) and executed by Nushell at runtime:
+  - ❌ Bash line continuation: `command --flag \` → literal backslash
+  - ✅ Nushell spread: `^command ...[ --flag1 --flag2 ]`
+  - ✅ Nushell interpolation: `$"prefix ($var)"`
+* **Binary Paths**: `hub install` defaults to `/usr/local/bin`. Use absolute paths (e.g., `^/usr/local/bin/warpgate`) in entrypoint scripts, do not rely on `$env.PATH`.

@@ -341,7 +341,8 @@ packages:
     repo: warp-tech/warpgate
     uri: download/{version}/warpgate-{version}-{arch}-linux
     unpack:
-      - rename 'warpgate*' warpgate
+      - mv warpgate-{version}-{arch}-linux warpgate
+      - chmodx warpgate
       - wrap bin
   zot:
     repo: project-zot/zot

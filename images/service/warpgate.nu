@@ -18,19 +18,21 @@ export def main [context: record = {}] {
                 $passwd | save /data/passwd
                 print $"setup warpgate with admin-password: ($passwd)"
 
-                ^warpgate unattended-setup \
-                    --data-path /data \
-                    --database-url 'sqlite:/data/db' \
-                    --ssh-port 12222 \
-                    --http-port 8888 \
-                    --mysql-port 33306 \
-                    --record-sessions \
+                /usr/local/bin/warpgate ...[
+                    unattended-setup
+                    --data-path /data
+                    --database-url 'sqlite:/data/db'
+                    --ssh-port 12222
+                    --http-port 8888
+                    --mysql-port 33306
+                    --record-sessions
                     --admin-password $passwd
+                ]
 
                 mv /etc/warpgate.yaml /data/warpgate.yaml
             }
 
-            ^warpgate --config /data/warpgate.yaml run
+            /usr/local/bin/warpgate --config /data/warpgate.yaml run
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
@@ -38,13 +40,12 @@ export def main [context: record = {}] {
         }
 
         with-mount {
-            mkdir /data
-            mkdir /data/ssh-keys
-            mkdir /data/recordings
-            mkdir /data/db
+            mkdir data/ssh-keys
+            mkdir data/recordings
+            mkdir data/db
         }
 
         conf workdir /data
-        conf entrypoint ['srv']
+        conf cmd ['srv']
     }
 }
