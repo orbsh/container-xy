@@ -337,6 +337,12 @@ packages:
     unpack:
       - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
       - wrap bin
+  warpgate:
+    repo: warp-tech/warpgate
+    uri: download/{version}/warpgate-{version}-{arch}-linux
+    unpack:
+      - rename 'warpgate*' warpgate
+      - wrap bin
   zot:
     repo: project-zot/zot
     exclude_vessel: true

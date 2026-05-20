@@ -1,6 +1,6 @@
 # bx Framework
 
-The `bx` framework is a Nushell-based container image building framework that wraps `buildah` functionality. It provides a flexible way to build container images using Nushell scripts with full programming language capabilities.
+The `bx` framework is a Nushell-based container image building framework that wraps `buildah` functionality. It is the core engine of the [xy](../README.md) image repository, replacing traditional Dockerfiles with programmable Nushell scripts.
 
 ## Build Context Fields
 
@@ -93,3 +93,47 @@ The `bx` module exports the following submodules:
 - `reverse.nu` - Reverse proxy utilities
 - `upterm.nu` - Uterm terminal utilities
 - `utils.nu` - Utility functions (`relative-path`, `into-tree`)
+
+## Nushell Entrypoint Framework
+
+All service images share a unified **Nushell-based startup framework** (located in `entrypoint/libs/`).
+
+### Task Queue System (`libs/tasks/jobs.nu`)
+Instead of running multiple background processes with `&` and `wait`, the framework implements a lightweight **task queue** based on a temporary file (`$env.TASKSEQ`) and `tail -f`.
+
+**Architecture:**
+```
+init → TASKSEQ (tmp file) → tail -f listener → spawn append → run (job spawn)
+wait monitors job list, any exit kills all → container restart
+```
+
+**Key Design Decisions:**
+
+* **All-or-Nothing Lifecycle**: If any task exits, the `wait` function detects `active < total`, kills all remaining jobs, and exits — allowing the container runtime (K8s) to restart the pod. This ensures services don't run in a partially-degraded state.
+* **No External Dependencies**: Rejected `pueue` (external dependency) and `sqlite` (overkill). Uses only Nushell's built-in `job spawn`/`job list`/`job kill`.
+* **Structured Command Execution**: `cmd` is a **list of strings** (not a joined shell command). The first element is the binary, the rest are arguments. Avoids shell injection and parsing ambiguity.
+* **Nushell Pipeline Support**: When `shell: true`, commands are executed via `nu -c`, allowing Nushell features (pipes, redirects) without forking a bash process.
+* **Unified Log Routing**: All tasks route stdout/stderr through `tee /proc/1/fd/1` to ensure logs appear in the container runtime's log stream.
+* **No Race Conditions**: `job spawn` is synchronous — jobs appear in the job list immediately. No startup race between `spawn` and `wait`.
+* **Polling Tasks**: Supports `polling_interval` for tasks that need periodic restart (e.g., health checks, cron-like jobs).
+
+### Script Conventions
+* **No Executable Permission Needed**: Scripts are parsed and run by the framework interpreter. No `chmod +x` required.
+* **No Manual Output**: The framework handles message printing and lifecycle management. Scripts do not need to manually `print` logs.
+
+## Best Practices
+
+### `with-mount` Execution Context
+`with-mount` is executed **on the host machine**, but the path context is the **container's filesystem** (mounted via buildah).
+
+This is a major paradigm shift from Dockerfiles:
+*   **Dockerfile**: `RUN` commands execute *inside* the build container layer.
+*   **bx**: You have full access to the mounted container directory from the host. You can use the host's powerful tools (like Nushell) to generate, modify, and organize files directly into the image layers without running a shell inside the build context.
+
+```nushell
+# Generates a config on the host, but saves it into the container's /etc/
+with-mount {
+    r#':8080 { root "/srv" }'#
+    | save etc/ferron.kdl
+}
+```
