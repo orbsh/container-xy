@@ -35,4 +35,32 @@ export def main [context: record = {}] {
         pkgs: [openai agno git+https://github.com/NousResearch/hermes-agent.git]
         stack: []
     }
+
+    {
+        from: $'($context.image):py-data'
+        user: master
+        workdir: /home/master
+    }
+    | merge $context
+    | merge { tag: py-duckdb }
+    | build {|ctx|
+        pkg setup py [duckdb]
+
+        [
+            httpfs
+            # vortex
+            delta
+            ducklake
+            iceberg
+            lance
+            postgres
+            mysql
+            sqlite
+            fts
+        ]
+        | each {|x|
+            $"python3 -c \"import duckdb; duckdb.execute\('INSTALL ($x);'\)\""
+        }
+        | run $in
+    }
 }
