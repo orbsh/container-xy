@@ -2,7 +2,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):deb'
+        from: $'($context.image):wireguard'
         image: $context.image
         tag: 'warpgate'
     }
