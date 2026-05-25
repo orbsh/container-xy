@@ -25,24 +25,19 @@ export def main [context: record = {}] {
         [tag pkgs stack];
         [py [] [web dev io cli utils logging codec]]
         [py-data [polars lancedb zstandard] []]
+        [py-agent [openai agno git+https://github.com/NousResearch/hermes-agent.git] []]
     ] {
         derive $context $from $i
         $from = $i.tag
     }
 
-    derive $context py {
-        tag: py-agent
-        pkgs: [openai agno git+https://github.com/NousResearch/hermes-agent.git]
-        stack: []
-    }
-
     {
-        from: $'($context.image):py-data'
+        from: $'($context.image):py-agent'
         user: master
         workdir: /home/master
     }
     | merge $context
-    | merge { tag: py-duckdb }
+    | merge { tag: py-duck-agent }
     | build {|ctx|
         pkg setup py [duckdb]
 
