@@ -13,6 +13,8 @@ export def main [context: record = {}] {
         with-mount {
             r#'
             #!/usr/bin/env nu
+            use libs/tasks.nu
+
             if not ('/data/warpgate.yaml' | path exists) {
                 let passwd = (random chars -l 19)
                 $passwd | save /data/passwd
@@ -32,7 +34,14 @@ export def main [context: record = {}] {
                 mv /etc/warpgate.yaml /data/warpgate.yaml
             }
 
-            /usr/local/bin/warpgate --config /data/warpgate.yaml run
+            tasks spawn {
+                tag: warpgate
+                cmd: [
+                    /usr/local/bin/warpgate
+                    --config /data/warpgate.yaml
+                    run
+                ]
+            }
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
