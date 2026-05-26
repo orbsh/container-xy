@@ -43,7 +43,7 @@ export def main [context: record = {}] {
 
         [
             httpfs
-            # vortex
+            vortex
             delta
             ducklake
             iceberg
