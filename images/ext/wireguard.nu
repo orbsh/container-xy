@@ -36,25 +36,15 @@ export def main [context: record = {}] {
             }
 
             def run-wireguard [] {
-                cd /etc/wireguard
-                let its = ls *.conf
-                | get name
-                | each {|x| $x | path parse | get stem }
+                let its = glob /etc/wireguard/*.conf
+                | path parse
+                | get stem
 
-                resolvconf -u
+                # resolvconf -u
                 for i in $its {
-                    # do -i { ip link delete $i }
                     wg-quick up $i
                     print $"==> wg entrypoint: ($i)"
                 }
-
-                # $its | each {|i|
-                #     {
-                #         tag: $"wireguard_($i)"
-                #         cmd: ([wg-quick up $i] | str join ' ')
-                #     }
-                # }
-                # | tasks spawn ...$in
             }
 
             run-wireguard
