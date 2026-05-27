@@ -258,6 +258,14 @@ export module test {
         ^$env.CNTRCTL run ...$flag $image
     }
 
+    export def hooks [
+        hook: path = scripts/hook_x.nu
+        payload: path = scripts/hook_x.nu
+    ] {
+        curl -sSL --progress-bar -X PUT -T $hook $"localhost:9900/box/__hooks__/($payload)"
+        curl -sSL --progress-bar -X PUT -T $payload $"localhost:9900/box/($payload)"
+    }
+
     export def run [
         --user(-u)
         --socat

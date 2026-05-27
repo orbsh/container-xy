@@ -7,11 +7,31 @@ export def main [] {
     match ($env.REQUEST_METHOD | str downcase) {
         post | put => {
             let i = $in | upload
-            if ($env.WEBHOOK_UPLOAD? | is-not-empty) {
-                webhook $env.WEBHOOK_URI $i
-            }
+            let hook = [
+                $env.DOCUMENT_ROOT
+                # HACK: hardcode
+                'box'
+                ($env.HOOKS_PATH? | default '__hooks__')
+                ...($env.PATH_INFO | path split | skip 2)
+            ]
+            | path join
+
             content -j
-            $i | to json -r
+
+            if ($hook | path exists) {
+                let workdir = mktemp -d
+                cd $workdir
+                let script = [$workdir run.nu] | path join
+                $"(open -r $hook)\n\nexport def main [] { let o = $in | from json; file_uploaded $o }" | save -f $script
+                $i
+                | insert location {|x| $env.DOCUMENT_ROOT | path join ($x.filename | str substring 1..)}
+                | to json -r
+                | nu --stdin $script
+                cd ..
+                rm -rf $workdir
+            } else {
+                $i | to json -r
+            }
         }
         _ => {
             index
@@ -45,15 +65,5 @@ def upload [] {
         size: $size
         filename: $env.PATH_INFO,
         timestamp: (date now | format date "%+")
-    }
-}
-
-
-def webhook [url payload] {
-    try {
-        let response = (http post -t application/json $url $payload)
-        { status: "success", webhook_response: $response }
-    } catch {
-        { status: "error", message: "Webhook failed" }
     }
 }

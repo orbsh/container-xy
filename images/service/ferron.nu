@@ -55,7 +55,6 @@ export def main [context: record = {}] {
 
         conf env {
             CONFIGFILE: /srv/ferron/box.kdl
-            WEBHOOK_URI: ''
         }
 
         conf workdir $ctx.workdir
