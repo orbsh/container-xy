@@ -17,8 +17,7 @@ export def main [] {
     } else if ($p | str starts-with '/redirect') {
     } else {
         content -j
-        { hello: 'world' }
-        | to json -r
+        fallback | to json -r
     }
 }
 
@@ -82,4 +81,9 @@ def info [] {
         headers: $h
         body: $b
     }
+}
+
+
+def fallback [] {
+    { hello: 'world' }
 }
