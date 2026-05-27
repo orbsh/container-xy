@@ -45,10 +45,6 @@ export def is-binary-file []: binary -> bool {
     $in | first 512 | bytes index-of 0x[00] | $in >= 0
 }
 
-export def query [] {
-    $env.QUERY_STRING? | default '' | url split-query | reduce -f {} {|i,a| $a | insert $i.key $i.value }
-}
-
 export def path-to-file [] {
   $env.DOCUMENT_ROOT | path join ($env.PATH_INFO | str substring 1..)
 }

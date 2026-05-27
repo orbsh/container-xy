@@ -6,14 +6,16 @@ use $utils *
 export def main [] {
     let n = $in
     let path = $env.PATH_INFO | str downcase | path split | slice 1..
-    match $path {
-        [vessel install $arch $pkgs] => {
+    let q = $env.QUERY_STRING? | default '' | url split-query | reduce -f {} {|i,a| $a | insert $i.key $i.value }
+    let dest = $q.dest? | default $q.target? | default /usr/local
+    match [($q.op? | default '') ...$path] {
+        [install vessel $pkgs] => {
             content -p
             let invalid = $pkgs | split row ',' | where {|it|
-                '/opt/vessel' | path join $arch $"($it).tar.zst" | path exists | not $in
+                '/opt/vessel' | path join $q.arch $"($it).tar.zst" | path exists | not $in
             }
             if ($invalid | is-not-empty) {
-                cd ('/opt/vessel' | path join $arch)
+                cd ('/opt/vessel' | path join $q.arch)
                 let pkgs = do -i { ls *.tar.zst }
                 | default []
                 | get name
@@ -27,12 +29,10 @@ export def main [] {
                 | print $in
                 return
             }
-            let q = query
-            let dest = $q.dest? | default $q.target? | default /usr/local
             let r = $"
             for i in ($pkgs | split row ',') {
                 info $'install \($i\)'
-                install \($i\) $'($env.HTTP_HOST)/vessel/download/($arch)/\($i\).tar.zst' ($dest)
+                install \($i\) $'($env.HTTP_HOST)/vessel/\($i\).tar.zst?arch=($q.arch)&op=download' ($dest)
             }
             "
             | str trim
@@ -46,20 +46,20 @@ export def main [] {
             | str join (char newline)
             | print $in
         }
-        [vessel download $arch $pkg] => {
-            let f = '/opt/vessel' | path join $arch $pkg
+        [download vessel $pkg] => {
+            let f = '/opt/vessel' | path join $q.arch $pkg
             send-file $f
         }
-        [vessel $args] => {
+        ['' vessel $args] => {
             content -p
-            let q = if ($env.QUERY_STRING? | is-not-empty) { $'?($env.QUERY_STRING)' } else { '' }
+            let q = if ($env.QUERY_STRING? | is-not-empty) { $'&($env.QUERY_STRING)' } else { '' }
             $"
             ARCH=$\(uname -m\)
             if ! command -v nu >/dev/null 2>&1; then
                 echo \"nu not found. installing\"
-                curl -SL --progress-bar ($env.HTTP_HOST)/vessel/download/${ARCH}/nushell.tar.zst | zstd -d | tar -xf - -C /usr/local
+                curl -SL --progress-bar \"($env.HTTP_HOST)/vessel/nushell.tar.zst?arch=${ARCH}&op=download\" | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -SL --progress-bar ($env.HTTP_HOST)/vessel/install/${ARCH}/($args)($q) | $\(command -v nu\) --stdin -c 'nu -c $in'
+            curl -SL --progress-bar \"($env.HTTP_HOST)/vessel/($args)?arch=${ARCH}&op=install&dest=($dest)\" | $\(command -v nu\) --stdin -c 'nu -c $in'
             "
             | str trim
             | str replace -rma '^ {12}' ''
@@ -82,7 +82,7 @@ def tar-fs [f] {
 }
 
 def install [tag url loc] {
-    let file = $url | path split | last
+    let file = $url | url parse | get path | path split | last
     let file = '/tmp' | path join $file
     curl -SL --progress-bar $url -o $file
     let fs = tar-fs $file
