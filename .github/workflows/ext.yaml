@@ -51,7 +51,7 @@ jobs:
       - name: Setup Nushell
         uses: hustcer/setup-nu@v3
         with:
-          version: 0.112.1
+          version: '0.113.0'
 
       - name: build surreal
         shell: buildah unshare nu {0}
@@ -75,15 +75,15 @@ jobs:
             tag: postgres
           }
 
-      - name: build py
-        shell: buildah unshare nu {0}
+      - name: 'build hermes'
+        shell: 'buildah unshare nu {0}'
         run: |-
-          overlay use ${{ github.workspace }}/images/core/py.nu as build
+          overlay use ${{ github.workspace }}/images/tools/hermes.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tag: py
+            tag: hermes
           }
 
       - name: Build marimo
