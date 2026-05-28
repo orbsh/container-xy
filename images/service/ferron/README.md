@@ -1,5 +1,7 @@
 # Ferron: Lightweight Upload Gateway
 
+> `box.conf` and `php.conf` are configuration files prepared for **ferron3**.
+
 ## Overview
 Ferron includes a minimal, high-performance upload gateway component. It leverages Nushell's native capabilities and the local filesystem to trigger automated post-upload hooks with zero external dependencies (no Redis, no message queues).
 

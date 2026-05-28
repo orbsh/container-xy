@@ -6,6 +6,7 @@ The `xy` repository is a centralized container image registry and build system. 
 
 | Component | Description |
 |-----------|-------------|
+| **[ferron](images/service/ferron/README.md)** | Lightweight upload gateway with path-based Nushell hooks and streaming `tar+zstd` architecture. |
 | **[bx](bx/README.md)** | Nushell-based `buildah` wrapper. Replaces Dockerfiles with programmable Nushell scripts. Provides `build`, `hub install`, `with-mount`, and other primitives. |
 | **vessel** | Airgap distribution tool. Bundles packages defined in `hub.yaml` into compressed `.tar.zst` archives for offline environments. Built on top of `bx`. |
 | **hub.yaml** | Central package manifest. Defines download URLs, versions, and bundle configurations for all third-party dependencies. |
