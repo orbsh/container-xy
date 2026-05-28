@@ -8,8 +8,8 @@ export def main [] {
     let path = $env.PATH_INFO | str downcase | path split | slice 1..
     let q = $env.QUERY_STRING? | default '' | url split-query | reduce -f {} {|i,a| $a | insert $i.key $i.value }
     let dest = $q.dest? | default $q.target? | default /usr/local
-    match [($q.op? | default '') ...$path] {
-        [install vessel $pkgs] => {
+    match [$q.op? ...$path] {
+        [install $pkgs] => {
             content -p
             let invalid = $pkgs | split row ',' | where {|it|
                 '/opt/vessel' | path join $q.arch $"($it).tar.zst" | path exists | not $in
@@ -46,11 +46,11 @@ export def main [] {
             | str join (char newline)
             | print $in
         }
-        [download vessel $pkg] => {
+        [download $pkg] => {
             let f = '/opt/vessel' | path join $q.arch $pkg
             send-file $f
         }
-        ['' vessel $args] => {
+        [_ $args] => {
             content -p
             let q = if ($env.QUERY_STRING? | is-not-empty) { $'&($env.QUERY_STRING)' } else { '' }
             $"

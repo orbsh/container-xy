@@ -9,10 +9,8 @@ export def main [] {
             let i = $in | upload
             let hook = [
                 $env.DOCUMENT_ROOT
-                # HACK: hardcode
-                'box'
                 ($env.HOOKS_PATH? | default '__hooks__')
-                ...($env.PATH_INFO | path split | skip 2)
+                ...($env.PATH_INFO | path split | skip 1)
             ]
             | path join
 

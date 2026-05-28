@@ -6,5 +6,9 @@ use $utils *
 export def main [] {
     let n = $in
     content -j
-    envs | to json
+    {
+        handler: 'index.nu'
+        path_info: $env.PATH_INFO
+    }
+    | to json -r
 }

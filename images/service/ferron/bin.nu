@@ -85,5 +85,5 @@ def info [] {
 
 
 def fallback [] {
-    { hello: 'world' }
+    envs
 }
