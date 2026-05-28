@@ -11,33 +11,42 @@ def derive [context src layer] {
     | build {|ctx|
         if ($layer.pkgs | any {|x| $x | str starts-with git+https}) {
             pkg with [git] {
-                pkg setup py --stack $layer.stack $layer.pkgs
+                pkg py install --stack $layer.stack $layer.pkgs
             }
         } else {
-            pkg setup py --stack $layer.stack $layer.pkgs
+            pkg py install --stack $layer.stack $layer.pkgs
         }
     }
 }
 
 export def main [context: record = {}] {
-    mut from = 'deb'
+    {
+        from: $'($context.image):deb'
+        user: master
+        workdir: /home/master
+    }
+    | merge $context
+    | merge { tag: py }
+    | build {|ctx|
+        pkg setup py --stack [web dev io cli utils logging codec]
+    }
+
+    mut from = 'py'
     for i in [
         [tag pkgs stack];
-        [py [] [web dev io cli utils logging codec]]
         [py-data [polars lancedb zstandard] []]
-        [py-agent [openai agno git+https://github.com/NousResearch/hermes-agent.git] []]
     ] {
         derive $context $from $i
         $from = $i.tag
     }
 
     {
-        from: $'($context.image):py-agent'
+        from: $'($context.image):py-data'
         user: master
         workdir: /home/master
     }
     | merge $context
-    | merge { tag: py-duck-agent }
+    | merge { tag: py-duckdb }
     | build {|ctx|
         pkg setup py [duckdb]
 

@@ -118,14 +118,14 @@ export module action {
                                     version: $nu_ver
                                 }
                             },
-                            {
-                                name: "Setup upterm session",
-                                uses: "owenthereal/action-upterm@v1",
-                                if: "contains(github.event.head_commit.message, '+debug')",
-                                with: {
-                                    upterm-server: "${{ secrets.UPTERMD_ADDR }}"
-                                }
-                            },
+                            # {
+                            #     name: "Setup upterm session",
+                            #     uses: "owenthereal/action-upterm@v1",
+                            #     if: "contains(github.event.head_commit.message, '+debug')",
+                            #     with: {
+                            #         upterm-server: "${{ secrets.UPTERMD_ADDR }}"
+                            #     }
+                            # },
                             {
                                 name: $"build ($f.stem)",
                                 shell: "buildah unshare nu {0}",
