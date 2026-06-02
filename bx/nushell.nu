@@ -48,6 +48,6 @@ export def setup [
 
     b run [
         $'chown ($config.user):($config.user) -R ($config.xdg_config)/nushell'
-        $'sudo -u ($config.user) nu -c "($reg)"'
+        $'sudo -u ($config.user) ($install_path) -c "($reg)"'
     ]
 }
