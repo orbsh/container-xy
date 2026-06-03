@@ -9,6 +9,7 @@ export def main [] {
             let i = $in | upload
             let hook = [
                 $env.DOCUMENT_ROOT
+                ($env.BOX_PREFIX | str trim -c '/')
                 ($env.HOOKS_PATH? | default '__hooks__')
                 ...($env.PATH_INFO | path split | skip 1)
             ]
@@ -22,7 +23,7 @@ export def main [] {
                 let script = [$workdir run.nu] | path join
                 $"(open -r $hook)\n\nexport def main [] { let o = $in | from json; file_uploaded $o }" | save -f $script
                 $i
-                | insert location {|x| $env.DOCUMENT_ROOT | path join ($x.filename | str substring 1..)}
+                | insert location {|x| $env.DOCUMENT_ROOT | path join ($x.filename | str trim -c '/')}
                 | to json -r
                 | nu --stdin $script
                 cd ..
@@ -38,13 +39,13 @@ export def main [] {
 }
 
 def index [] {
-    let file = path-to-file
+    let file = path-to-file $env.BOX_PREFIX
     send-file $file
 }
 
 def upload [] {
     let n = $in
-    let dest = path-to-file
+    let dest = path-to-file $env.BOX_PREFIX
     let parent = $dest | path parse | get parent
     if not ($parent | path exists) {
         mkdir $parent

@@ -1,3 +1,14 @@
+# Ferron Style Guide
+#
+# Style
+# - Pipe first: use `| let x` tail binding, not `let x = (...)`
+# - String trim: use `str trim -c '/'`, not `str substring 1..`
+# - Variable reuse: compute once, use multiple times
+#
+# Refactor
+# - Abstract mount point: scripts don't know their mount path, derive from REQUEST_URI - PATH_INFO
+# - Inline functions: helpers used by a single caller get merged into the caller
+
 export def content [
   --json(-j)
   --plain(-p)
@@ -45,8 +56,13 @@ export def is-binary-file []: binary -> bool {
     $in | first 512 | bytes index-of 0x[00] | $in >= 0
 }
 
-export def path-to-file [] {
-  $env.DOCUMENT_ROOT | path join ($env.PATH_INFO | str substring 1..)
+# output = DOCUMENT_ROOT / ...prefix / PATH_INFO (trimmed)
+export def path-to-file [...prefix: string] {
+    $prefix
+    | each { |p| $p | str trim -c '/' }
+    | prepend $env.DOCUMENT_ROOT
+    | where { $in | is-not-empty }
+    | path join ($env.PATH_INFO | str trim -c '/')
 }
 
 export def send-file [file] {
