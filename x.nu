@@ -231,7 +231,7 @@ export module test {
         | get stem
     }
 
-    export def ferron [
+    export def box [
         config:string@cmpl-ferron
         --ssh(-s)
         --image(-i): string = 'xy:ferron'

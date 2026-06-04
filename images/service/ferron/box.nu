@@ -7,17 +7,29 @@ export def main [] {
     match ($env.REQUEST_METHOD | str downcase) {
         post | put => {
             let i = $in | upload
-            let hook = [
+            let segments = ($env.PATH_INFO | path split | skip 1)
+            let hooks_root = [
                 $env.DOCUMENT_ROOT
                 ($env.BOX_PREFIX | str trim -c '/')
                 ($env.HOOKS_PATH? | default '__hooks__')
-                ...($env.PATH_INFO | path split | skip 1)
-            ]
-            | path join
+            ] | path join
+
+            mut hook = ''
+
+            for p in [
+                $segments
+                ($segments | drop 1 | append '_')
+                ...(1..($segments | length) | each {|i| $segments | drop $i | append '__'})
+            ] {
+                if ($hooks_root | path join ...$p | path exists) {
+                    $hook = $p
+                    break
+                }
+            }
 
             content -j
 
-            if ($hook | path exists) {
+            if ($hook | is-not-empty) {
                 let workdir = mktemp -d
                 cd $workdir
                 let script = [$workdir run.nu] | path join
