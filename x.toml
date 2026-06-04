@@ -23,7 +23,7 @@ xy = ["ci"]
 xy = ["mihomo"]
 
 [assets.image.manifest.vessel]
-xy = ["ferron", "vessel"]
+xy = ["ferron", "vessel", "box"]
 
 [assets.image.manifest.surreal]
 xy = ["surreal"]
@@ -50,7 +50,7 @@ xy = ["hermes"]
 #0x = ["java17"]
 
 [assets.image.manifest.vpn]
-xy = ["wireguard"]
+xy = ["wireguard", "warpgate"]
 
 #[manifest.pyflink]
 #0x = ["pyflink"]
