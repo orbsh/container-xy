@@ -344,6 +344,12 @@ packages:
       - mv warpgate-{version}-{arch}-linux warpgate
       - chmodx warpgate
       - wrap bin
+  easytier:
+    repo: EasyTier/EasyTier
+    uri: download/{version}/easytier-linux-{arch}-{version}.zip
+    unpack:
+      - strip 1
+      - wrap bin
   zot:
     repo: project-zot/zot
     exclude_vessel: true
