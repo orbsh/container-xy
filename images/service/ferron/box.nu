@@ -14,26 +14,27 @@ export def main [] {
                 ($env.HOOKS_PATH? | default '__hooks__')
             ] | path join
 
-            mut hook = ''
+            mut hook_path = ''
 
-            for p in [
-                $segments
-                ($segments | drop 1 | append '_')
-                ...(1..($segments | length) | each {|i| $segments | drop $i | append '__'})
-            ] {
-                if ($hooks_root | path join ...$p | path exists) {
-                    $hook = $p
+            let paths = [ $segments ($segments | drop 1 | append '_') ]
+            | append (1..($segments | length) | each {|i| $segments | drop $i | append '__'})
+
+
+            for p in $paths {
+                let candidate_path = $hooks_root | path join ...$p
+                if ($candidate_path | path exists) {
+                    $hook_path = $candidate_path
                     break
                 }
             }
 
             content -j
 
-            if ($hook | is-not-empty) {
+            if ($hook_path | is-not-empty) {
                 let workdir = mktemp -d
                 cd $workdir
                 let script = [$workdir run.nu] | path join
-                $"(open -r $hook)\n\nexport def main [] { let o = $in | from json; file_uploaded $o }" | save -f $script
+                $"(open -r $hook_path)\n\nexport def main [] { let o = $in | from json; file_uploaded $o }" | save -f $script
                 $i
                 | insert location {|x| $env.DOCUMENT_ROOT | path join ($x.filename | str trim -c '/')}
                 | to json -r

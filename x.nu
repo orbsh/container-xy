@@ -234,9 +234,9 @@ export module test {
     export def box [
         config:string@cmpl-ferron
         --ssh(-s)
-        --image(-i): string = 'xy:ferron'
+        --image(-i): string = 'xy:box'
     ] {
-        let name = 'test-ferron'
+        let name = 'test-box'
         ^$env.CNTRCTL rm -f $name
         mut flag = [
             -it
@@ -261,9 +261,10 @@ export module test {
     export def hooks [
         hook: path = scripts/hook_x.nu
         payload: path = scripts/hook_x.nu
+        --path: string = ''
     ] {
-        curl -sSL --progress-bar -X PUT -T $hook $"localhost:9900/box/__hooks__/($payload)"
-        curl -sSL --progress-bar -X PUT -T $payload $"localhost:9900/box/($payload)"
+        curl -sSL --progress-bar -X PUT -T $hook $"localhost:9900/box/__hooks__/($path)($payload)"
+        curl -sSL --progress-bar -X PUT -T $payload $"localhost:9900/box/($path)($payload)"
     }
 
     export def run [
