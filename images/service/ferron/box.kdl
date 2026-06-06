@@ -2,11 +2,11 @@
     root "/srv"
     cgi
     cgi_extension ".nu"
+    cgi_environment "PREFIX_LEN" "1"
 
-    rewrite "^/bin(.*)" "/ferron/bin.nu$1" file=#true directory=#true last=#true
-    cgi_environment "BOX_PREFIX" "/box"
-    rewrite "^/box(.*)" "/ferron/box.nu$1" file=#true directory=#true last=#true
-    rewrite "^/vessel(.*)" "/ferron/vessel.nu$1" file=#true directory=#true last=#true
+    rewrite "^/bin/(.*)" "/ferron/bin.nu/bin/$1" file=#true directory=#true last=#true
+    rewrite "^/box/(.*)" "/ferron/box.nu/box/$1" file=#true directory=#true last=#true
+    rewrite "^/vessel/(.*)" "/ferron/vessel.nu/vessel/$1" file=#true directory=#true last=#true
 
     rewrite "^/(.*)" "/ferron/index.nu/$1" file=#true directory=#true last=#true
 

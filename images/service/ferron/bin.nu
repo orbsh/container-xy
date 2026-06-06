@@ -5,25 +5,33 @@ use $utils *
 
 export def main [] {
     let n = $in
-    let p = $env.PATH_INFO
-    if ($p | str starts-with '/inspect') {
-        content -j
-        $n
-        | info
-        | to json -r
-    } else if ($p | str starts-with '/log') {
-        log ($n | info)
-    } else if ($p | str starts-with '/status-code') {
-    } else if ($p | str starts-with '/redirect') {
-    } else {
-        content -j
-        fallback | to json -r
+    let prefix_len = $env.PREFIX_LEN? | default 1 | into int
+    let p = $env.PATH_INFO | path split | skip 1 | get $prefix_len
+    match $p {
+        inspect => {
+            content -j
+            $n
+            | insp
+            | to json -r
+        }
+        log => {
+            log ($n | insp)
+        }
+        status-code => {}
+        redirect => {}
+        _ => {
+            content -j
+            fallback | to json -r
+        }
     }
 }
 
 def log [data] {
     match ($env.REQUEST_METHOD | str downcase) {
-        post => {
+        get => {
+            send-file (path-to-file)
+        }
+        _ => {
             content -p
             let t = date now | format date "%+"
             let f = path-to-file | path join $t
@@ -34,13 +42,10 @@ def log [data] {
             let url = ($env.HTTP_HOST)($uri)
             return $url
         }
-        _ => {
-            send-file (path-to-file)
-        }
     }
 }
 
-def info [] {
+def insp [] {
     let n = $in
     let q = $env.QUERY_STRING? | default '' | url split-query
     let h = $env

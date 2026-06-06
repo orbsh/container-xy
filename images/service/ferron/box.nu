@@ -7,10 +7,12 @@ export def main [] {
     match ($env.REQUEST_METHOD | str downcase) {
         post | put => {
             let i = $in | upload
-            let segments = ($env.PATH_INFO | path split | skip 1)
+            let prefix_len = $env.PREFIX_LEN? | default 1 | into int
+            let parts = $env.PATH_INFO | path split | skip 1
+            let segments = $parts | skip $prefix_len
             let hooks_root = [
                 $env.DOCUMENT_ROOT
-                ($env.BOX_PREFIX | str trim -c '/')
+                ...($parts | slice ..<$prefix_len)
                 ($env.HOOKS_PATH? | default '__hooks__')
             ] | path join
 
@@ -30,6 +32,7 @@ export def main [] {
 
             content -j
 
+            # print ($paths | to yaml)
             if ($hook_path | is-not-empty) {
                 let workdir = mktemp -d
                 cd $workdir
@@ -52,13 +55,13 @@ export def main [] {
 }
 
 def index [] {
-    let file = path-to-file $env.BOX_PREFIX
+    let file = path-to-file
     send-file $file
 }
 
 def upload [] {
     let n = $in
-    let dest = path-to-file $env.BOX_PREFIX
+    let dest = path-to-file
     let parent = $dest | path parse | get parent
     if not ($parent | path exists) {
         mkdir $parent

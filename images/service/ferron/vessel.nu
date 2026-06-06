@@ -3,12 +3,14 @@
 const utils = path self utils.nu
 use $utils *
 
+const mount = 'vessel'
+
 export def main [] {
     let n = $in
-    let path = $env.PATH_INFO | str downcase | path split | slice 1..
+    let pkg = $env.PATH_INFO | str downcase | path split | last
     let q = $env.QUERY_STRING? | default '' | url split-query | reduce -f {} {|i,a| $a | insert $i.key $i.value }
     let dest = $q.dest? | default $q.target? | default /usr/local
-    match [$q.op? ...$path] {
+    match [($q.op? | default '') $pkg] {
         [install $pkgs] => {
             content -p
             let invalid = $pkgs | split row ',' | where {|it|
@@ -32,7 +34,7 @@ export def main [] {
             let r = $"
             for i in ($pkgs | split row ',') {
                 info $'install \($i\)'
-                install \($i\) $'($env.HTTP_HOST)/vessel/\($i\).tar.zst?arch=($q.arch)&op=download' ($dest)
+                install \($i\) $'($env.HTTP_HOST)/($mount)/\($i\).tar.zst?arch=($q.arch)&op=download' ($dest)
             }
             "
             | str trim
@@ -57,9 +59,9 @@ export def main [] {
             ARCH=$\(uname -m\)
             if ! command -v nu >/dev/null 2>&1; then
                 echo \"nu not found. installing\"
-                curl -SL --progress-bar \"($env.HTTP_HOST)/vessel/nushell.tar.zst?arch=${ARCH}&op=download\" | zstd -d | tar -xf - -C /usr/local
+                curl -SL --progress-bar \"($env.HTTP_HOST)/($mount)/nushell.tar.zst?arch=${ARCH}&op=download\" | zstd -d | tar -xf - -C /usr/local
             fi
-            curl -SL --progress-bar \"($env.HTTP_HOST)/vessel/($args)?arch=${ARCH}&op=install&dest=($dest)\" | $\(command -v nu\) --stdin -c 'nu -c $in'
+            curl -SL --progress-bar \"($env.HTTP_HOST)/($mount)/($args)?arch=${ARCH}&op=install&dest=($dest)\" | $\(command -v nu\) --stdin -c 'nu -c $in'
             "
             | str trim
             | str replace -rma '^ {12}' ''
@@ -67,7 +69,7 @@ export def main [] {
         }
         _ => {
             content -p
-            print $path
+            print ({pkgs: $pkg, ...$q} | to json)
         }
     }
 }

@@ -265,6 +265,8 @@ export module test {
     ] {
         curl -sSL --progress-bar -X PUT -T $hook $"localhost:9900/box/__hooks__/($path)($payload)"
         curl -sSL --progress-bar -X PUT -T $payload $"localhost:9900/box/($path)($payload)"
+        curl -sSL --progress-bar -X PUT -T $hook $"localhost:9900/box/__hooks__/a/b/c/__"
+        curl -sSL --progress-bar -X PUT -T $hook localhost:9900/box/a/b/c/d/e/f/g/h/i/j/k
     }
 
     export def run [
