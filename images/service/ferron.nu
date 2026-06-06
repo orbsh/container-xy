@@ -48,7 +48,7 @@ export def main [context: record = {}] {
 
         with-mount {
             cd srv
-            mkdir bin box install ferron
+            mkdir box ferron
         }
 
         copy images/service/ferron /srv/ferron
