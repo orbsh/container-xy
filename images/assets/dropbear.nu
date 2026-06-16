@@ -35,6 +35,7 @@ export def main [context: record = {}] {
                 'cd /build/dropbear'
                 'autoconf'
                 'autoheader'
+                'echo "#define DROPBEAR_SVR_PASSWORD_AUTH 0" > localoptions.h'
                 './configure --enable-static'
                 'make PROGRAMS="dropbear dbclient scp dropbearkey dropbearconvert"'
                 'mkdir -p /target/bin'
