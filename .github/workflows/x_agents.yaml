@@ -8,7 +8,7 @@ name: x_agents
 on:
   workflow_run:
     workflows: [ext]
-    branches: [release, ext, agent]
+    branches: [release]
     types:
       - completed
 
