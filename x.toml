@@ -50,7 +50,7 @@ xy = ["hermes"]
 #0x = ["java17"]
 
 [assets.image.manifest.vpn]
-xy = ["wireguard", "warpgate"]
+xy = ["wireguard", "warpgate", "easytier"]
 
 #[manifest.pyflink]
 #0x = ["pyflink"]
