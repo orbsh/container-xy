@@ -112,7 +112,7 @@ export def 'py install' [
         debian => "pip3"
         _ => "pip",
     }
-    mut cmd = [$pip install --no-cache-dir --break-system-packages]
+    mut cmd = [$pip install --no-cache-dir --break-system-packages --ignore-installed]
     if ($index_url | is-not-empty) {
         $cmd ++= [--index-url $index_url]
     }
