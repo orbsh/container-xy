@@ -37,7 +37,7 @@ export def main [context: record = {}] {
         with-mount {|new, old|
             let tg = $new | path join root/.config/nushell/scripts
             mkdir $tg
-            for f in [bx version.yaml] {
+            for f in [bx hub.yaml] {
                 cp -r ($old | path join $f) $tg
             }
         }
