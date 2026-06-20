@@ -736,7 +736,6 @@ stacks:
       - pyo3
       - steel-core
       - steel-repl
-      - koto
       - rune
     system:
       - notify
