@@ -2,7 +2,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: 'debian:sid-slim'
+        from: 'debian:stable-slim'
         author: unnamed
         timezone: Asia/Shanghai
         user: master
