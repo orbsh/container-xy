@@ -9,13 +9,7 @@ def derive [context src layer] {
     | merge $context
     | merge { tag: $layer.tag }
     | build {|ctx|
-        if ($layer.pkgs | any {|x| $x | str starts-with git+https}) {
-            pkg with [git] {
-                pkg py install --stack $layer.stack $layer.pkgs
-            }
-        } else {
-            pkg py install --stack $layer.stack $layer.pkgs
-        }
+        pkg py install --stack $layer.stack $layer.pkgs
     }
 }
 
@@ -31,14 +25,20 @@ export def main [context: record = {}] {
         pkg setup py --stack [web dev io cli utils logging codec]
     }
 
-    mut from = 'py'
-    for i in [
-        [tag pkgs stack];
-        [py-data [polars pyiceberg[rest-sigv4] lancedb zstandard] []]
-    ] {
-        derive $context $from $i
-        $from = $i.tag
+
+    {
+        from: $'($context.image):py'
+        user: master
+        workdir: /home/master
     }
+    | merge $context
+    | merge { tag: py-data }
+    | build {|ctx|
+        pkg with [git gcc python3-dev] {
+            pkg py install [polars pyiceberg[rest-sigv4] lancedb zstandard]
+        }
+    }
+
 
     {
         from: $'($context.image):py-data'
