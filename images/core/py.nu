@@ -34,7 +34,7 @@ export def main [context: record = {}] {
     mut from = 'py'
     for i in [
         [tag pkgs stack];
-        [py-data [polars lancedb zstandard] []]
+        [py-data [polars pyiceberg[rest-sigv4] lancedb zstandard] []]
     ] {
         derive $context $from $i
         $from = $i.tag
