@@ -16,7 +16,7 @@ export def main [context: record = {}] {
         pkg install [git]
 
         pkg py install [
-            html2txt
+            html2txt ddgr
             openai agno
             git+https://github.com/NousResearch/hermes-agent.git
         ]
