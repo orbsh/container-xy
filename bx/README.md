@@ -162,6 +162,6 @@ r#'^warpgate --config /data/warpgate.yaml run'#   # ✓ runtime context
 # Generates a config on the host, but saves it into the container's /etc/
 with-mount {
     r#':8080 { root "/srv" }'#
-    | save etc/ferron.kdl
+    | save etc/ferron.conf
 }
 ```

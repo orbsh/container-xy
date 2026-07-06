@@ -14,13 +14,13 @@ export def main [context: record = {}] {
 
         with-mount {|new, old|
             r#'
-            :8080 {
+            *:8080 {
                 root "/srv"
             }
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
-            | save etc/ferron.kdl
+            | save etc/ferron.conf
         }
 
         with-mount {
@@ -31,8 +31,9 @@ export def main [context: record = {}] {
 
             let cmd = [
                 /usr/local/bin/ferron
+                run
                 --config
-                ($env.CONFIGFILE? | default /etc/ferron.kdl)
+                ($env.CONFIGFILE? | default /etc/ferron.conf)
             ]
 
             tasks spawn {
@@ -54,7 +55,7 @@ export def main [context: record = {}] {
         copy images/service/ferron /srv/ferron
 
         conf env {
-            CONFIGFILE: /srv/ferron/box.kdl
+            CONFIGFILE: /srv/ferron/box.conf
         }
 
         conf workdir $ctx.workdir

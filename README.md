@@ -32,7 +32,7 @@ export def main [context: record = {}] {
         with-mount {
             # Configuration files embedded directly via Nushell raw strings
             r#':8080 { root "/srv" }'#
-            | save etc/ferron.kdl
+            | save etc/ferron.conf
         }
         conf cmd ['srv']
     }

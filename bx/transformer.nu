@@ -19,6 +19,15 @@ def dispatch [input act args?] {
         select => {
             $input | where {|i| $i | parse -r $args.0 | is-not-empty }
         }
+        filter => {
+            $input | where {|i|
+                let f = $i | get $args.0 | into string
+                match $args.1 {
+                    '==' => { $f == $args.2 }
+                    '!=' => { $f != $args.2 }
+                }
+            }
+        }
         from-json => {
             $input | from json
         }
@@ -32,17 +41,6 @@ def dispatch [input act args?] {
                 error make { msg: $"'($args)' not in ($input)" }
             } else {
                 $r
-            }
-        }
-        field => {
-            if ($args | is-empty) {
-                $input
-            } else {
-                if $args in $input {
-                    $input | get $args
-                } else {
-                    null
-                }
             }
         }
         trim => {

@@ -26,7 +26,7 @@ export def get-version [cfg]: nothing -> string {
         curl --retry 3 -fsSL $cfg.repo
     } else if ($cfg.list_tags? | default false) {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases"
-        curl --retry 3 -fsSL $url | from json | get tag_name
+        curl --retry 3 -fsSL $url | from json
     } else {
         let url = $"https://api.github.com/repos/($cfg.repo)/releases/latest"
         curl --retry 3 -fsSL $url | from json | get tag_name

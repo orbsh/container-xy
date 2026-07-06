@@ -226,7 +226,7 @@ export def build [s: string@cmpl-build] {
 
 export module test {
     def cmpl-ferron [] {
-        glob ($CWD)/images/service/ferron/*.kdl
+        glob ($CWD)/images/service/ferron/*.conf
         | path parse
         | get stem
     }
@@ -243,7 +243,7 @@ export module test {
             --name $name
             -v ($CWD)/images/service/ferron:/srv/ferron
             -v ($CWD)/entrypoint/libs:/entrypoint/libs
-            -e CONFIGFILE=/srv/ferron/($config).kdl
+            -e CONFIGFILE=/srv/ferron/($config).conf
             -p 9900:8080
         ]
         if $ssh {

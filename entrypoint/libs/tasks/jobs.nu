@@ -3,7 +3,7 @@ use ../info.nu
 # ============================================================================
 # Task Queue System - Data Flow & Invariants
 # ============================================================================
-# Data Flow: init → TASKSEQ → spawn append → tail -f → run → job spawn
+# Data Flow: init → TASKSEQ → spawn append → tail -f → dispatch → job spawn
 #            wait monitors job list, any exit kills all → container restart
 #
 # Invariants:
@@ -16,7 +16,7 @@ use ../info.nu
 #   [P2] spawn called with non-empty $tasks
 #   [P3] cmd is a list of strings, e.g. ["socat", "TCP-LISTEN:80,...", "TCP:target:80"]
 #        - first element is the binary, remaining elements are arguments
-#        - caller does NOT join into a string; run splits bin/args directly
+#        - caller does NOT join into a string; dispatch splits bin/args directly
 #        - when shell: true, elements are joined with spaces and passed to nu -c
 #        - example (socat):
 #            {tag: "socat_tcp_80", cmd: ["sudo", "socat", "TCP-LISTEN:80,reuseaddr,fork", "TCP:target:80"]}
@@ -43,7 +43,7 @@ export def log [id] {
 
 # -----------------------------------------------------------------------------
 # init: Initialize task queue listener
-# Data Flow: mktemp → $env.TASKSEQ → job spawn(tail -f → lines → from json → run)
+# Data Flow: mktemp → $env.TASKSEQ → job spawn(tail -f → lines → from json → dispatch)
 # Preconditions: called once [P1]
 # -----------------------------------------------------------------------------
 export def --env init [] {
@@ -53,7 +53,7 @@ export def --env init [] {
         tail -f $env.TASKSEQ
         | lines
         | each {|x|
-            $x | from json | run $in
+            $x | from json | dispatch $in
         }
     }
 }
@@ -83,7 +83,7 @@ export def spawn [
 }
 
 # -----------------------------------------------------------------------------
-# run: Execute tasks (called by listener)
+# dispatch: Execute tasks (called by listener)
 # Data Flow: $tasks (from JSON) → job spawn -d $job_desc
 # Invariants: $t.tag? | default "" [I3], $t.cmd exists and is a list [P3]
 # Preconditions: JSON format valid, cmd is a list of strings [P3]
@@ -92,7 +92,7 @@ export def spawn [
 #         allowing nushell pipeline features without forking a bash process
 # Reserved: _group, _task_id (intentionally kept for future extension — do not remove)
 # -----------------------------------------------------------------------------
-def run [
+def dispatch [
     ...tasks
 ] {
     if ($tasks | is-empty) { return }

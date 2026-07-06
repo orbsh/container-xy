@@ -333,9 +333,14 @@ packages:
       - wrap bin
   ferron:
     repo: ferronweb/ferron
-    uri: download/{version}/ferron-{version}-{arch}-unknown-linux-musl.zip
+    list_tags: true
+    version:
+      #- filter prerelease != true
+      - first
+      - index tag_name
+    uri: download/{version}/ferron-{version}-{arch}-unknown-linux-musl.tar.gz
     unpack:
-      - filter ferron ferron-passwd ferron-yaml2kdl ferron-precompress
+      - filter ferron ferron-passwd ferron-fmt ferron-precompress
       - wrap bin
   warpgate:
     repo: warp-tech/warpgate
