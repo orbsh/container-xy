@@ -322,7 +322,7 @@ export def gen-script [
 
     let m = $input
     | str replace -rma '^' '    '
-    | $"def run [] {\n($in)\n}"
+    | $"def apply [] {\n($in)\n}"
     $ctx ++= [$m]
 
     let m = $"
@@ -334,7 +334,7 @@ export def gen-script [
         | merge \($ctx | from nuon\)
         | to nuon
         with-env { ($key): $envs } {
-            run
+            apply
         }
     }
     "

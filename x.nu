@@ -22,6 +22,7 @@ export module hub {
         }
     }
 }
+export use hub
 
 export module action {
     export def update-nu-version [] {
@@ -164,6 +165,7 @@ export module action {
         }
     }
 }
+export use action
 
 export module image {
     def cmpl-tags [] {
@@ -202,6 +204,7 @@ export module image {
         }
     }
 }
+export use image
 
 def cmpl-build [] {
     glob ($CWD)/test/*.nu
@@ -390,3 +393,5 @@ export module test {
      }
 
 }
+export use test  
+

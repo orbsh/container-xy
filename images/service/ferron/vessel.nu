@@ -7,7 +7,7 @@ const mount = 'vessel'
 
 export def main [] {
     let n = $in
-    let pkg = $env.PATH_INFO | str downcase | path split | last
+    let pkg = $env.PATH_INFO | str lowercase | path split | last
     let q = $env.QUERY_STRING? | default '' | url split-query | reduce -f {} {|i,a| $a | insert $i.key $i.value }
     let dest = $q.dest? | default $q.target? | default /usr/local
     match [($q.op? | default '') $pkg] {

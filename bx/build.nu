@@ -84,7 +84,7 @@ def os-id []: path -> string {
     | lines
     | reduce -f {} {|i, a|
         let i = $i | split row '='
-        $a | insert ($i.0 | str downcase) $i.1
+        $a | insert ($i.0 | str lowercase) $i.1
     }
     $os_id.id_like? | default $os_id.id
 }

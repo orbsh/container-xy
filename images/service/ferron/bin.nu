@@ -27,7 +27,7 @@ export def main [] {
 }
 
 def log [data] {
-    match ($env.REQUEST_METHOD | str downcase) {
+    match ($env.REQUEST_METHOD | str lowercase) {
         get => {
             send-file (path-to-file)
         }

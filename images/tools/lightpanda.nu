@@ -21,7 +21,7 @@ export def main [context: record = {}] {
             #!/usr/bin/env nu
             use libs/tasks.nu
 
-            let lv = $env.LOG_LEVEL? | default info | str downcase
+            let lv = $env.LOG_LEVEL? | default info | str lowercase
             let proxy = if ($env.HTTP_PROXY? | is-not-empty) {
                 [--http_proxy $env.HTTP_PROXY]
             } else {

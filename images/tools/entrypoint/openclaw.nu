@@ -21,7 +21,7 @@ def setup-models [] {
         let r = $i.k | parse -r '^(?<m>.+)_API_KEY$'
         if ($r | is-not-empty) {
             let id =  $r.0.m
-            let name = $id | str downcase
+            let name = $id | str lowercase
             $a | append {
                 id: $id
                 name: $name
@@ -120,7 +120,7 @@ def fetch-skills [] {
 def gen-config [file home] {
     mkdir $home
 
-    let token = random binary 24 | encode hex | str downcase
+    let token = random binary 24 | encode hex | str lowercase
 
     mut skill_entries = $env.OPENCLAW_SKILLS
     | split row ','

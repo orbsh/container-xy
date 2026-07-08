@@ -103,7 +103,7 @@ export def route [
     --method(-m): string
 ] {
     if ($method | is-not-empty) {
-        if ($env.REQUEST_METHOD | str downcase) != ($method | str downcase) {
+        if ($env.REQUEST_METHOD | str lowercase) != ($method | str lowercase) {
             return
         }
     }

@@ -33,7 +33,7 @@ def pg-setup-conf [] {
                 $acc
             } else {
                 let p = $p | first
-                let k = $p.k | str downcase | str replace --all "__" "."
+                let k = $p.k | str lowercase | str replace --all "__" "."
                 let v = match $p.t {
                     CONF => {
                         $"($k) = ($it.value)"

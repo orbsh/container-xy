@@ -4,7 +4,7 @@ const utils = path self utils.nu
 use $utils *
 
 export def main [] {
-    match ($env.REQUEST_METHOD | str downcase) {
+    match ($env.REQUEST_METHOD | str lowercase) {
         post | put => {
             let i = $in | upload
             let prefix_len = $env.PREFIX_LEN? | default 1 | into int
