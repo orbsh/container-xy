@@ -11,6 +11,7 @@ export def content [
   --json(-j)
   --plain(-p)
   --html(-h)
+  --stream(-s)
   --length(-l): int
   --no-newline(-n)
 ] {
@@ -19,6 +20,12 @@ export def content [
         $hs ++= ["Content-Type: application/json; charset=utf-8"]
     } else if $plain {
         $hs ++= ["Content-Type: text/plain"]
+    } else if $stream {
+      $hs ++= [
+        "Content-Type: text/event-stream"
+        "Cache-Control: no-cache"
+        "X-Accel-Buffering: no"
+      ]
     } else if $html {
         $hs ++= ["Content-Type: text/html; charset=utf-8"]
     } else {

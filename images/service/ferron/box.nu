@@ -30,7 +30,7 @@ export def main [] {
                 }
             }
 
-            content -j
+            content -s
 
             # print ($paths | to yaml)
             if ($hook_path | is-not-empty) {
