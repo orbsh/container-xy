@@ -9,10 +9,10 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        conf expose [8080]
+        b conf expose [8080]
         hub install [ferron] -c $ctx.cache?
 
-        with-mount {|new, old|
+        b with-mount {|new, old|
             r#'
             *:8080 {
                 root "/srv"
@@ -23,7 +23,7 @@ export def main [context: record = {}] {
             | save etc/ferron.conf
         }
 
-        with-mount {
+        b with-mount {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
@@ -47,18 +47,18 @@ export def main [context: record = {}] {
             | save ferron.nu
         }
 
-        with-mount {
+        b with-mount {
             cd srv
             mkdir bin box ferron
         }
 
-        copy images/service/ferron /srv/ferron
+        b copy images/service/ferron /srv/ferron
 
-        conf env {
+        b conf env {
             CONFIGFILE: /srv/ferron/box.conf
         }
 
-        conf workdir $ctx.workdir
-        conf cmd ['srv']
+        b conf workdir $ctx.workdir
+        b conf cmd ['srv']
     }
 }

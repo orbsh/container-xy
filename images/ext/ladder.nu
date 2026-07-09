@@ -20,7 +20,7 @@ export def main [context: record = {}] {
     | merge { tag: mihomo }
     | build {|ctx|
         hub install -c $ctx.cache? [mihomo]
-        with-mount {
+        b with-mount {
             let m = [
                 [country.mmdb Country.mmdb]
                 geoip.dat
@@ -58,8 +58,8 @@ export def main [context: record = {}] {
             | save entrypoint/mihomo.nu
         }
 
-        conf expose [7890 7891 9090]
-        conf cmd ['srv']
-        conf workdir /data
+        b conf expose [7890 7891 9090]
+        b conf cmd ['srv']
+        b conf workdir /data
     }
 }

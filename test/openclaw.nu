@@ -9,6 +9,6 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: openclawx }
     | build {|ctx|
-        copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
+        b copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
     }
 }

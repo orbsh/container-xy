@@ -8,8 +8,8 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        conf expose [8080]
-        conf env {
+        b conf expose [8080]
+        b conf env {
             HOST: '0.0.0.0'
             PORT: '8080'
         }
@@ -23,7 +23,7 @@ export def main [context: record = {}] {
                 torch torchvision torchaudio
             ]
         }
-        with-mount {
+        b with-mount {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
@@ -44,7 +44,7 @@ export def main [context: record = {}] {
             | str replace -rma $'^ {12}' ''
             | save marimo.nu
         }
-        conf cmd ['srv']
-        conf user master
+        b conf cmd ['srv']
+        b conf user master
     }
 }

@@ -24,7 +24,7 @@ export def main [xctx] {
             }
             | build --no-commit {|ctx1|
                 let pg_ver = $context.pg_version_major
-                run [
+                b run [
                     'opwd=$(pwd)'
                     'curl -sSL http://www.xunsearch.com/scws/down/scws-1.2.3.tar.bz2 | tar -jxf -'
                     'cd scws-1.2.3'
@@ -41,7 +41,7 @@ export def main [xctx] {
                 ]
             }
 
-            with-mount {|new, old|
+            b with-mount {|new, old|
                 cd ($dst.BUILDAH_WORKING_MOUNTPOINT | path join out/usr)
                 cp -r * $new
             }

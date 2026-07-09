@@ -32,9 +32,9 @@ export def main [context: record = {}] {
             kubernetes.core
         ]
         | each { $"ansible-galaxy collection install ($in)" }
-        | run $in
+        | b run $in
 
-        with-mount {|new, old|
+        b with-mount {|new, old|
             let tg = $new | path join root/.config/nushell/scripts
             mkdir $tg
             for f in [bx hub.yaml] {

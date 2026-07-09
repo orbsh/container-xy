@@ -9,6 +9,6 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        conf user master
+        b conf user master
     }
 }

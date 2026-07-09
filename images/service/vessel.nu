@@ -21,6 +21,6 @@ export def main [context: record = {}] {
             }
         }
         hub install $pkg -c $ctx.cache? -t /opt/vessel --bundle --with-python
-        conf workdir $ctx.workdir
+        b conf workdir $ctx.workdir
     }
 }

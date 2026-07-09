@@ -10,7 +10,7 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: spacy }
     | build {|ctx|
-        conf env {
+        b conf env {
             PYTHONUNBUFFERED: x
         }
 
@@ -20,6 +20,6 @@ export def main [context: record = {}] {
         ] {
             pkg py install [pip setuptools wheel 'spacy[transformers]']
         }
-        run ['python -m spacy download zh_core_web_trf']
+        b run ['python -m spacy download zh_core_web_trf']
     }
 }

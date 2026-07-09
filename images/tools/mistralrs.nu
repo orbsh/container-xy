@@ -10,10 +10,10 @@ export def main [context: record = {}] {
     | build {|ctx|
         let r = { from: $'($context.image):rust' }
         | build --no-commit {|ctx|
-            run ['cargo install mistralrs-cli']
+            b run ['cargo install mistralrs-cli']
         }
 
-        with-mount {|new, old|
+        b with-mount {|new, old|
             cd $r.BUILDAH_WORKING_MOUNTPOINT
             cp opt/cargo/bin/mistralrs ($new | path join usr/local/bin)
         }

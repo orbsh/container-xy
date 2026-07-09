@@ -10,13 +10,13 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         let ghcup_root = '/opt/.ghcup'
-        conf env {
+        b conf env {
             BOOTSTRAP_HASKELL_NONINTERACTIVE: '1'
             GHCUP_INSTALL_BASE_PREFIX:/opt
             GHCUP_ROOT: $ghcup_root
             STACK_ROOT: /opt/stack
         }
-        conf path [($ghcup_root)/bin]
+        b conf path [($ghcup_root)/bin]
 
         pkg install [
             ghc cabal-install
@@ -40,7 +40,7 @@ export def main [context: record = {}] {
         #     'stack clean'
         # ]
 
-        with-mount {
+        b with-mount {
             r#'
             :set prompt "λ: "
             :set prompt-cont "   | "

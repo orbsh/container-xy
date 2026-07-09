@@ -17,13 +17,13 @@ export def main [xctx] {
         | merge $context
         | merge { from: 'scratch', tag: $tag }
         | build {|ctx|
-            conf workdir /app
+            b conf workdir /app
             let dst = {
                 from: $"($context.image):($pgrx)"
             }
             | build --no-commit {|ctx1|
                 let pg_ver = $context.pg_version_major
-                run [
+                b run [
                     $'curl --retry 3 -fsSL https://github.com/pgvector/pgvector/archive/refs/tags/v($version).tar.gz | tar -zxf - -C . --strip-components=1'
                     'make clean -j'
                     'make USE_PGXS=1 OPTFLAGS="" -j'
@@ -35,7 +35,7 @@ export def main [xctx] {
                 ]
             }
 
-            with-mount {|new, old|
+            b with-mount {|new, old|
                 cd ($dst.BUILDAH_WORKING_MOUNTPOINT | path join out)
                 cp -r * $new
             }

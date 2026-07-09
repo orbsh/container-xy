@@ -18,20 +18,20 @@ export def main [xctx] {
         | merge $context
         | merge { from: 'scratch', tag: $cx.tag }
         | build {|ctx|
-            conf workdir /
+            b conf workdir /
             let dst = {
                 from: $"($context.image):($pgrx)"
             }
             | build --no-commit {|ctx1|
                 let pg_ver = $context.pg_version_major
-                run [
+                b run [
                     $'curl -sSL https://github.com/timescale/pg_textsearch/releases/download/v($cx.version)/pg_textsearch-($cx.version).tar.gz | tar -zxf - -C . --strip-component=1'
                     'make -j$(nproc)'
                     'DESTDIR=/out make install'
                 ]
             }
 
-            with-mount {|new, old|
+            b with-mount {|new, old|
                 cd ($dst.BUILDAH_WORKING_MOUNTPOINT | path join out/usr)
                 cp -r * $new
             }

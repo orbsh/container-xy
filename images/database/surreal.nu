@@ -12,17 +12,17 @@ export def main [context: record = {}] {
         hub install -c $ctx.cache? [surrealdb]
         let port = '8000'
 
-        conf volume [/var/lib/surrealdb]
-        conf env {
+        b conf volume [/var/lib/surrealdb]
+        b conf env {
             SURREAL_USER: $ctx.user
             SURREAL_PASS: $ctx.user
             SURREAL_BIND: $'0.0.0.0:($port)'
         }
-        conf expose [$port]
+        b conf expose [$port]
 
-        copy images/database/surreal/entrypoint.nu /entrypoint/surreal.nu
+        b copy images/database/surreal/entrypoint.nu /entrypoint/surreal.nu
 
-        conf cmd ['srv']
-        conf workdir $ctx.workdir
+        b conf cmd ['srv']
+        b conf workdir $ctx.workdir
     }
 }

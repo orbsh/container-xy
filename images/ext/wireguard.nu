@@ -15,13 +15,13 @@ export def main [context: record = {}] {
         hub install [
             boringtun
         ]
-        conf env {
+        b conf env {
             WG_LOG_LEVEL: info
             WG_THREADS: 4
             WG_SUDO: 1
             WG_QUICK_USERSPACE_IMPLEMENTATION: boringtun-cli
         }
-        with-mount {
+        b with-mount {
             r#'
             #!/usr/bin/env nu
             use libs/tasks.nu

@@ -12,8 +12,8 @@ export def main [context: record = {}] {
             # registry
             zot
         ]
-        conf cmd [srv]
-        with-mount {
+        b conf cmd [srv]
+        b with-mount {
             mkdir etc/zot
             {
                 storage: {
@@ -149,6 +149,6 @@ export def main [context: record = {}] {
             | str replace -rma $'^ {12}' ''
             | save entrypoint/zot.nu
         }
-        conf workdir $ctx.workdir
+        b conf workdir $ctx.workdir
     }
 }

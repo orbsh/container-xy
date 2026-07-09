@@ -8,9 +8,9 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        conf path [$"/home/($ctx.user)/.moon/bin:$PATH"]
+        b conf path [$"/home/($ctx.user)/.moon/bin:$PATH"]
         let url = 'https://cli.moonbitlang.com/install/unix.sh'
-        run [
+        b run [
             $"curl --retry 3 -fsSL ($url) | sudo -u ($ctx.user) bash"
         ]
     }

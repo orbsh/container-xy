@@ -14,12 +14,12 @@ export def main [context: record = {}] {
         let r = $ctx
         | merge { from: $'($context.image):mistralrs' }
         | build --no-commit {|ctx|
-            run [
+            b run [
                 $"'\\exit' | mistralrs run -m ($ctx.model)"
             ]
         }
 
-        with-mount {|new, old|
+        b with-mount {|new, old|
             cd ($r.BUILDAH_WORKING_MOUNTPOINT | path join root/.cache)
             mv huggingface $new
         }

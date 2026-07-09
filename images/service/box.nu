@@ -15,7 +15,7 @@ export def main [context: record = {}] {
         ]
         hub install [kubectl helm]
 
-        with-mount {|new, old|
+        b with-mount {|new, old|
             let tg = $new | path join root/.config/nushell/scripts
             mkdir $tg
             for f in [bx version.yaml] {

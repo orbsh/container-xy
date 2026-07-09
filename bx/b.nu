@@ -113,3 +113,4 @@ export module conf {
         buildah config --user $name $env.BUILDAH_WORKING_CONTAINER
     }
 }
+export use conf

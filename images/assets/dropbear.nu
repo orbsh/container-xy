@@ -27,11 +27,11 @@ export def main [context: record = {}] {
                 | jq -r '.[0].tarball_url'
             )
             trace o {dropbear: $url}
-            with-mount {
+            b with-mount {
                 mkdir build/dropbear
                 curl -fsSL $url | tar -zxf - -C build/dropbear --strip-component=1
             }
-            run [
+            b run [
                 'cd /build/dropbear'
                 'autoconf'
                 'autoheader'
@@ -41,11 +41,11 @@ export def main [context: record = {}] {
                 'mkdir -p /target/bin'
                 'mv dbclient dropbear scp dropbearkey dropbearconvert /target/bin'
             ]
-            with-mount {
+            b with-mount {
                 cd build
                 git clone --depth=1 https://github.com/openssh/openssh-portable.git
             }
-            run [
+            b run [
                 'cd /build/openssh-portable'
                 'autoreconf'
                 './configure'

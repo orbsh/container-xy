@@ -8,10 +8,10 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        run ['ollama --version']
+        b run ['ollama --version']
 
         pkg install [curl zstd git sudo]
-        conf cmd [srv]
+        b conf cmd [srv]
 
         setup git $ctx.author
         let xdg_config = $"/home/($ctx.user)/.config"
@@ -22,16 +22,16 @@ export def main [context: record = {}] {
             xdg_config: $xdg_config
             plugins: [query]
         }
-        with-mount {|new, old|
+        b with-mount {|new, old|
             cd ($new)/root
             cp ($new)/home/($ctx.user)/.config/nushell/scripts/llm/integration/ollama.nu .
         }
 
-        conf volume [/root/.ollama]
-        copy entrypoint /entrypoint
-        conf entrypoint [/entrypoint/libs/init.nu]
+        b conf volume [/root/.ollama]
+        b copy entrypoint /entrypoint
+        b conf entrypoint [/entrypoint/libs/init.nu]
 
-        with-mount {
+        b with-mount {
             cd entrypoint
             r#'
             #!/usr/bin/env nu

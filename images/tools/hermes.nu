@@ -9,7 +9,7 @@ export def main [context: record = {}] {
     | merge $context
     | merge { tag: hermes }
     | build {|ctx|
-        conf env {
+        b conf env {
             HERMES_HOME: $ctx.workdir
         }
 
@@ -27,10 +27,11 @@ export def main [context: record = {}] {
             webhook: 8644
         }
         | values
-        conf expose $ports
 
-        copy images/tools/entrypoint/hermes.nu /entrypoint/hermes.nu
+        b conf expose $ports
 
-        conf cmd ['srv']
+        b copy images/tools/entrypoint/hermes.nu /entrypoint/hermes.nu
+
+        b conf cmd ['srv']
     }
 }

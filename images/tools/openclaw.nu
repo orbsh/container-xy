@@ -31,7 +31,7 @@ export def main [context: record = {}] {
         | uniq
     }
     | build {|ctx|
-        conf env {
+        b conf env {
             NODE_LLAMA_CPP_SKIP_DOWNLOAD: 'true'
             OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: '1'
             OPENCLAW_HOME: $ctx.workdir
@@ -55,7 +55,7 @@ export def main [context: record = {}] {
 
         let plugins_ins = $ctx.plugins | each {|x| $'openclaw plugins install @openclaw/($x)' }
 
-        run [
+        b run [
             'mkdir -p /app/data'
             'cd /app'
             # 'npm install --no-cache --omit=optional openclaw'
@@ -63,10 +63,10 @@ export def main [context: record = {}] {
             ...$skills_ins
         ]
 
-        conf workdir $ctx.workdir
-        copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
+        b conf workdir $ctx.workdir
+        b copy images/tools/entrypoint/openclaw.nu /entrypoint/openclaw.nu
 
-        conf expose [18789]
-        conf cmd ['srv']
+        b conf expose [18789]
+        b conf cmd ['srv']
     }
 }

@@ -19,10 +19,10 @@ export def main [context: record = {}] {
             ]
         }
         let model = 'codefuse-ai/F2LLM-v2-0.6B'
-        run [
+        b run [
             $'infinity_emb v2 --model-id ($model) --preload-only'
         ]
-        with-mount {
+        b with-mount {
             cd entrypoint
             r#'
             #!/usr/bin/env nu
@@ -41,7 +41,7 @@ export def main [context: record = {}] {
             | str replace -rma $'^ {12}' ''
             | save marimo.nu
         }
-        conf cmd ['srv']
-        conf user master
+        b conf cmd ['srv']
+        b conf user master
     }
 }

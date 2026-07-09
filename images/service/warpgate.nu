@@ -10,7 +10,7 @@ export def main [context: record = {}] {
     | build {|ctx|
         hub install [warpgate] -c $ctx.cache?
 
-        with-mount {
+        b with-mount {
             r#'
             #!/usr/bin/env nu
             use libs/tasks.nu
@@ -48,13 +48,13 @@ export def main [context: record = {}] {
             | save entrypoint/warpgate.nu
         }
 
-        with-mount {
+        b with-mount {
             mkdir data/ssh-keys
             mkdir data/recordings
             mkdir data/db
         }
 
-        conf workdir /data
-        conf cmd ['srv']
+        b conf workdir /data
+        b conf cmd ['srv']
     }
 }

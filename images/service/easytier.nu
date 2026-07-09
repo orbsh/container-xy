@@ -12,9 +12,9 @@ export def main [context: record = {}] {
         pkg install [iptables iproute2]
         hub install [easytier] -c $ctx.cache?
 
-        conf expose [11010 u11010]
+        b conf expose [11010 u11010]
 
-        with-mount {
+        b with-mount {
             r#'
             #!/usr/bin/env nu
             use libs/tasks.nu
@@ -70,7 +70,7 @@ export def main [context: record = {}] {
             | save entrypoint/easytier.nu
         }
 
-        conf workdir $ctx.workdir
-        conf cmd ['srv']
+        b conf workdir $ctx.workdir
+        b conf cmd ['srv']
     }
 }

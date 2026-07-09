@@ -65,6 +65,6 @@ export def main [context: record = {}] {
         | each {|x|
             $"python3 -c \"import duckdb; duckdb.execute\('INSTALL ($x);'\)\""
         }
-        | run $in
+        | b run $in
     }
 }

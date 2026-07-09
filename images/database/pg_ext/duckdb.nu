@@ -18,12 +18,12 @@ export def main [xctx] {
         | merge $context
         | merge { from: 'scratch', tag: $cx.tag }
         | build {|ctx|
-            conf workdir /
+            b conf workdir /
             let dst = {
                 from: $"($context.image):($pgrx)"
             }
             | build --no-commit {|ctx1|
-                run [
+                b run [
                     'git clone --depth=1 https://github.com/duckdb/pg_duckdb.git'
                     'cd pg_duckdb'
                     'git submodule update --init --recursive'
@@ -32,7 +32,7 @@ export def main [xctx] {
                 ]
             }
 
-            with-mount {|new, old|
+            b with-mount {|new, old|
                 cd ($dst.BUILDAH_WORKING_MOUNTPOINT | path join out/usr)
                 cp -r * $new
             }

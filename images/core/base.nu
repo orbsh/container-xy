@@ -10,8 +10,8 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        conf expose [22]
-        conf env {
+        b conf expose [22]
+        b conf env {
             LANG: C.UTF-8
             LC_ALL: C.UTF-8
             TIMEZONE: $ctx.timezone
@@ -45,15 +45,15 @@ export def main [context: record = {}] {
         ]
 
         # conf volume [$ctx.workdir]
-        conf env {
+        b conf env {
             DEBUGE: ''
             PREBOOT: ''
             POSTBOOT: ''
             CRONFILE: ''
         }
-        conf workdir $ctx.workdir
-        conf cmd []
-        copy entrypoint /entrypoint
-        conf entrypoint ["/entrypoint/libs/init.nu"]
+        b conf workdir $ctx.workdir
+        b conf cmd []
+        b copy entrypoint /entrypoint
+        b conf entrypoint ["/entrypoint/libs/init.nu"]
     }
 }

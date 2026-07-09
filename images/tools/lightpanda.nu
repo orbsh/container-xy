@@ -9,13 +9,13 @@ export def main [context: record = {}] {
     | merge $context
     | build {|ctx|
         hub install [lightpanda]
-        conf expose [9222]
+        b conf expose [9222]
 
         pkg setup py [
             playwright
         ]
 
-        with-mount {
+        b with-mount {
             cd entrypoint
             r#'
             #!/usr/bin/env nu

@@ -13,7 +13,7 @@ export def --env main [context: record = {}] {
             let version = curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest | from json | get tag_name
             trace o -p neovim-version $version
             let url = $"https://github.com/neovim/neovim/releases/download/($version)/nvim-linux-x86_64.tar.gz"
-            with-mount {|new, old|
+            b with-mount {|new, old|
                 mkdir target
                 cd target
                 let target = pwd
@@ -24,7 +24,7 @@ export def --env main [context: record = {}] {
             trace o -p setup-extensions
             let gurl = 'https://github.com/fj0r/nvim-lua.git'
             trace o -p config $gurl
-            run [
+            b run [
                 'cd ~/.config'
                 $'git clone --depth=3 ($gurl) nvim'
                 '/target/bin/nvim --headless "+Lazy! sync" +qa'

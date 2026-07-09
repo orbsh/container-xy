@@ -24,7 +24,7 @@ export def main [context: record = {}] {
     | build {|ctx|
 
         setup timezone $ctx.timezone
-        conf env {
+        b conf env {
             LANG: C.UTF-8
             LC_ALL: C.UTF-8
             TIMEZONE: $ctx.timezone
@@ -68,7 +68,7 @@ export def main [context: record = {}] {
             'psycopg[binary]' numpy
         ]
 
-        conf env {
+        b conf env {
             POSTGRES_USER: master
             POSTGRES_DB: default
             POSTGRES_PASSWORD: master
@@ -95,7 +95,7 @@ export def main [context: record = {}] {
             (pg_ext search $xctx)
             (pg_ext zhparser $xctx)
         ] {
-            with-mount {|new, old|
+            b with-mount {|new, old|
                 let ctr = { from: $'($context.image):($ext)' } | build --no-commit {|| }
                 cd ($ctr.BUILDAH_WORKING_MOUNTPOINT)
                 cp -r * ($new | path join usr)
@@ -104,10 +104,10 @@ export def main [context: record = {}] {
         }
 
         for f in [extend hook] {
-            copy images/database/postgres/entrypoint-($f).nu /usr/local/bin/entrypoint-($f).nu
+            b copy images/database/postgres/entrypoint-($f).nu /usr/local/bin/entrypoint-($f).nu
         }
 
-        conf workdir $ctx.workdir
-        conf entrypoint [nu /usr/local/bin/entrypoint-hook.nu]
+        b conf workdir $ctx.workdir
+        b conf entrypoint [nu /usr/local/bin/entrypoint-hook.nu]
     }
 }
