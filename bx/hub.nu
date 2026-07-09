@@ -39,13 +39,15 @@ export def get-version [cfg]: nothing -> string {
 
 export def format-uri [cfg]: record -> string {
     let vers = $in
-    if ($cfg.uri | describe -d).type == list {
+    let uris: list<string> = if ($cfg.uri | describe -d).type == list {
         $cfg.uri
     } else {
         [$cfg.uri]
     }
+
+    $uris
     | each {|x|
-        let u = $vers | format pattern $x
+        let u: string = $vers | format pattern $x
         if $cfg.type? in ['ImageVolume'] {
             $u
         } else if ($u | str starts-with 'http') {
