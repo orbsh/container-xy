@@ -37,9 +37,9 @@ export def get-version [cfg]: nothing -> string {
     $v
 }
 
-export def format-uri [cfg]: record -> string {
+export def format-uri [cfg]: record -> list<string> {
     let vers = $in
-    let uris: list<string> = if ($cfg.uri | describe -d).type == list {
+    let uris = if ($cfg.uri | describe -d).type == list {
         $cfg.uri
     } else {
         [$cfg.uri]
@@ -47,7 +47,7 @@ export def format-uri [cfg]: record -> string {
 
     $uris
     | each {|x|
-        let u: string = $vers | format pattern $x
+        let u = $vers | format pattern $x
         if $cfg.type? in ['ImageVolume'] {
             $u
         } else if ($u | str starts-with 'http') {
