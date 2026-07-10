@@ -25,7 +25,7 @@ export def exec [cmd: list] {
 export def commit [image] {
     trace o -p commit $image
     let msg = consume-history
-    buildah config --add-history --comment $msg $env.BUILDAH_WORKING_CONTAINER
+    buildah config --add-history --history-comment $msg $env.BUILDAH_WORKING_CONTAINER
     buildah commit --format docker --rm $env.BUILDAH_WORKING_CONTAINER $image
     rm -f $env.BUILDAH_WORKING_HISTORY
 }

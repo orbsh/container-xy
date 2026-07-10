@@ -60,7 +60,7 @@ export def --env main [
     trace o -p commit $image
 
     let msg = consume-history
-    buildah config --add-history --comment $msg $working_container
+    buildah config --add-history --history-comment $msg $working_container
 
     mut args = [--format docker --rm]
     if $squash {
