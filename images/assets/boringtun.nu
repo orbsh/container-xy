@@ -21,7 +21,7 @@ export def main [context: record = {}] {
             ]
         }
 
-        let version = with-mount {
+        let version = b with-mount {
             mkdir bin
             cp ($boringtun.BUILDAH_WORKING_MOUNTPOINT
                | path join target boringtun-cli
