@@ -11,6 +11,7 @@ export def main [context: record = {}] {
     | build {|ctx|
         b conf env {
             HERMES_HOME: $ctx.workdir
+            FEISHU_REQUIRE_MENTION: "true"
         }
 
         pkg install [git]
@@ -18,6 +19,7 @@ export def main [context: record = {}] {
         pkg py install [
             html2txt ddgr
             openai agno
+            lark-oapi==1.6.8 qrcode==7.4.2
             git+https://github.com/NousResearch/hermes-agent.git
         ]
 
