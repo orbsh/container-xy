@@ -425,7 +425,7 @@ packages:
         - fts
   lakekeeper:
     repo: lakekeeper/lakekeeper
-    uri: download/{version}/lakekeeper-{arch2}-unknown-linux-gnu.tar.gz
+    uri: download/{version}/lakekeeper-{arch}-unknown-linux-gnu.tar.gz
     unpack:
       - wrap bin
   surrealdb:
