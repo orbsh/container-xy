@@ -25,7 +25,7 @@ if not ($flag | path exists) {
             $ok = true
             break
         }
-        print $"Bootstrap attempt ($attempt) failed (HTTP ($code))"
+        print $"Bootstrap attempt ($attempt) failed \(HTTP ($code | into string)\)"
         sleep (1sec * $attempt)
     }
     if not $ok { exit 1 }
@@ -67,7 +67,7 @@ if not ($flag | path exists) {
             } else if $code == 409 {
                 print "Warehouse already exists"; $wh_ok = true; break
             }
-            print $"Warehouse attempt ($attempt) failed (HTTP ($code))"
+            print $"Warehouse attempt ($attempt) failed \(HTTP ($code | into string)\)"
             sleep (1sec * $attempt)
         }
         if not $wh_ok { exit 1 }
