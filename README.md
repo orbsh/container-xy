@@ -27,14 +27,14 @@ export def main [context: record = {}] {
     }
     | merge $context
     | build {|ctx|
-        conf expose [8080]
+        b conf expose [8080]
         hub install [ferron] -c $ctx.cache?
-        with-mount {
+        b with-mount {
             # Configuration files embedded directly via Nushell raw strings
             r#':8080 { root "/srv" }'#
             | save etc/ferron.conf
         }
-        conf cmd ['srv']
+        b conf cmd ['srv']
     }
 }
 ```

@@ -423,6 +423,11 @@ packages:
         - mysql
         - sqlite
         - fts
+  lakekeeper:
+    repo: lakekeeper/lakekeeper
+    uri: download/{version}/lakekeeper-{arch2}-unknown-linux-gnu.tar.gz
+    unpack:
+      - wrap bin
   surrealdb:
     repo: surrealdb/surrealdb
     # list_tags: true
