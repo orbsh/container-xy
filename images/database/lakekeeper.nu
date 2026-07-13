@@ -14,6 +14,8 @@ export def main [context: record = {}] {
 
         b conf env {
             LAKEKEEPER__PG_ENCRYPTION_KEY: 'This-is-NOT-Secure!'
+            LAKEKEEPER__PG_DATABASE_URL_READ: 'postgresql://postgres:postgres@localhost:5432/lakekeeper'
+            LAKEKEEPER__PG_DATABASE_URL_WRITE: 'postgresql://postgres:postgres@localhost:5432/lakekeeper'
             LAKEKEEPER__AUTHZ_BACKEND: allowall
         }
 
