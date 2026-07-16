@@ -1,5 +1,5 @@
 [assets.image]
-repo = "ghcr.io/fj0r"
+repo = "ghcr.io/orbsh"
 dest = '~/pub/Platform'
 
 [assets.image.manifest.xy]

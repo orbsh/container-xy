@@ -29,7 +29,7 @@ export def main [context: record = {}] {
                 mkdir etc
             }
             trace o -p setup-extensions
-            let gurl = 'https://github.com/fj0r/nvim-lua.git'
+            let gurl = 'https://github.com/orbsh/nvim-lua.git'
             trace o -p config $gurl
             b run [
                 'cd ~/.config'

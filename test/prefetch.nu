@@ -2,8 +2,8 @@ use ../bx *
 
 export def main [context: record = {}] {
     {
-        from: 'ghcr.io/fj0r/xy:z'
-        author: fj0r
+        from: 'ghcr.io/orbsh/xy:z'
+        author: orbsh
         user: master
         workdir: /home/master
         rust: {

@@ -26,7 +26,7 @@ The `build` function accepts a record as context (passed via pipeline `$in`). Be
 
 ```nu
 {
-    from: 'ghcr.io/fj0r/xy:py'        # Required: base image
+    from: 'ghcr.io/orbsh/xy:py'        # Required: base image
     image: 'test-skill'               # Required: image name
     tag: 'latest'                     # Optional: tag, defaults to latest
     author: 'master'                  # Optional: author

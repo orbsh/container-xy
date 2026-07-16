@@ -1,6 +1,6 @@
 # OpenClaw
 
-The `ghcr.io/fj0r/xy:openclaw` image is regularly updated to the latest version
+The `ghcr.io/orbsh/xy:openclaw` image is regularly updated to the latest version
 
 - Configuration files are automatically generated from environment variables, no onboarding process required
 - Mount `/app/data` to persist data

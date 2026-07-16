@@ -57,7 +57,7 @@ export module action {
 
     export def gen [
         --reg:string = "ghcr.io"
-        --user:string = "fj0r"
+        --user:string = "orbsh"
         --image:string = xy
     ] {
         use hub
@@ -332,7 +332,7 @@ export module test {
     export def hermes [
         ...args
     ] {
-        let image = 'ghcr.io/fj0r/xy:hermes'
+        let image = 'ghcr.io/orbsh/xy:hermes'
         mut flag = [
             -e DASHSCOPE_API_KEY=(asn --all | get api_key)
             -v ($env.PWD)/images/tools/entrypoint/hermes.nu:/entrypoint/hermes.nu
@@ -343,7 +343,7 @@ export module test {
     export def zeroclaw [
         ...args
     ] {
-        let image = 'ghcr.io/fj0r/xy:zeroclaw'
+        let image = 'ghcr.io/orbsh/xy:zeroclaw'
         mut flag = [
             -p 42617:42617
             -e API_KEY=(asn --all | get api_key)
@@ -379,7 +379,7 @@ export module test {
     }
 
     export def openfang [
-        --image(-i): string = 'ghcr.io/fj0r/xy:openfang'
+        --image(-i): string = 'ghcr.io/orbsh/xy:openfang'
     ] {
         mut flag = [
             --name test-openfang

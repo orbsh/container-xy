@@ -53,14 +53,14 @@ packages:
         b exec $cmd
     options:
       config:
-        git: https://github.com/fj0r/nushell.git
+        git: https://github.com/orbsh/nushell.git
         clone:
           depth: 3
       plugins:
         - query
   helix:
     type: ImageVolume
-    uri: ghcr.io/fj0r/assets:helix
+    uri: ghcr.io/orbsh/assets:helix
     path: "" # opt/helix
     unpack: []
     hooks:
@@ -446,12 +446,12 @@ packages:
       - wrap bin
   boringtun:
     type: ImageVolume
-    uri: ghcr.io/fj0r/assets:boringtun
+    uri: ghcr.io/orbsh/assets:boringtun
     path: ""
     unpack: []
   dropbear:
     type: ImageVolume
-    uri: ghcr.io/fj0r/assets:dropbear
+    uri: ghcr.io/orbsh/assets:dropbear
     path: ""
     unpack: []
   mkcert:
@@ -468,7 +468,7 @@ packages:
       - wrap bin
   nvim:
     type: ImageVolume
-    uri: ghcr.io/fj0r/assets:nvim
+    uri: ghcr.io/orbsh/assets:nvim
     path: "" # opt/helix
     unpack: []
     hooks:

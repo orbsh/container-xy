@@ -27,10 +27,10 @@ if not ($flag | path exists) {
     # Wait for port readiness (serve is queued, listener will dispatch shortly)
     mut ready = false
     for attempt in 1..30 {
-        let r = (
+        let r = do -i {(
             http get --allow-errors
             $"http://localhost:($port)/management/v1/info"
-        )
+        )}
         let code = $r.status_code? | default 0
         if $code in [200 401 403 404] {
             $ready = true

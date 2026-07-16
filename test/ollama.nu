@@ -2,7 +2,7 @@ use ../bx *
 
 export def main [context: record = {}] {
     {
-        from: 'ghcr.io/fj0r/xy:ollama'
+        from: 'ghcr.io/orbsh/xy:ollama'
         author: unnamed
         timezone: Asia/Shanghai
         user: master

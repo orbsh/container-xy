@@ -3,7 +3,7 @@ use ../bx *
 export def --env main [context: record = {}] {
     { from: 'scratch' }
     | build --no-commit --expose {|ctx|
-        let nvim = { from: 'ghcr.io/fj0r/xy:latest' }
+        let nvim = { from: 'ghcr.io/orbsh/xy:latest' }
         | build --no-commit {|ctx|
             pkg install [
                 base-devel
@@ -22,7 +22,7 @@ export def --env main [context: record = {}] {
                 mkdir etc
             }
             trace o -p setup-extensions
-            let gurl = 'https://github.com/fj0r/nvim-lua.git'
+            let gurl = 'https://github.com/orbsh/nvim-lua.git'
             trace o -p config $gurl
             b run [
                 'cd ~/.config'
@@ -50,7 +50,7 @@ def x [] {
         curl -fsSL $url | tar -zxf - -C . --strip-components=1
     }
     mkdir etc
-    git clone --depth=1 https://github.com/fj0r/nvim-lua.git etc/nvim
+    git clone --depth=1 https://github.com/orbsh/nvim-lua.git etc/nvim
     bin/nvim -u etc/nvim/init.lua --headless "+Lazy! sync" +qa
     rm -rf etc/nvim/lazy/packages/*/.git
 }

@@ -8,7 +8,7 @@ name: branch_zeroclaw
   workflow_dispatch: null
 env:
   REGISTRY: ghcr.io
-  USERNAME: fj0r
+  USERNAME: orbsh
   IMAGE_NAME: xy
 jobs:
   build:

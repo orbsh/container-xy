@@ -21,7 +21,7 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: 'ghcr.io/fj0r/xy:deb'
+        from: 'ghcr.io/orbsh/xy:deb'
         image: 'ferron'
         tag: 'deb'
     }

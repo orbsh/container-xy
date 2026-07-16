@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  USERNAME: fj0r
+  USERNAME: orbsh
   IMAGE_NAME: xy
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
-          username: fj0r
+          username: orbsh
           password: ${{ secrets.GHCR_TOKEN }}
 
       # Extract metadata (tags, labels) for Docker
@@ -74,7 +74,7 @@ jobs:
         run: |
           overlay use ${{ github.workspace }}/images/test.nu as build
           build {
-            from: 'ghcr.io/fj0r/xy:z'
+            from: 'ghcr.io/orbsh/xy:z'
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}

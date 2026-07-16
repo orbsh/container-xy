@@ -2,7 +2,7 @@ use ../bx *
 
 export def main [context: record = {}] {
     {
-        from: 'ghcr.lizzie.fun/fj0r/io:base'
+        from: 'ghcr.lizzie.fun/orbsh/io:base'
         timezone: Asia/Shanghai
         user: master
         workdir: /home/master

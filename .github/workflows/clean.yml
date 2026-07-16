@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: fj0r/xy
+  IMAGE_NAME: orbsh/xy
 
 
 jobs:
