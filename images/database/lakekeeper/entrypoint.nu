@@ -31,12 +31,12 @@ if not ($flag | path exists) {
             http get --allow-errors
             $"http://localhost:($port)/management/v1/info"
         )}
-        let code = $r.status_code? | default 0
-        if $code in [200 401 403 404] {
+
+        if ($r.server-id? | is-not-empty) {
             $ready = true
             break
         }
-        print $"Waiting for port ($port)... (attempt ($attempt)/30)"
+        print $"Waiting for port ($port)... \(attempt ($attempt)/30\)"
         sleep 2sec
     }
     if not $ready {
@@ -56,11 +56,11 @@ if not ($flag | path exists) {
         )}
         let code = $r.status_code? | default 0
         if $code in [200 201 400 409] {
-            print $"Bootstrapped (HTTP ($code))"
+            print $"Bootstrapped \(HTTP ($code)\)"
             $ok = true
             break
         }
-        print $"Bootstrap attempt ($attempt) failed (HTTP ($code | into string))"
+        print $"Bootstrap attempt ($attempt) failed \(HTTP ($code | into string)\)"
         sleep (1sec * $attempt)
     }
     if not $ok { exit 1 }
@@ -102,7 +102,7 @@ if not ($flag | path exists) {
             } else if $code == 409 {
                 print "Warehouse already exists"; $wh_ok = true; break
             }
-            print $"Warehouse attempt ($attempt) failed (HTTP ($code | into string))"
+            print $"Warehouse attempt ($attempt) failed \(HTTP ($code | into string)\)"
             sleep (1sec * $attempt)
         }
         if not $wh_ok { exit 1 }
