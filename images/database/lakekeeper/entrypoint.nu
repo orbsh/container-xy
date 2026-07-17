@@ -54,13 +54,13 @@ if not ($flag | path exists) {
             $"http://localhost:($port)/management/v1/bootstrap"
             {"accept-terms-of-use": true}
         )}
-        let code = $r.status_code? | default 0
-        if $code in [200 201 400 409] {
-            print $"Bootstrapped \(HTTP ($code)\)"
+        let error = $r.error?.type? | default ''
+        if ($error | is-empty) or ($error == 'CatalogAlreadyBootstrapped') {
+            print "Bootstrapped"
             $ok = true
             break
         }
-        print $"Bootstrap attempt ($attempt) failed \(HTTP ($code | into string)\)"
+        print $"Bootstrap attempt ($attempt) failed: ($error)"
         sleep (1sec * $attempt)
     }
     if not $ok { exit 1 }
@@ -96,13 +96,10 @@ if not ($flag | path exists) {
                     }
                 }
             )
-            let code = $r.status_code? | default 0
-            if $code in [200 201] {
-                print "Warehouse created"; $wh_ok = true; break
-            } else if $code == 409 {
-                print "Warehouse already exists"; $wh_ok = true; break
+            if ($r | is-not-empty) {
+                print "Warehouse created or already exists"; $wh_ok = true; break
             }
-            print $"Warehouse attempt ($attempt) failed \(HTTP ($code | into string)\)"
+            print $"Warehouse attempt ($attempt) failed \(($r)\)"
             sleep (1sec * $attempt)
         }
         if not $wh_ok { exit 1 }
