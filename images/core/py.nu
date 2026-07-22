@@ -35,7 +35,7 @@ export def main [context: record = {}] {
     | merge { tag: py-data }
     | build {|ctx|
         pkg with [git gcc python3-dev] {
-            pkg py install [polars deltalake pyiceberg[rest-sigv4] lancedb zstandard]
+            pkg py install [polars deltalake pyiceberg[rest-sigv4,pyarrow] lancedb zstandard]
         }
     }
 
