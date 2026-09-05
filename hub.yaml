@@ -642,7 +642,7 @@ stacks:
     logging:
       - structlog
     codec:
-      - ckdl
+      - kdl-py
       - pyyaml
   js:
     dev:
@@ -714,6 +714,7 @@ stacks:
       - serde_yaml
       - serde-kdl2
       - kdl
+      - knus
       - toml
     logging:
       - tracing
