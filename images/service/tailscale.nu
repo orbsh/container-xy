@@ -82,11 +82,18 @@ export def main [context: record = {}] {
                 ]
             }
 
-            # tailscale up is retried: control plane may be briefly unreachable
-            # at container start; the daemon itself stays managed by tasks.
+            # tailscale up is a ONE-SHOT command: it exits right after the node
+            # registers. The task framework is all-or-nothing ([I2] any task
+            # exit kills all tasks), so up must NOT be a bare task — wrap it in
+            # a polling loop that re-runs on failure and sleeps forever on
+            # success, keeping the task alive for the container lifetime.
+            # (key is --reusable for stateless re-register; retry covers the
+            # control plane being briefly unreachable at container start.)
             tasks spawn {
                 tag: tailscale-up
-                msg: "Running tailscale up"
+                msg: "Running tailscale up (retried)"
+                shell: true
+                polling_interval: 30sec
                 cmd: [
                     /usr/local/bin/tailscale
                     --socket=($"($state)/tailscaled.sock")
