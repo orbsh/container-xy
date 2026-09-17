@@ -360,6 +360,18 @@ packages:
       - mv headscale_{version}_linux_{arch2} headscale
       - chmodx headscale
       - wrap bin
+  tailscale:
+    # GitHub releases 不带编译资产，官方二进制托管在 pkgs.tailscale.com
+    repo: tailscale/tailscale
+    exclude_vessel: true
+    version:
+      - substr 1
+    uri: https://pkgs.tailscale.com/stable/tailscale_{version}_{arch2}.tgz
+    unpack:
+      - strip 1
+      - filter tailscale tailscaled
+      - chmodx tailscale tailscaled
+      - wrap bin
   zot:
     repo: project-zot/zot
     exclude_vessel: true
