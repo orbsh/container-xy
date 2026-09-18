@@ -50,7 +50,7 @@ xy = [
 #0x = ["java17"]
 
 [assets.image.manifest.vpn]
-xy = ["wireguard", "warpgate", "headscale", "tailscale"]
+xy = ["wireguard", "warpgate", "netbird-server", "netbird-client"]
 
 #[manifest.pyflink]
 #0x = ["pyflink"]

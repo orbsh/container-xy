@@ -97,13 +97,24 @@ jobs:
             tag: ''
           }
 
-      - name: build headscale
+      - name: build netbird-client
         shell: buildah unshare nu {0}
         run: |-
-          overlay use ${{ github.workspace }}/images/service/headscale.nu as build
+          overlay use ${{ github.workspace }}/images/service/netbird-client.nu as build
           build {
             author: ${{ env.USERNAME }}
             password: ${{ secrets.GHCR_TOKEN }}
             image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
-            tag: headscale
+            tag: netbird-client
+          }
+
+      - name: build netbird-server
+        shell: buildah unshare nu {0}
+        run: |-
+          overlay use ${{ github.workspace }}/images/service/netbird-server.nu as build
+          build {
+            author: ${{ env.USERNAME }}
+            password: ${{ secrets.GHCR_TOKEN }}
+            image: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+            tag: netbird-server
           }
