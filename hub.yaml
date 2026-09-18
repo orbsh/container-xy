@@ -372,6 +372,24 @@ packages:
       - filter tailscale tailscaled
       - chmodx tailscale tailscaled
       - wrap bin
+  netbird:
+    repo: netbirdio/netbird
+    exclude_vessel: true
+    version:
+      - substr 1
+    uri: download/v{version}/netbird_{version}_linux_{arch2}.tar.gz
+    unpack:
+      - filter netbird
+      - chmodx netbird
+      - wrap bin
+  netbird-server:
+    # 服务端无独立二进制 release，从官方 combined 镜像抽取 /go/bin/netbird-server
+    type: ImageVolume
+    uri: netbirdio/netbird-server:latest
+    path: go/bin
+    unpack:
+      - chmodx netbird-server
+      - wrap bin
   zot:
     repo: project-zot/zot
     exclude_vessel: true
