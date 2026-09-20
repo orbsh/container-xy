@@ -12,6 +12,44 @@ export def main [context: record = {}] {
         pkg install [ca-certificates]
         hub install [netbird-server] -c $ctx.cache?
 
+        # GeoLite2 预置：首次启动 netbird 会同步下载 GeoLite2（33MB mmdb + 50MB CSV），
+        # 国内网络下载不完导致启动被 liveness probe 反复杀（NB_DISABLE_GEOLOCATION
+        # 是全量禁用，geolocation 功能没了）。构建期下载并导入 geonames sqlite，
+        # 运行时 entrypoint 拷到 $NB_DATA，netbird 见文件存在即跳过下载。
+        #
+        # with-mount 在宿主机执行、相对路径落在容器挂载点：下载 / 解包 / sqlite 导入
+        # 全部用宿主机工具完成，产物直接写进镜像 /opt/geo。镜像里不留 sqlite3/unzip，
+        # 也不需要事后再 purge。
+        b with-mount {
+            let base = 'https://pkgs.netbird.io/geolocation-dbs'
+            let stage = (mktemp -t -d --suffix .geolite)
+            trace o -p geolite $stage
+
+            curl -fsSL --retry 3 -o ($stage | path join city.tar.gz) $'($base)/GeoLite2-City/download?suffix=tar.gz'
+            curl -fsSL --retry 3 -o ($stage | path join csv.zip) $'($base)/GeoLite2-City-CSV/download?suffix=zip'
+
+            # 日期取自 tarball 顶层目录名，netbird 按 GeoLite2-City_<date> 匹配文件
+            let top = (tar tzf ($stage | path join city.tar.gz) | lines | first | split row '/' | first)
+            let date = ($top | parse 'GeoLite2-City_{date}' | get 0.date)
+            trace o -p geolite { date: $date }
+
+            mkdir opt/geo
+            mkdir ($stage | path join city)
+            tar zxf ($stage | path join city.tar.gz) -C ($stage | path join city)
+            cp ($stage | path join city $top GeoLite2-City.mmdb) $'opt/geo/GeoLite2-City_($date).mmdb'
+
+            unzip -q ($stage | path join csv.zip) -d ($stage | path join csv)
+            let csvdir = (ls ($stage | path join csv) | where type == dir | get name | first)
+            let db = $'opt/geo/geonames_($date).db'
+            sqlite3 $db 'CREATE TABLE geonames (geoname_id integer, locale_code text, continent_code text, continent_name text, country_iso_code text, country_name text, subdivision_1_iso_code text, subdivision_1_name text, subdivision_2_iso_code text, subdivision_2_name text, city_name text, metro_code text, time_zone text, is_in_european_union text);'
+            # 导入 CSV：跳过 header，14 列
+            sqlite3 -csv $db $'.import --skip 1 ($csvdir | path join GeoLite2-City-Locations-en.csv) geonames'
+            sqlite3 $db 'CREATE INDEX idx_geonames_country_iso_code ON geonames(country_iso_code); CREATE INDEX idx_geonames_geoname_id ON geonames(geoname_id);'
+
+            trace o -p geolite (ls opt/geo | get name)
+            rm -rf $stage
+        }
+
         b conf expose [80 u3478]
 
         b with-mount {
@@ -89,6 +127,20 @@ export def main [context: record = {}] {
             }
 
             mkdir $data
+
+            # 预置 GeoLite2：构建期已放在 /opt/geo，拷到数据目录后 netbird 检测
+            # 到文件存在即跳过启动期下载（文件名含日期，匹配 netbird 的 glob）
+            let geo_src = '/opt/geo'
+            if ($geo_src | path exists) {
+                ls $'($geo_src)/*' | each {|f|
+                    let dst = ($data | path join $f.name)
+                    if not ($dst | path exists) {
+                        cp $f.name $dst
+                        print $"staged geolite: ($f.name)"
+                    }
+                }
+            }
+
             let cfg = ($data | path join config.yaml)
 
             # regenerate every boot from env; state files untouched
