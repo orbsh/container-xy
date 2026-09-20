@@ -390,6 +390,13 @@ packages:
     unpack:
       - chmodx netbird-server
       - wrap bin
+  netbird-dashboard:
+    # dashboard 也无二进制 release，从官方 SPA 镜像抽取 Next.js 静态导出根
+    # （每个路由一个 <route>.html，运行期按 NB_SERVER_URL 做 envsubst 等价替换）
+    type: ImageVolume
+    uri: netbirdio/dashboard:latest
+    path: usr/share/nginx/html
+    unpack: []
   zot:
     repo: project-zot/zot
     exclude_vessel: true

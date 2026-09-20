@@ -2,7 +2,9 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        from: $'($context.image):deb'
+        # ferron 基础镜像：镜像内已有 ferron 及其 entrypoint（自行启动 ferron），
+        # 本镜像只加 dashboard 静态 + 一个 ferron 配置 + netbird 自己的 entrypoint。
+        from: $'($context.image):ferron'
         user: master
         workdir: /data
         tag: netbird-server
@@ -11,6 +13,11 @@ export def main [context: record = {}] {
     | build {|ctx|
         pkg install [ca-certificates]
         hub install [netbird-server] -c $ctx.cache?
+        # dashboard SPA（Next.js 静态导出）落到 /srv/dashboard，ferron 直接服务。
+        # 镜像以 root 运行（deb 基础镜像只建 master 用户，不设容器用户；除非定义里显式
+        # b conf user），所以 entrypoint 运行期直接改写这些资产，不需要 chown。
+        # 若将来给本镜像加 b conf user master，需同时把 /srv/dashboard chown 过去。
+        hub install [netbird-dashboard] -t /srv/dashboard
 
         # GeoLite2 预置：首次启动 netbird 会同步下载 GeoLite2（33MB mmdb + 50MB CSV），
         # 国内网络下载不完导致启动被 liveness probe 反复杀（NB_DISABLE_GEOLOCATION
@@ -50,7 +57,82 @@ export def main [context: record = {}] {
             rm -rf $stage
         }
 
-        b conf expose [80 u3478]
+        # 80  = ferron（h1：dashboard 静态 + /api /oauth2 /ws-proxy /relay 代理）
+        # 8080 = netbird 自身（h2c：网关直连的 gRPC；ferron 回源也走这里）
+        b conf expose [80 8080 u3478]
+
+        # ferron 配置（镜像内 /srv/ferron/dashboard.conf，经 CONFIGFILE 选中）
+        #
+        # 为什么 dashboard 与 gRPC 必须分端口：ferron 一个明文 listener 无法同时
+        # 接受 h1 与 h2c（http-server/src/server/mod.rs: "Plaintext HTTP/1.x and
+        # HTTP/2 over cleartext are mutually exclusive"），而 netbird 的 gRPC
+        # （management.ManagementService / signalexchange.SignalExchange）必须 h2c、
+        # relay 与 ws-proxy 的 WebSocket 升级必须 h1。故 ferron 只做 h1 面，
+        # gRPC 由网关直连 8080。
+        #
+        # 路径细节：location 会剥掉匹配前缀（proxy 的 upstream URL 需补回），
+        # 且 location / 的 rewrite 实测会泄漏到其它 location —— 因此 rewrite 用
+        # if_not <matcher> 按路径闸住，否则 /api/xxx 会被改写成 /api/xxx.html。
+        b with-mount {
+            r#'
+            match api_http {
+                request.uri.path ~ r"^/(api|oauth2|relay|ws-proxy)(/|$)"
+            }
+
+            *:80 {
+                root /srv/dashboard
+
+                # Next.js 静态导出：每个路由是 <route>.html（nginx 的
+                # try_files $uri $uri.html $uri/ =404 等价物）；含点的资产路径不动
+                if_not api_http {
+                    rewrite r"^/([-_A-Za-z0-9]+(/[-_A-Za-z0-9]+)*)$" "/$1.html" {
+                        file false
+                        last
+                    }
+                }
+
+                if api_http {
+                    proxy http://127.0.0.1:8080
+                }
+
+                error_page 404 /srv/dashboard/404.html
+                mime_type ".wasm" "application/wasm"
+                directory_listing false
+                file_cache_control "no-store, no-cache, must-revalidate"
+            }
+            '#
+            | str trim
+            | str replace -rma $'^ {12}' ''
+            | save srv/ferron/dashboard.conf
+        }
+
+        # ferron 启动脚本：覆写 ferron 基础镜像带来的 /entrypoint/ferron.nu。
+        # 不走「让它的 entrypoint 读 CONFIGFILE」这条捷径：在派生镜像里
+        # buildah config --env 是「追加」而非「替换」，父镜像的
+        # CONFIGFILE=/srv/ferron/box.conf 仍在 env 列表里并排在前面（getenv/os.Getenv
+        # 取第一个匹配），ferron 于是照 box.conf 起在 :8080，与 netbird 撞端口
+        # （实测报错：failed creating TCP listener on port 8080: bind: address already
+        # in use）。因此把配置路径写死在启动命令里。
+        b with-mount {
+            r#'
+            #!/usr/bin/env nu
+            use libs/tasks.nu
+
+            tasks spawn {
+                tag: ferron
+                msg: 'Starting ferron: dashboard front on :80'
+                cmd: [
+                    /usr/local/bin/ferron
+                    run
+                    --config
+                    /srv/ferron/dashboard.conf
+                ]
+            }
+            '#
+            | str trim
+            | str replace -rma $'^ {12}' ''
+            | save -f entrypoint/ferron.nu
+        }
 
         b with-mount {
             r#'
@@ -60,8 +142,12 @@ export def main [context: record = {}] {
             # ------------------------------------------------------------------
             # NetBird combined server (management + signal + relay + STUN),
             # embedded IdP (Dex) always enabled — issuer = exposedAddress + /oauth2.
-            # TLS is terminated upstream by the gateway: plaintext HTTP on :80
-            # (gRPC multiplexed via HTTP/2 cleartext, h2c from Envoy Gateway).
+            # TLS is terminated upstream by the gateway: plaintext HTTP on :8080
+            # (gRPC multiplexed via HTTP/2 cleartext, h2c from the gateway).
+            # The dashboard SPA and the h1 API surface are served by ferron on
+            # :80 in the same container (see dashboard.conf): ferron proxies
+            # /api /oauth2 /relay /ws-proxy here, while the gRPC prefixes hit
+            # this port directly from the gateway.
             # Config is regenerated on every boot from NB_* env (single source
             # of truth); state (sqlite db, idp.db, keys) lives in NB_DATA and
             # is never touched.
@@ -84,7 +170,7 @@ export def main [context: record = {}] {
                 let dashboard_url = ($env.NB_DASHBOARD_URL? | default $server_url)
                 mut config = {
                     server: {
-                        listenAddress: ":80"
+                        listenAddress: ":8080"
                         exposedAddress: $"($server_url):443"
                         stunPorts: [($env.NB_STUN_PORT? | default 3478 | into int)]
                         metricsPort: 9090
@@ -128,16 +214,18 @@ export def main [context: record = {}] {
 
             mkdir $data
 
-            # 预置 GeoLite2：构建期已放在 /opt/geo，拷到数据目录后 netbird 检测
-            # 到文件存在即跳过启动期下载（文件名含日期，匹配 netbird 的 glob）
+            # 预置 GeoLite2：构建期已放在 /opt/geo，运行期无条件覆盖数据目录里的同名文件。
+            # 不用"不存在才拷"：netbird 启动期自己下载若中途被打断，会在同一文件名下留
+            # 半成品（文件名带日期，与镜像副本同名），存在性判断会让它一直用坏文件；镜像
+            # 里的副本是已知良好的，覆盖安全。版本升级时文件名带新日期，不会互相覆盖。
             let geo_src = '/opt/geo'
             if ($geo_src | path exists) {
                 ls $'($geo_src)/*' | each {|f|
-                    let dst = ($data | path join $f.name)
-                    if not ($dst | path exists) {
-                        cp $f.name $dst
-                        print $"staged geolite: ($f.name)"
-                    }
+                    # 必须取 basename：ls 给的是绝对路径，path join 遇到绝对路径会把它
+                    # 当成结果（不是拼接），直接拼就成了"自己拷自己"（cp-error-same-file）
+                    let name = ($f.name | path basename)
+                    cp -f $f.name ($data | path join $name)
+                    print $"staged geolite: ($name)"
                 }
             }
 
@@ -147,6 +235,73 @@ export def main [context: record = {}] {
             build-config $server_url $data | to yaml | save -f $cfg
             print $"Generated netbird config: ($cfg)"
             print $"exposedAddress = ($server_url)"
+
+            # dashboard 静态导出里的运行期变量：官方 dashboard 容器用 envsubst 注入，
+            # 这里等价地在 boot 期替换。值全部由 NB_SERVER_URL 推导（SPA 与 API 同源，
+            # ferron :80 同时服务静态并代理 /api）。占位符形如 "$AUTH_AUTHORITY"，
+            # 只替换下表列出的变量名——chunk 里还有 $D/$H/$W 这类压缩变量，不能碰。
+            let dash = '/srv/dashboard'
+            if ($dash | path exists) {
+                let vars = {
+                    NETBIRD_MGMT_API_ENDPOINT: $server_url
+                    NETBIRD_MGMT_GRPC_API_ENDPOINT: $server_url
+                    AUTH_AUTHORITY: $"($server_url)/oauth2"
+                    AUTH_CLIENT_ID: "netbird-dashboard"
+                    AUTH_CLIENT_SECRET: ""
+                    # embedded IdP 无 audience（官方 configure.sh: audience=none）
+                    AUTH_AUDIENCE: ""
+                    # 与 embedded IdP 的 defaultScopes 一致（idp/embedded.go）
+                    AUTH_SUPPORTED_SCOPES: "openid profile email groups"
+                    # 这两个必须是 PATH 不是绝对 URL：dashboard 里是
+                    # redirect_uri = window.location.origin + config.redirectURI
+                    # （OIDCProvider.tsx），给绝对 URL 会拼成
+                    # https://hosthttps://host/nb-auth → Dex 报 Unregistered redirect_uri
+                    AUTH_REDIRECT_URI: "/nb-auth"
+                    AUTH_SILENT_REDIRECT_URI: "/nb-silent-auth"
+                    USE_AUTH0: "false"
+                    NETBIRD_TOKEN_SOURCE: "accessToken"
+                    NETBIRD_CLOUD: "false"
+                    NETBIRD_LICENSED: "false"
+                    NETBIRD_AGENT_NETWORK_ONLY: "false"
+                    NETBIRD_AGENT_NETWORK_ENABLED: "false"
+                    NETBIRD_DRAG_QUERY_PARAMS: "false"
+                    NETBIRD_AUTH_SERVICE_URL: ""
+                    NETBIRD_WASM_PATH: ""
+                    NETBIRD_HOTJAR_TRACK_ID: ""
+                    NETBIRD_GOOGLE_ANALYTICS_ID: ""
+                    NETBIRD_GOOGLE_TAG_MANAGER_ID: ""
+                    NETBIRD_ANALYTICS_EXCLUDED_EMAILS: ""
+                    NETBIRD_HUBSPOT_PORTAL_ID: ""
+                    NETBIRD_HUBSPOT_SIGNUP_FORM_ID: ""
+                    NETBIRD_HUBSPOT_ONBOARDING_FORM_ID: ""
+                    NETBIRD_HUBSPOT_SURVEY_FORM_ID: ""
+                }
+                let subst = {|text: string|
+                    mut t = $text
+                    for k in ($vars | columns) {
+                        $t = ($t | str replace --all ('$' + $k) ($vars | get $k))
+                    }
+                    $t
+                }
+
+                let tmpl = ($dash | path join OidcTrustedDomains.js.tmpl)
+                if ($tmpl | path exists) {
+                    do $subst (open --raw $tmpl) | save -f ($dash | path join OidcTrustedDomains.js)
+                }
+
+                # 运行期配置的 JS chunk 按内容定位（文件名带 hash，随 dashboard 版本变）
+                let chunks = ls $'($dash)/_next/static/chunks/*.js'
+                | where {|f| (open --raw $f.name) | str contains '$AUTH_SUPPORTED_SCOPES' }
+                | get name
+                if ($chunks | is-empty) {
+                    print "dashboard runtime config: 未找到占位符 chunk（已注入过，或 dashboard 占位符布局变了）"
+                } else {
+                    for f in $chunks {
+                        do $subst (open --raw $f) | save -f $f
+                        print $"patched dashboard runtime config: ($f)"
+                    }
+                }
+            }
 
             tasks spawn {
                 tag: netbird-server
