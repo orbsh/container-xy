@@ -2,18 +2,18 @@ use ../../bx *
 
 export def main [context: record = {}] {
     {
-        # ferron 基础镜像：镜像内已有 ferron 及其 entrypoint（自行启动 ferron），
-        # 本镜像只加 dashboard 静态 + 一个 ferron 配置 + netbird 自己的 entrypoint。
-        from: $'($context.image):ferron'
+        # deb 基础镜像 + apt 安装 nginx：单 listener 混跑 h1 与 h2c（nginx 按协议
+        # 分流，不互斥），前端形态对齐 netbird 官方 nginx.tmpl.conf 的单 nginx 方案。
+        from: $'($context.image):deb'
         user: master
         workdir: /data
         tag: netbird-server
     }
     | merge $context
     | build {|ctx|
-        pkg install [ca-certificates]
+        pkg install [ca-certificates nginx]
         hub install [netbird-server] -c $ctx.cache?
-        # dashboard SPA（Next.js 静态导出）落到 /srv/dashboard，ferron 直接服务。
+        # dashboard SPA（Next.js 静态导出）落到 /srv/dashboard，nginx 直接服务。
         # 镜像以 root 运行（deb 基础镜像只建 master 用户，不设容器用户；除非定义里显式
         # b conf user），所以 entrypoint 运行期直接改写这些资产，不需要 chown。
         # 若将来给本镜像加 b conf user master，需同时把 /srv/dashboard chown 过去。
@@ -57,81 +57,121 @@ export def main [context: record = {}] {
             rm -rf $stage
         }
 
-        # 80  = ferron（h1：dashboard 静态 + /api /oauth2 /ws-proxy /relay 代理）
-        # 8080 = netbird 自身（h2c：网关直连的 gRPC；ferron 回源也走这里）
+        # 80   = nginx（单一入口：h1 + h2c 混跑 —— dashboard 静态 + /api /oauth2
+        #        /relay /ws-proxy 的 h1 代理、gRPC 前缀的 grpc_pass，全部一个 listener）
+        # 8080 = netbird 本体（h2c 上游，nginx 回源；不再由网关直连）
         b conf expose [80 8080 u3478]
 
-        # ferron 配置（镜像内 /srv/ferron/dashboard.conf，经 CONFIGFILE 选中）
+        # nginx 配置（镜像内 /srv/nginx/dashboard.conf）。
         #
-        # 为什么 dashboard 与 gRPC 必须分端口：ferron 一个明文 listener 无法同时
-        # 接受 h1 与 h2c（http-server/src/server/mod.rs: "Plaintext HTTP/1.x and
-        # HTTP/2 over cleartext are mutually exclusive"），而 netbird 的 gRPC
-        # （management.ManagementService / signalexchange.SignalExchange）必须 h2c、
-        # relay 与 ws-proxy 的 WebSocket 升级必须 h1。故 ferron 只做 h1 面，
-        # gRPC 由网关直连 8080。
+        # 为什么回到单端口：ferron 一个明文 listener 无法同时接受 h1 与 h2c
+        # （"Plaintext HTTP/1.x and HTTP/2 over cleartext are mutually exclusive"），
+        # 只好让网关按前缀把 gRPC 直连 8080。nginx 明文 listener 能按连接协商
+        # h1/h2c（grpc location 走 h2c、proxy location 走 h1），单端口承载全部路径，
+        # 网关侧不再需要 gRPC 直连路由。
         #
-        # 路径细节：location 会剥掉匹配前缀（proxy 的 upstream URL 需补回），
-        # 且 location / 的 rewrite 实测会泄漏到其它 location —— 因此 rewrite 用
-        # if_not <matcher> 按路径闸住，否则 /api/xxx 会被改写成 /api/xxx.html。
+        # 形态对齐上游 infrastructure_files/nginx.tmpl.conf：SPA 静态在 location /，
+        # proxy location 用 proxy_http_version 1.1 + Upgrade 头透传 WebSocket，
+        # gRPC location 用 grpc_pass（长超时防连接早断）。SPA 路由（/invite/ 等）
+        # 用 try_files 落到 <route>.html —— query string 不参与 try_files 匹配，
+        # ferron rewrite 的两个坑（尾斜杠、query）在这里结构性消失。
         b with-mount {
+            mkdir srv/nginx
             r#'
-            match api_http {
-                request.uri.path ~ r"^/(api|oauth2|relay|ws-proxy)(/|$)"
+            # Next.js 静态导出：每个路由是 <route>.html；try_files $uri $uri.html
+            # =404 等价物。query string 不参与 try_files 匹配，尾斜杠由
+            # $uri.html 兜住（/invite/?token=... → /invite.html）
+            map $http_upgrade $connection_upgrade {
+                default upgrade;
+                ''      close;
             }
+            server {
+                listen 80;
+                listen 80 http2;
+                root /srv/dashboard;
 
-            *:80 {
-                root /srv/dashboard
+                # gRPC 长连接不能被默认 60s 头超时掐断
+                client_header_timeout 1d;
+                client_body_timeout 1d;
 
-                # Next.js 静态导出：每个路由是 <route>.html（nginx 的
-                # try_files $uri $uri.html $uri/ =404 等价物）；含点的资产路径不动
-                if_not api_http {
-                    rewrite r"^/([-_A-Za-z0-9]+(/[-_A-Za-z0-9]+)*)$" "/$1.html" {
-                        file false
-                        last
-                    }
+                proxy_set_header   X-Real-IP $remote_addr;
+                proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header   X-Forwarded-Proto $scheme;
+                proxy_set_header   X-Forwarded-Host $host;
+                grpc_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+
+                # Management grpc
+                location /management.ManagementService/ {
+                    grpc_pass grpc://127.0.0.1:8080;
+                    grpc_read_timeout 1d;
+                    grpc_send_timeout 1d;
+                    grpc_socket_keepalive on;
                 }
-
-                if api_http {
-                    proxy http://127.0.0.1:8080
+                # Signal grpc
+                location /signalexchange.SignalExchange/ {
+                    grpc_pass grpc://127.0.0.1:8080;
+                    grpc_read_timeout 1d;
+                    grpc_send_timeout 1d;
+                    grpc_socket_keepalive on;
                 }
-
-                error_page 404 /srv/dashboard/404.html
-                mime_type ".wasm" "application/wasm"
-                directory_listing false
-                file_cache_control "no-store, no-cache, must-revalidate"
+                # Management api（/api 由 netbird 自带，/oauth2 是 embedded Dex）
+                location /api/ {
+                    proxy_pass http://127.0.0.1:8080;
+                    proxy_set_header Host $host;
+                }
+                location /oauth2/ {
+                    proxy_pass http://127.0.0.1:8080;
+                    proxy_set_header Host $host;
+                }
+                # Relay（WebSocket 升级）
+                location /relay {
+                    proxy_pass http://127.0.0.1:8080;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection $connection_upgrade;
+                    proxy_set_header Host $host;
+                }
+                # Management/Signal wsproxy（WebSocket 升级）
+                location /ws-proxy/ {
+                    proxy_pass http://127.0.0.1:8080;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection $connection_upgrade;
+                    proxy_set_header Host $host;
+                }
+                # dashboard SPA：静态导出 + 路由改写
+                location / {
+                    try_files $uri $uri.html =404;
+                }
+                error_page 404 /404.html;
             }
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
-            | save srv/ferron/dashboard.conf
+            | save srv/nginx/dashboard.conf
         }
 
-        # ferron 启动脚本：覆写 ferron 基础镜像带来的 /entrypoint/ferron.nu。
-        # 不走「让它的 entrypoint 读 CONFIGFILE」这条捷径：在派生镜像里
-        # buildah config --env 是「追加」而非「替换」，父镜像的
-        # CONFIGFILE=/srv/ferron/box.conf 仍在 env 列表里并排在前面（getenv/os.Getenv
-        # 取第一个匹配），ferron 于是照 box.conf 起在 :8080，与 netbird 撞端口
-        # （实测报错：failed creating TCP listener on port 8080: bind: address already
-        # in use）。因此把配置路径写死在启动命令里。
+        # nginx 启动脚本：apt 版 nginx 需要显式指定配置（系统默认 /etc/nginx 会
+        # 带起 site-enabled 默认站点）。-g daemon off 前台运行，交给 tasks 框架管理。
         b with-mount {
             r#'
             #!/usr/bin/env nu
             use libs/tasks.nu
 
             tasks spawn {
-                tag: ferron
-                msg: 'Starting ferron: dashboard front on :80'
+                tag: nginx
+                msg: 'Starting nginx: dashboard front on :80'
                 cmd: [
-                    /usr/local/bin/ferron
-                    run
-                    --config
-                    /srv/ferron/dashboard.conf
+                    /usr/sbin/nginx
+                    -c /srv/nginx/dashboard.conf
+                    -e /dev/stderr
+                    -g daemon\ off\;
                 ]
             }
             '#
             | str trim
             | str replace -rma $'^ {12}' ''
-            | save -f entrypoint/ferron.nu
+            | save -f entrypoint/nginx.nu
         }
 
         b with-mount {
@@ -143,11 +183,11 @@ export def main [context: record = {}] {
             # NetBird combined server (management + signal + relay + STUN),
             # embedded IdP (Dex) always enabled — issuer = exposedAddress + /oauth2.
             # TLS is terminated upstream by the gateway: plaintext HTTP on :8080
-            # (gRPC multiplexed via HTTP/2 cleartext, h2c from the gateway).
-            # The dashboard SPA and the h1 API surface are served by ferron on
-            # :80 in the same container (see dashboard.conf): ferron proxies
-            # /api /oauth2 /relay /ws-proxy here, while the gRPC prefixes hit
-            # this port directly from the gateway.
+            # (gRPC multiplexed via HTTP/2 cleartext, h2c).
+            # The dashboard SPA and the h1 API surface are served by nginx on
+            # :80 in the same container (see /srv/nginx/dashboard.conf): nginx
+            # proxies /api /oauth2 /relay /ws-proxy here and grpc_pass the gRPC
+            # prefixes; the gateway only ever talks to :80.
             # Config is regenerated on every boot from NB_* env (single source
             # of truth); state (sqlite db, idp.db, keys) lives in NB_DATA and
             # is never touched.
@@ -238,7 +278,7 @@ export def main [context: record = {}] {
 
             # dashboard 静态导出里的运行期变量：官方 dashboard 容器用 envsubst 注入，
             # 这里等价地在 boot 期替换。值全部由 NB_SERVER_URL 推导（SPA 与 API 同源，
-            # ferron :80 同时服务静态并代理 /api）。占位符形如 "$AUTH_AUTHORITY"，
+            # nginx :80 同时服务静态并代理 /api）。占位符形如 "$AUTH_AUTHORITY"，
             # 只替换下表列出的变量名——chunk 里还有 $D/$H/$W 这类压缩变量，不能碰。
             let dash = '/srv/dashboard'
             if ($dash | path exists) {
