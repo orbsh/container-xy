@@ -57,12 +57,16 @@ export def main [context: record = {}] {
 
             let args = up-args
 
+            # netbird v0.5x+ 没有 bare `start`：CLI 依赖 daemon（service run），
+            # 或用 `up --foreground-mode` 单进程前台连接（容器形态，无 systemd）。
+            # flags 同时接受 NB_* env（SetFlagsFromEnvVars），这里显式传参更直观
             tasks spawn {
                 tag: netbird-client
                 msg: $"Connecting to ($env.NB_MANAGEMENT_URL) as ($env.NB_HOSTNAME?)"
                 cmd: [
                     /usr/local/bin/netbird
-                    start
+                    up
+                    --foreground-mode
                     --setup-key=($setup_key)
                     ...$args
                 ]
