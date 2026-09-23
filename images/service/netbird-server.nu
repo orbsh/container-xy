@@ -77,7 +77,12 @@ export def main [context: record = {}] {
         # ferron rewrite 的两个坑（尾斜杠、query）在这里结构性消失。
         b with-mount {
             mkdir srv/nginx
+            # -c 指定的文件是完整主配置：必须自己包 events + http 层级
+            # （map 等 http 级指令不能出现在 server 里）
             r#'
+            events {
+            }
+            http {
             # Next.js 静态导出：每个路由是 <route>.html；try_files $uri $uri.html
             # =404 等价物。query string 不参与 try_files 匹配，尾斜杠由
             # $uri.html 兜住（/invite/?token=... → /invite.html）
@@ -86,8 +91,10 @@ export def main [context: record = {}] {
                 ''      close;
             }
             server {
+                # nginx >= 1.25 用 http2 on 启用明文 h2（listen 80 http2 是旧语法，
+                # 且与 listen 80 同时出现会报 duplicate listen）
                 listen 80;
-                listen 80 http2;
+                http2 on;
                 root /srv/dashboard;
 
                 # gRPC 长连接不能被默认 60s 头超时掐断
@@ -144,6 +151,7 @@ export def main [context: record = {}] {
                     try_files $uri $uri.html =404;
                 }
                 error_page 404 /404.html;
+            }
             }
             '#
             | str trim
