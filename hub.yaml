@@ -764,7 +764,6 @@ stacks:
       - nalgebra
       - linfa
       - burn
-      - ggplot-rs
     db:
       - slatedb
       - fjall
