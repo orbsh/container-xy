@@ -146,9 +146,12 @@ export def main [context: record = {}] {
                     proxy_set_header Connection $connection_upgrade;
                     proxy_set_header Host $host;
                 }
-                # dashboard SPA：静态导出 + 路由改写
+                # dashboard SPA：静态导出 + 路由改写。
+                # 根路径与尾斜杠路径：index 指到 index.html；/invite/ 命中目录时
+                # 由 index 指令回退到 /invite/index.html（静态导出有 <route>/index.html）
+                index index.html;
                 location / {
-                    try_files $uri $uri.html =404;
+                    try_files $uri $uri.html $uri/index.html =404;
                 }
                 error_page 404 /404.html;
             }
