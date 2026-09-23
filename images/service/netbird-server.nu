@@ -161,11 +161,13 @@ export def main [context: record = {}] {
             tasks spawn {
                 tag: nginx
                 msg: 'Starting nginx: dashboard front on :80'
+                # nushell list 传参不做 shell 分词：一个完整字符串元素即可，
+                # 反斜杠转义会被字面传入（nginx 报 invalid option: "off\""）
                 cmd: [
                     /usr/sbin/nginx
                     -c /srv/nginx/dashboard.conf
                     -e /dev/stderr
-                    -g daemon\ off\;
+                    -g 'daemon off;'
                 ]
             }
             '#
