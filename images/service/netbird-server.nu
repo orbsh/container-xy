@@ -83,6 +83,10 @@ export def main [context: record = {}] {
             events {
             }
             http {
+            # -c 独立主配置不会带默认 include：必须显式加载 mime.types，
+            # 否则 js/css 按 default_type text/plain 下发，浏览器拒绝执行脚本
+            include /etc/nginx/mime.types;
+            default_type application/octet-stream;
             # Next.js 静态导出：每个路由是 <route>.html；try_files $uri $uri.html
             # =404 等价物。query string 不参与 try_files 匹配，尾斜杠由
             # $uri.html 兜住（/invite/?token=... → /invite.html）
