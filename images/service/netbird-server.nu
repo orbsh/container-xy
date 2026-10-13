@@ -374,6 +374,9 @@ export def main [context: record = {}] {
             | save entrypoint/netbird-server.nu
         }
 
+        b conf env {
+            NETBIRD_DISABLE_ANNOUNCEMENTS: 'true'
+        }
         b conf workdir $ctx.workdir
         b conf cmd ['srv']
     }
