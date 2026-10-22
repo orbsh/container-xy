@@ -59,10 +59,13 @@ export def up [
             $'chown ($owner):($owner) -R ($cargo_home)'
         ]
         b with-mount {
-            let linker = if ('usr/bin/clang' | path exists) {{
+            let clang = 'usr/bin/clang' | path exists
+            let linker = if $clang {{
                 linker: /usr/bin/clang
             }} else {{}}
-            let ld = if ('usr/local/bin/mold' | path exists) {[
+            # --ld-path is a clang driver option; gcc rejects it, so mold is only
+            # wired in when clang is the linker.
+            let ld = if $clang and ('usr/local/bin/mold' | path exists) {[
                 -C, "link-arg=--ld-path=/usr/local/bin/mold"
                 # -C, "codegen-units=16"
             ]} else {[]}

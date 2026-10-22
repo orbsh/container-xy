@@ -23,6 +23,8 @@ export def main [context: record = {}] {
         pkg install [
             rustup lldb
             musl
+            # linker for build scripts and for crates without binstall binaries
+            gcc
         ]
 
         mut cmps = []
