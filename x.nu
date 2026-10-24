@@ -89,7 +89,7 @@ export module action {
                         steps: [
                             {
                                 name: "Checkout repository",
-                                uses: "actions/checkout@v3",
+                                uses: "actions/checkout@v7",
                                 with: {
                                     submodules: "true"
                                 }
@@ -97,7 +97,7 @@ export module action {
                             {
                                 name: "Log into registry ${{ env.REGISTRY }}",
                                 if: "github.event_name != 'pull_request'",
-                                uses: "docker/login-action@v2",
+                                uses: "docker/login-action@v4",
                                 with: {
                                     registry: "${{ env.REGISTRY }}",
                                     username: "${{ env.USERNAME }}",
@@ -107,7 +107,7 @@ export module action {
                             {
                                 name: "Extract Docker metadata",
                                 id: meta,
-                                uses: "docker/metadata-action@v4",
+                                uses: "docker/metadata-action@v6",
                                 with: {
                                     images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
                                 }
