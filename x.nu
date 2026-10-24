@@ -146,7 +146,7 @@ export module action {
                             },
                             {
                                 name: "Delete untagged ghcr",
-                                uses: "Chizkiyahu/delete-untagged-ghcr-action@v3",
+                                uses: "Chizkiyahu/delete-untagged-ghcr-action@v6",
                                 with: {
                                     token: "${{ secrets.GHCR_TOKEN }}",
                                     repository: "${{ github.repository }}",
