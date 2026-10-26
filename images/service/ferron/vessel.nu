@@ -84,7 +84,7 @@ def tar-fs [f] {
 }
 
 def install [tag url loc] {
-    let file = $url | url parse | get path | path split | last
+    let file = $url | split row "?" | first | path split | last
     let file = '/tmp' | path join $file
     curl -SL --progress-bar $url -o $file
     let fs = tar-fs $file
