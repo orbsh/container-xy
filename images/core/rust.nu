@@ -56,7 +56,7 @@ export def main [context: record = {}] {
         ] --bin [
             bacon cross bugstalker
             cargo-pgo cargo-bloat # cargo-profiler
-            cargo-expand cargo-eval # cargo-tree
+            cargo-expand # cargo-eval cargo-tree
             cargo-feature cargo-edit cargo-rail
             trunk cargo-wasi
             wasm-tools wit-deps-cli wit-bindgen-cli
